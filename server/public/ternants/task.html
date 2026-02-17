@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Công việc - Opsera</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="../js/global-notification.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" type="image/png" href="../img/logo_header.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style> 
+        body { font-family: 'Nunito', sans-serif; } 
+        [x-cloak] { display: none !important; } 
+        
+        .kanban-col::-webkit-scrollbar { width: 4px; }
+        .kanban-col::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 4px; }
+        
+        div:where(.swal2-container) div:where(.swal2-popup) { font-family: 'Nunito', sans-serif !important; }
+
+        .modal-enter { opacity: 0; transform: scale(0.9); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.3s ease-out; }
+        .modal-leave { opacity: 1; transform: scale(1); }
+        .modal-leave-active { opacity: 0; transform: scale(0.9); transition: all 0.2s ease-in; }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'opsera-primary': '#2563EB',
+                        'opsera-dark': '#1F2937',
+                        'opsera-light': '#F3F4F6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-800" x-data="taskApp()" x-init="init()">
+
+    <div x-show="newNotificationModal.show" class="fixed inset-0 z-[200] flex items-center justify-center px-4" x-cloak>
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" @click="closeNotificationModal"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm relative z-10 p-6 text-center transform transition-all"
+             x-transition:enter="modal-enter-active" x-transition:enter-start="modal-enter" x-transition:enter-end="modal-enter-active"
+             x-transition:leave="modal-leave-active" x-transition:leave-start="modal-leave" x-transition:leave-end="modal-leave-active">
+            
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4" 
+                 :class="newNotificationModal.type === 'WARNING' ? 'bg-red-100' : 'bg-blue-100'">
+                <i x-show="newNotificationModal.type === 'WARNING'" class="fa-solid fa-triangle-exclamation text-3xl text-red-600"></i>
+                <i x-show="newNotificationModal.type !== 'WARNING'" class="fa-solid fa-bell text-3xl text-blue-600"></i>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-2" x-text="newNotificationModal.title"></h3>
+            <p class="text-sm text-gray-600 mb-6" x-text="newNotificationModal.message"></p>
+            
+            <button @click="closeNotificationModal" class="w-full py-3 bg-opsera-primary hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition-transform transform hover:scale-105 focus:outline-none">
+                Đã hiểu
+            </button>
+        </div>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 bg-white text-gray-800 border-r border-gray-200 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shadow-lg flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-center h-20 border-b border-gray-100">
+                    <div class="flex items-center space-x-2">
+                        <a href="/index.html"><img src="../img/aegism_logo_mini.png" alt="Logo AEGISM" class="h-[30px] w-auto"/></a>
+                    </div>
+                </div>
+
+                <nav class="mt-6 px-4 space-y-2">
+                    <a href="../ternants/dashboard.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-opsera-primary rounded-lg transition-colors">
+                        <i class="fa-solid fa-gauge-high w-6 text-center mr-2 text-lg"></i> Tổng quan
+                    </a>
+                    
+                    <template x-if="hasPermission('VIEW_PROJECTS') || hasPermission('MANAGE_PROJECT')">
+                        <a href="../ternants/project.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-opsera-primary rounded-lg transition-colors">
+                            <i class="fa-solid fa-building-user w-6 text-center mr-2 text-lg"></i> Quản lý Dự án
+                        </a>
+                    </template>
+
+                    <template x-if="hasPermission('VIEW_QR') || hasPermission('SCAN_QR') || hasPermission('CREATE_QR')">
+                        <a href="../ternants/qrcodes.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-opsera-primary rounded-lg transition-colors">
+                            <i class="fa-solid fa-qrcode w-6 text-center mr-2 text-lg"></i> Mã QR & Điểm quét
+                        </a>
+                    </template>
+
+                    <template x-if="hasPermission('VIEW_USERS') || hasPermission('MANAGE_USER')">
+                        <a href="../ternants/staff.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-opsera-primary rounded-lg transition-colors">
+                            <i class="fa-solid fa-users-gear w-6 text-center mr-2 text-lg"></i> Nhân sự & Phân quyền
+                        </a>
+                    </template>
+
+                    <a href="../ternants/task.html" class="flex items-center px-4 py-3 bg-blue-50 text-opsera-primary rounded-lg transition-colors font-semibold">
+                        <i class="fa-solid fa-list-check w-6 text-center mr-2 text-lg"></i> Công việc & Task
+                    </a>
+                    
+                    <a href="/ternants/chat.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-opsera-primary rounded-lg transition-colors group">
+                        <i class="fa-solid fa-comments w-6 text-center mr-2 text-lg"></i> Trò chuyện
+                    </a>
+
+                    <template x-if="['professional', 'enterprise'].includes(currentPlan) && (hasPermission('VIEW_REPORT') || user.isTenantAdmin)">
+                        <div class="pt-2 mt-2 border-t border-gray-100">
+                            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nâng cao</p>
+                            <a href="../ternants/report.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-purple-600 rounded-lg transition-colors">
+                                <i class="fa-solid fa-chart-line w-6 text-center mr-2 text-lg"></i> Báo cáo Thống kê
+                            </a>
+                            <a href="../ternants/audit_log.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-purple-600 rounded-lg transition-colors">
+                                <i class="fa-solid fa-clock-rotate-left w-6 text-center mr-2 text-lg"></i> Nhật ký Hoạt động
+                            </a>
+                        </div>
+                    </template>
+
+                    <template x-if="currentPlan === 'enterprise' && (user.isTenantAdmin || user.isSuperAdmin)">
+                        <div class="pt-2 mt-2 border-t border-gray-100">
+                            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Doanh nghiệp</p>
+                            <a href="../ternants/api_integration.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors">
+                                <i class="fa-solid fa-code w-6 text-center mr-2 text-lg"></i> Tích hợp API
+                            </a>
+                            <a href="../ternants/branding.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors">
+                                <i class="fa-solid fa-paint-roller w-6 text-center mr-2 text-lg"></i> Tùy chỉnh Thương hiệu
+                            </a>
+                        </div>
+                    </template>
+                </nav>
+            </div>
+            
+            <div class="p-4 border-t border-gray-200">
+                <button @click="logout" class="flex items-center w-full px-4 py-2 text-sm text-gray-600 hover:text-red-600 transition-colors">
+                    <i class="fa-solid fa-right-from-bracket w-6 text-center mr-2 text-lg"></i> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <header class="flex justify-between items-center py-4 px-6 bg-white border-b border-gray-200 shadow-sm relative z-40">
+                <div class="flex items-center">
+                    <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none lg:hidden mr-4">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-gray-800 hidden sm:block">Quản lý Công việc</h2>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                     <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                        <span class="text-xs font-medium text-gray-500 px-2">Gói:</span>
+                        <span class="text-sm font-bold text-blue-600 uppercase px-2" x-text="currentPlan"></span>
+                     </div>
+
+                    <div class="flex items-center cursor-pointer group relative">
+                        <div class="text-right mr-3 hidden sm:block">
+                            <div class="text-sm font-semibold text-gray-800" x-text="user.name">Loading...</div>
+                            <div class="text-xs text-gray-500 uppercase font-bold text-opsera-primary" x-text="user.roleName">User</div>
+                        </div>
+                        <img class="h-9 w-9 rounded-full object-cover border border-gray-200 shadow-sm" :src="user.avatar" alt="User Avatar">
+                        
+                        <div class="absolute right-0 top-full mt-2 w-48 bg-white border rounded shadow-lg p-3 hidden group-hover:block z-50">
+                            <p class="text-xs text-gray-500 truncate" x-text="user.email"></p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center w-full md:w-auto">
+                        <span class="text-gray-600 font-medium mr-3 whitespace-nowrap">Dự án:</span>
+                        <select x-model="selectedProjectId" @change="changeProject()" class="w-full md:w-64 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-opsera-primary text-gray-700 font-semibold bg-white">
+                            <template x-for="project in projects" :key="project.id">
+                                <option :value="project.id" x-text="project.name"></option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="flex w-full md:w-auto space-x-3 items-center">
+                        <label class="flex items-center cursor-pointer select-none whitespace-nowrap mr-2">
+                            <input type="checkbox" x-model="showMyTasksOnly" class="form-checkbox h-5 w-5 text-opsera-primary rounded border-gray-300 focus:ring-opsera-primary">
+                            <span class="ml-2 text-sm text-gray-700 font-medium">Công việc của tôi</span>
+                        </label>
+
+                        <div class="relative flex-1 md:w-64">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <i class="fa-solid fa-search text-gray-400"></i>
+                            </span>
+                            <input type="text" x-model="searchQuery" placeholder="Tìm công việc..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-opsera-primary text-sm">
+                        </div>
+                        
+                        <button @click="openCreateModal" 
+                                x-show="hasPermission('CREATE_TASK') || hasPermission('MANAGE_TASK')"
+                                :disabled="!selectedProjectId" 
+                                :class="!selectedProjectId ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-opsera-primary hover:bg-blue-700'" 
+                                class="flex items-center px-4 py-2 text-white rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap text-sm">
+                            <i class="fa-solid fa-plus mr-2"></i> Tạo Task
+                        </button>
+                    </div>
+                </div>
+
+                <div x-show="isLoading" class="flex justify-center py-10">
+                    <svg class="animate-spin h-8 w-8 text-opsera-primary" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </div>
+
+                <div x-show="selectedProjectId && !isLoading" class="flex flex-col lg:flex-row gap-6 h-[calc(100vh-220px)] overflow-x-auto pb-4">
+                    <div class="flex-1 flex flex-col bg-gray-100 rounded-xl border border-gray-200 min-w-[300px]">
+                        <div class="p-4 border-b border-gray-200 bg-gray-50 rounded-t-xl flex justify-between items-center sticky top-0 z-10">
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-400 mr-2"></span><h3 class="font-bold text-gray-700 uppercase text-xs tracking-wider">Chờ xử lý</h3></div>
+                            <span class="bg-white px-2 py-0.5 rounded text-xs font-bold text-gray-500 border border-gray-200 shadow-sm" x-text="tasksByStatus('PENDING').length"></span>
+                        </div>
+                        <div class="flex-1 p-3 space-y-3 overflow-y-auto kanban-col">
+                            <template x-for="task in tasksByStatus('PENDING')" :key="task.id">
+                                <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition-all group border-l-4 border-l-gray-400 relative">
+                                    <div @click="openTaskDetail(task)">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" :class="getPriorityColor(task.priority)"><span x-text="task.priority"></span></span>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800 mb-1 line-clamp-2 text-sm" x-text="task.title"></h4>
+                                        <p class="text-xs text-gray-500 line-clamp-2 mb-3" x-text="task.description"></p>
+                                    </div>
+                                    
+                                    <div x-show="!task.assigneeId" class="mb-3">
+                                        <button @click.stop="pickUpTask(task)" class="w-full py-1.5 bg-blue-50 text-blue-600 text-xs font-bold rounded border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors flex items-center justify-center">
+                                            <i class="fa-solid fa-hand-point-up mr-1.5"></i> Nhận việc này
+                                        </button>
+                                    </div>
+
+                                    <div class="flex justify-between items-center pt-3 border-t border-gray-100" @click="openTaskDetail(task)">
+                                        <div class="flex items-center space-x-1">
+                                            <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] text-gray-600 font-bold" x-text="(task.assignee?.fullName || 'U').charAt(0)"></div>
+                                            <span class="text-xs text-gray-600 truncate max-w-[80px]" x-text="task.assignee?.fullName || 'Chưa gán'"></span>
+                                        </div>
+                                        <div class="flex items-center text-xs text-gray-500" :class="isOverdue(task.deadline) ? 'text-red-500 font-bold' : ''">
+                                            <i x-show="task.deadline" class="fa-regular fa-clock mr-1"></i>
+                                            <span x-text="formatDate(task.deadline)"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col bg-blue-50 rounded-xl border border-blue-100 min-w-[300px]">
+                        <div class="p-4 border-b border-blue-200 bg-blue-100 rounded-t-xl flex justify-between items-center sticky top-0 z-10">
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span><h3 class="font-bold text-blue-800 uppercase text-xs tracking-wider">Đang thực hiện</h3></div>
+                            <span class="bg-white px-2 py-0.5 rounded text-xs font-bold text-blue-600 border border-blue-200 shadow-sm" x-text="tasksByStatus('IN_PROGRESS').length"></span>
+                        </div>
+                        <div class="flex-1 p-3 space-y-3 overflow-y-auto kanban-col">
+                            <template x-for="task in tasksByStatus('IN_PROGRESS')" :key="task.id">
+                                <div @click="openTaskDetail(task)" class="bg-white p-4 rounded-lg border border-blue-200 shadow-sm hover:shadow-md cursor-pointer transition-all border-l-4 border-l-blue-500">
+                                    <div class="flex justify-between items-start mb-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" :class="getPriorityColor(task.priority)"><span x-text="task.priority"></span></span></div>
+                                    <h4 class="font-bold text-gray-800 mb-1 line-clamp-2 text-sm" x-text="task.title"></h4>
+                                    <p class="text-xs text-gray-500 line-clamp-2 mb-3" x-text="task.description"></p>
+
+                                    <div x-show="task.assigneeId === user.id || user.isTenantAdmin" class="mb-3">
+                                        <button @click.stop="completeTask(task)" class="w-full py-1.5 bg-green-50 text-green-600 text-xs font-bold rounded border border-green-200 hover:bg-green-100 hover:border-green-300 transition-colors flex items-center justify-center">
+                                            <i class="fa-solid fa-check mr-1.5"></i> Hoàn thành
+                                        </button>
+                                    </div>
+
+                                    <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                                        <div class="flex items-center space-x-1"><div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[10px] text-blue-600 font-bold" x-text="(task.assignee?.fullName || 'U').charAt(0)"></div><span class="text-xs text-gray-600 truncate max-w-[80px]" x-text="task.assignee?.fullName || 'Chưa gán'"></span></div>
+                                        <div class="flex items-center text-xs text-gray-500" :class="isOverdue(task.deadline) ? 'text-red-500 font-bold' : ''">
+                                            <i x-show="task.deadline" class="fa-regular fa-clock mr-1"></i>
+                                            <span x-text="formatDate(task.deadline)"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col bg-green-50 rounded-xl border border-green-100 min-w-[300px]">
+                        <div class="p-4 border-b border-green-200 bg-green-100 rounded-t-xl flex justify-between items-center sticky top-0 z-10">
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span><h3 class="font-bold text-green-800 uppercase text-xs tracking-wider">Hoàn thành</h3></div>
+                            <span class="bg-white px-2 py-0.5 rounded text-xs font-bold text-green-600 border border-green-200 shadow-sm" x-text="tasksByStatus('COMPLETED').length"></span>
+                        </div>
+                        <div class="flex-1 p-3 space-y-3 overflow-y-auto kanban-col">
+                            <template x-for="task in tasksByStatus('COMPLETED')" :key="task.id">
+                                <div @click="openTaskDetail(task)" class="bg-white p-4 rounded-lg border border-green-200 shadow-sm hover:shadow-md cursor-pointer transition-all border-l-4 border-l-green-500 opacity-75 hover:opacity-100">
+                                    <div class="flex justify-between items-start mb-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" :class="getPriorityColor(task.priority)"><span x-text="task.priority"></span></span></div>
+                                    <h4 class="font-bold text-gray-800 mb-1 line-clamp-2 line-through decoration-gray-400 text-sm" x-text="task.title"></h4>
+                                    <p class="text-xs text-gray-500 line-clamp-2 mb-3" x-text="task.description"></p>
+                                    <div class="flex justify-between items-center pt-3 border-t border-gray-100"><div class="flex items-center space-x-1"><div class="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-[10px] text-green-600 font-bold" x-text="(task.assignee?.fullName || 'U').charAt(0)"></div><span class="text-xs text-gray-600 truncate max-w-[80px]" x-text="task.assignee?.fullName || 'Chưa gán'"></span></div><div class="text-xs text-gray-400 italic">Done</div></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="!selectedProjectId" class="text-center py-20">
+                    <h3 class="text-lg font-medium text-gray-900">Vui lòng chọn một dự án để xem công việc.</h3>
+                </div>
+            </main>
+        </div>
+
+        <div x-show="showDetailModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="showDetailModal = false"></div>
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
+                        <div class="flex justify-between items-start border-b border-gray-100 pb-4 mb-4">
+                            <div class="w-full mr-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider" :class="getPriorityColor(selectedTask?.priority)"><span x-text="selectedTask?.priority"></span></span>
+                                    <span class="text-xs text-gray-400">#<span x-text="selectedTask?.id.slice(0,8)"></span></span>
+                                </div>
+                                <input type="text" x-model="selectedTask.title" 
+                                       :disabled="isReadOnly"
+                                       @input="errors.detailTitle = null"
+                                       :class="[isReadOnly ? 'bg-transparent cursor-not-allowed' : 'hover:border-gray-300 focus:border-blue-500 border-transparent', errors.detailTitle ? 'border-red-500' : '']"
+                                       class="text-xl font-bold text-gray-900 border rounded px-1 -ml-1 focus:outline-none w-full">
+                                <p x-show="errors.detailTitle" x-text="errors.detailTitle" class="text-red-500 text-xs mt-1 font-semibold"></p>
+                            </div>
+                            <button @click="showDetailModal = false" class="text-gray-400 hover:text-gray-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-700 mb-1">Mô tả</h4>
+                                    <textarea x-model="selectedTask.description" 
+                                              :disabled="isReadOnly"
+                                              rows="6" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none disabled:bg-gray-50"></textarea>
+                                    <p x-show="errors.detailDesc" x-text="errors.detailDesc" class="text-red-500 text-xs mt-1 font-semibold"></p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-700 mb-1">Độ ưu tiên</h4>
+                                    <select x-model="selectedTask.priority" :disabled="isReadOnly" class="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm disabled:bg-gray-50">
+                                        <option value="LOW">Thấp</option><option value="MEDIUM">Trung bình</option><option value="HIGH">Cao</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-4 text-sm h-fit border border-gray-100">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-500 font-medium">Trạng thái:</span>
+                                    <select x-model="selectedTask.status" :disabled="isReadOnly" class="border border-gray-300 rounded px-2 py-1 text-sm font-bold w-40 disabled:bg-gray-100">
+                                        <option value="PENDING">PENDING</option><option value="IN_PROGRESS">IN_PROGRESS</option><option value="COMPLETED">COMPLETED</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-500 font-medium">Người thực hiện:</span>
+                                    <select x-model="selectedTask.assigneeId" :disabled="!hasAssignPermission" class="border border-gray-300 rounded px-2 py-1 text-sm w-40 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                        <option value="">-- Chưa gán --</option>
+                                        <template x-for="member in projectMembers" :key="member.id">
+                                            <option :value="member.id" x-text="member.fullName" :selected="member.id === selectedTask.assigneeId"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div class="border-t border-gray-200"></div>
+                                <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Hạn chót:</span><input type="datetime-local" x-model="selectedTask.deadlineInput" :disabled="isReadOnly" class="border border-gray-300 rounded px-2 py-1 text-sm w-40 disabled:bg-gray-100"></div>
+                                <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Ước tính (giờ):</span><input type="number" x-model="selectedTask.estimatedHours" :disabled="isReadOnly" class="border border-gray-300 rounded px-2 py-1 text-sm w-20 text-right disabled:bg-gray-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between border-t border-gray-100">
+                        <div>
+                            <button x-show="hasDeletePermission" @click="deleteTask" class="text-red-600 font-bold text-sm px-4 py-2 border border-red-200 rounded hover:bg-red-50">Xóa Task</button>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button @click="showDetailModal = false" class="px-4 py-2 bg-white border border-gray-300 rounded text-gray-700 hover:bg-gray-50">Đóng</button>
+                            <button x-show="!isReadOnly" @click="updateTask" class="px-4 py-2 bg-opsera-primary text-white rounded font-bold hover:bg-blue-700 shadow-sm">Lưu Cập nhật</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="showCreateModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="showCreateModal = false"></div>
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4"><h3 class="text-lg font-bold text-gray-900">Tạo Công việc Mới</h3><button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-500"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tiêu đề <span class="text-red-500">*</span></label>
+                            <input type="text" x-model="newTask.title" 
+                                   @input="errors.title = null"
+                                   :class="errors.title ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'"
+                                   class="w-full border rounded-lg px-3 py-2 font-semibold focus:outline-none focus:ring-2 transition" placeholder="Nhập tên công việc...">
+                            <p x-show="errors.title" x-text="errors.title" class="text-red-500 text-xs mt-1 font-semibold"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Mô tả</label>
+                                    <textarea x-model="newTask.description" 
+                                              @input="errors.desc = null"
+                                              :class="errors.desc ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'"
+                                              rows="5" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 transition"></textarea>
+                                    <p x-show="errors.desc" x-text="errors.desc" class="text-red-500 text-xs mt-1 font-semibold"></p>
+                                </div>
+                                <div><label class="block text-sm font-bold text-gray-700 mb-1">Độ ưu tiên</label><select x-model="newTask.priority" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-sm"><option value="LOW">Thấp</option><option value="MEDIUM">Trung bình</option><option value="HIGH">Cao</option></select></div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-4 text-sm h-fit border border-gray-100">
+                                <div class="flex justify-between items-center"><span class="text-gray-600 font-medium">Trạng thái:</span><select x-model="newTask.status" class="border border-gray-300 rounded px-2 py-1 text-sm font-bold w-40"><option value="PENDING">PENDING</option><option value="IN_PROGRESS">IN_PROGRESS</option><option value="COMPLETED">COMPLETED</option></select></div>
+                                <div class="flex justify-between items-center"><span class="text-gray-600 font-medium">Người thực hiện:</span><select x-model="newTask.assigneeId" class="border border-gray-300 rounded px-2 py-1 text-sm w-40"><option value="">-- Chưa gán --</option><template x-for="member in projectMembers" :key="member.id"><option :value="member.id" x-text="member.fullName"></option></template></select></div>
+                                <div class="border-t border-gray-200"></div>
+                                <div class="flex justify-between items-center"><span class="text-gray-600 font-medium">Hạn chót:</span><input type="datetime-local" x-model="newTask.deadlineInput" class="border border-gray-300 rounded px-2 py-1 text-sm w-40"></div>
+                                <div class="flex justify-between items-center"><span class="text-gray-600 font-medium">Ước tính (giờ):</span><input type="number" x-model="newTask.estimatedHours" min="0" class="border border-gray-300 rounded px-2 py-1 text-sm w-20 text-right"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
+                        <button @click="saveTask" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-opsera-primary text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">Tạo Công việc</button>
+                        <button @click="showCreateModal = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Hủy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function taskApp() {
+            return {
+                apiUrl: (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+                    ? 'http://localhost:3000' 
+                    : 'https://aegism.online',
+
+                sidebarOpen: false, currentPlan: 'starter', 
+                user: { name: 'User', avatar: '', roleName: 'User', id: '', isSuperAdmin: false, isTenantAdmin: false, permissions: [] },
+                
+                selectedProjectId: null, searchQuery: '', isLoading: false, showMyTasksOnly: false,
+                projects: [], tasks: [], roles: [], projectMembers: [],
+                showDetailModal: false, showCreateModal: false,
+                selectedTask: null, newTask: { title: '', description: '', priority: 'MEDIUM', estimatedHours: 0, deadlineInput: '', assigneeId: '', status: 'PENDING' },
+                
+                isReadOnly: true,
+                hasAssignPermission: false,
+                hasDeletePermission: false,
+                errors: { title: null, desc: null, detailTitle: null, detailDesc: null },
+
+                async init() {
+                    const token = localStorage.getItem('accessToken');
+                    if (!token) return window.location.href = '/login.html';
+                    
+                    const userStr = localStorage.getItem('user');
+                    if (userStr) {
+                        try {
+                            const u = JSON.parse(userStr);
+                            this.updateUserUI(u);
+                        } catch(e) {}
+                    }
+                    await this.fetchUserProfile();
+                    await this.fetchProjects();
+                    this.initNotifications();
+                },
+
+                async fetchUserProfile() {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/users/profile`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } });
+                        if (res.ok) {
+                            const u = await res.json();
+                            localStorage.setItem('user', JSON.stringify(u));
+                            this.updateUserUI(u);
+                        }
+                    } catch (e) {}
+                },
+
+                updateUserUI(u) {
+                    let roleDisplay = 'Nhân viên';
+                    let permissions = [];
+                    const isSuper = u.isSuperAdmin === true || u.isSuperAdmin === 'true';
+                    const isTenant = u.isTenantAdmin === true || u.isTenantAdmin === 'true';
+
+                    if (isSuper) { roleDisplay = 'Super Admin'; permissions = ['ALL']; }
+                    else if (isTenant) { roleDisplay = 'Quản trị viên'; permissions = ['ALL']; }
+                    else if (u.role) {
+                        roleDisplay = u.role.name;
+                        try {
+                            if (Array.isArray(u.role.permissions)) permissions = u.role.permissions;
+                            else if (typeof u.role.permissions === 'string') {
+                                try { permissions = JSON.parse(u.role.permissions); } catch { permissions = u.role.permissions.split(',').map(p => p.trim()); }
+                            }
+                        } catch (e) { permissions = []; }
+                    }
+
+                    let avatarUrl = u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.fullName)}&background=2563EB&color=fff`;
+                    if (avatarUrl.startsWith('/uploads')) avatarUrl = this.apiUrl + avatarUrl;
+
+                    this.user = { id: u.id, name: u.fullName || 'User', email: u.email, avatar: avatarUrl, roleName: roleDisplay, isSuperAdmin: isSuper, isTenantAdmin: isTenant, permissions: permissions };
+                    if(u.tenant) this.currentPlan = u.tenant.subscriptionPlan?.toLowerCase() || 'starter';
+                },
+
+                hasPermission(perm) {
+                    if (this.user.isSuperAdmin || this.user.isTenantAdmin) return true;
+                    if (this.user.permissions.includes('ALL')) return true;
+                    return this.user.permissions.includes(perm);
+                },
+
+                checkPermissionAction(perm) {
+                    if (!this.hasPermission(perm)) {
+                        Swal.fire({ icon: 'error', title: 'Truy cập bị từ chối', text: 'Bạn không có quyền thực hiện chức năng này.' });
+                        return false;
+                    }
+                    return true;
+                },
+
+                validateInput(value, type) {
+                    if (!value || (typeof value === 'string' && !value.trim())) return 'Không được để trống.';
+                    const titleRegex = /^[a-zA-Z0-9\s\u00C0-\u1EF9]+$/;
+                    const descRegex = /^[a-zA-Z0-9\s\u00C0-\u1EF9.,\-\n?()]+$/;
+                    if (type === 'title') {
+                        if (value.length > 100) return 'Quá dài (>100 ký tự).';
+                        if (!titleRegex.test(value)) return 'Chứa ký tự đặc biệt.';
+                    }
+                    return null;
+                },
+
+                validateCreateForm() {
+                    this.errors = {}; let isValid = true;
+                    const titleError = this.validateInput(this.newTask.title, 'title');
+                    if (titleError) { this.errors.title = titleError; isValid = false; }
+                    return isValid;
+                },
+
+                validateUpdateForm() {
+                    this.errors = {}; let isValid = true;
+                    const titleError = this.validateInput(this.selectedTask.title, 'title');
+                    if (titleError) { this.errors.detailTitle = titleError; isValid = false; }
+                    return isValid;
+                },
+
+                async fetchProjects() {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/projects`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } });
+                        if (res.ok) {
+                            this.projects = await res.json();
+                            if (this.projects.length > 0) { this.selectedProjectId = this.projects[0].id; this.changeProject(); }
+                        }
+                    } catch(e) {}
+                },
+
+                changeProject() { this.fetchTasks(); this.fetchMembers(); },
+
+                async fetchTasks() {
+                    if (!this.selectedProjectId) return;
+                    this.isLoading = true;
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/tasks?projectId=${this.selectedProjectId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } });
+                        if (res.ok) { const data = await res.json(); this.tasks = data.data || data.tasks || (Array.isArray(data) ? data : []); }
+                    } catch(e) {} finally { this.isLoading = false; }
+                },
+
+                async fetchMembers() {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/members?projectId=${this.selectedProjectId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } });
+                        if(res.ok) this.projectMembers = await res.json();
+                    } catch(e) {}
+                },
+
+                tasksByStatus(status) {
+                    let filtered = this.tasks.filter(t => t.status === status);
+                    if (this.showMyTasksOnly) filtered = filtered.filter(t => t.assigneeId === this.user.id);
+                    if (this.searchQuery) filtered = filtered.filter(t => t.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
+                    return filtered;
+                },
+
+                formatDateForInput(isoString) {
+                    if (!isoString) return "";
+                    const date = new Date(isoString);
+                    const offset = date.getTimezoneOffset() * 60000; 
+                    return (new Date(date.getTime() - offset)).toISOString().slice(0, 16);
+                },
+
+                openTaskDetail(task) { 
+                    this.selectedTask = JSON.parse(JSON.stringify(task)); 
+                    if (!this.selectedTask.assigneeId) this.selectedTask.assigneeId = "";
+                    this.selectedTask.deadlineInput = this.formatDateForInput(this.selectedTask.deadline);
+                    this.errors = {};
+                    
+                    this.isReadOnly = !this.hasPermission('EDIT_TASK') && !this.hasPermission('UPDATE_TASK') && !this.hasPermission('MANAGE_TASK');
+                    this.hasAssignPermission = this.hasPermission('ASSIGN_TASK') || this.hasPermission('MANAGE_TASK');
+                    this.hasDeletePermission = this.hasPermission('DELETE_TASK') || this.hasPermission('MANAGE_TASK');
+                    
+                    this.showDetailModal = true; 
+                },
+
+                openCreateModal() { 
+                    if(!this.selectedProjectId) return Swal.fire('Thông báo', 'Chọn dự án trước', 'info');
+                    if (!this.checkPermissionAction('CREATE_TASK') && !this.checkPermissionAction('MANAGE_TASK')) return;
+                    this.newTask = { title: '', description: '', priority: 'MEDIUM', estimatedHours: 0, deadlineInput: '', assigneeId: '', status: 'PENDING' };
+                    this.errors = {}; this.fetchMembers(); this.showCreateModal = true; 
+                },
+
+                async pickUpTask(task) {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/tasks/${task.id}/accept`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+                        });
+                        
+                        if (res.ok) {
+                            Swal.fire({ icon: 'success', title: 'Thành công', text: 'Bạn đã nhận công việc này.', timer: 1500, showConfirmButton: false });
+                            this.fetchTasks();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Lỗi', err.message, 'error');
+                        }
+                    } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+                },
+
+                async completeTask(task) {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/tasks/${task.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` },
+                            body: JSON.stringify({ status: 'COMPLETED' })
+                        });
+                        if (res.ok) {
+                            Swal.fire({ icon: 'success', title: 'Hoàn thành!', text: 'Task đã được chuyển sang trạng thái Hoàn thành.', timer: 1500, showConfirmButton: false });
+                            this.fetchTasks();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Lỗi', err.message, 'error');
+                        }
+                    } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+                },
+
+                async updateTask() {
+                    if (!this.validateUpdateForm()) return;
+                    if (this.isReadOnly) return; 
+
+                    const payload = {
+                        title: this.selectedTask.title,
+                        description: this.selectedTask.description,
+                        priority: this.selectedTask.priority,
+                        status: this.selectedTask.status,
+                        assigneeId: this.selectedTask.assigneeId || null,
+                        estimatedHours: Number(this.selectedTask.estimatedHours),
+                        deadline: this.selectedTask.deadlineInput ? new Date(this.selectedTask.deadlineInput).toISOString() : null
+                    };
+                    
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/tasks/${this.selectedTask.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` },
+                            body: JSON.stringify(payload)
+                        });
+                        if (res.ok) {
+                            Swal.fire({ icon: 'success', title: 'Thành công', text: 'Cập nhật công việc xong!', timer: 1500, showConfirmButton: false });
+                            this.showDetailModal = false;
+                            this.fetchTasks();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Lỗi', err.message, 'error');
+                        }
+                    } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+                },
+
+                async deleteTask() {
+                    if (!this.hasDeletePermission) return;
+                    const result = await Swal.fire({ title: 'Xóa công việc?', text: "Hành động này không thể hoàn tác!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Xóa ngay', cancelButtonText: 'Hủy' });
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/tasks/${this.selectedTask.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } });
+                        if (res.ok) { 
+                            Swal.fire('Đã xóa!', 'Công việc đã được xóa.', 'success');
+                            this.showDetailModal = false; 
+                            this.fetchTasks(); 
+                        } else { Swal.fire('Lỗi', 'Không thể xóa', 'error'); }
+                    } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+                },
+
+                async saveTask() {
+                    if (!this.validateCreateForm()) return;
+                    const payload = { 
+                        ...this.newTask, 
+                        projectId: this.selectedProjectId,
+                        assigneeId: this.newTask.assigneeId || null,
+                        deadline: this.newTask.deadlineInput ? new Date(this.newTask.deadlineInput).toISOString() : null
+                    };
+                    delete payload.deadlineInput;
+
+                    try {
+                        const res = await fetch(`${this.apiUrl}/api/tasks`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` },
+                            body: JSON.stringify(payload)
+                        });
+                        if (res.ok) { 
+                            Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đã tạo công việc mới', timer: 1500, showConfirmButton: false });
+                            this.showCreateModal = false; 
+                            this.fetchTasks(); 
+                        }
+                        else { const err = await res.json(); Swal.fire('Lỗi', err.message, 'error'); }
+                    } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+                },
+
+                getPriorityColor(p) { return p==='HIGH'?'bg-red-100 text-red-700':(p==='MEDIUM'?'bg-orange-100 text-orange-700':'bg-blue-100 text-blue-700'); },
+                formatDate(d) { 
+                    if (!d) return 'N/A';
+                    const date = new Date(d);
+                    return date.getDate().toString().padStart(2, '0') + '/' + (date.getMonth() + 1).toString().padStart(2, '0') + ' ' + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+                },
+                isOverdue(d) { return d && new Date(d) < new Date(); },
+                
+                async initNotifications() { if (Notification.permission !== "granted") Notification.requestPermission(); await this.fetchUnreadCount(); setInterval(() => this.fetchNewNotifications(), 3000); },
+                async fetchUnreadCount() { try { const res = await fetch(`${this.apiUrl}/api/notifications?limit=1`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } }); if (res.ok) { const data = await res.json(); this.unreadCount = data.unreadCount; } } catch(e) {} },
+                async fetchNewNotifications() { try { const res = await fetch(`${this.apiUrl}/api/notifications?limit=1`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } }); if (res.ok) { const data = await res.json(); const newCount = data.unreadCount; if (newCount > this.unreadCount && data.data.length > 0) { const latest = data.data[0]; if (Date.now() - new Date(latest.createdAt).getTime() < 10000) { this.newNotificationModal = { show: true, title: latest.title, message: latest.message, type: latest.type }; } } this.unreadCount = newCount; } } catch(e) {} },
+                closeNotificationModal() { this.newNotificationModal.show = false; },
+
+                logout() { Swal.fire({ title: 'Đăng xuất?', icon: 'question', showCancelButton: true, confirmButtonText: 'Đăng xuất', cancelButtonText: 'Hủy' }).then((result) => { if (result.isConfirmed) { localStorage.clear(); window.location.href = '/login.html'; } }); }
+            }
+        }
+    </script>
+</body>
+</html>
