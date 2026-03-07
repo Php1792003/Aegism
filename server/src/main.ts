@@ -8,12 +8,9 @@ import { json, urlencoded } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // --- SỬA LẠI ĐOẠN NÀY ---
-  // Dùng process.cwd() để luôn lấy đúng thư mục gốc của dự án
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads/',
   });
-  // -----------------------
 
   app.setGlobalPrefix('api');
 
@@ -23,15 +20,22 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.use(json({ limit: '200mb' }));
-  app.use(urlencoded({ extended: true, limit: '200mb' }));
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     whitelist: true
   }));
 
-  app.listen(3000, '0.0.0.0')
-  console.log(`🚀 Application is running on: ${await app.getUrl()}`);
+  const port = 3000;
+  await app.listen(port, '0.0.0.0');
+
+  const url = await app.getUrl();
+  console.log(`
+  🚀 Server đang chạy tại: ${url}
+  🏢 API Prefix: ${url}/api
+  📂 Static Assets: ${url}/uploads
+  `);
 }
 bootstrap();
