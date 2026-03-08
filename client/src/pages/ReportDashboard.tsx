@@ -32,9 +32,7 @@ interface Project {
 
 const ReportDashboard: React.FC = () => {
     // --- State Management (Tương đương x-data) ---
-    const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://localhost:3000'
-        : 'https://aegism.online';
+    const apiUrl = 'https://api.aegism.online';
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [currentPlan, setCurrentPlan] = useState('starter');

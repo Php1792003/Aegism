@@ -13,9 +13,7 @@ import { FaRegEnvelope, FaRegFolderOpen } from 'react-icons/fa';
 
 const Staff = () => {
     // --- State Management ---
-    const [apiUrl] = useState((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://localhost:3000'
-        : 'https://aegism.online');
+    const [apiUrl] = 'https://api.aegism.online';
 
     const [activeTab, setActiveTab] = useState('staff'); // staff, roles
     const [currentPlan, setCurrentPlan] = useState('starter');

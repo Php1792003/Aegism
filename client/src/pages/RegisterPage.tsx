@@ -16,9 +16,7 @@ const colors = {
     borderNormal: 'border-gray-300 focus:ring-[#2563EB]',
 };
 
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000'
-    : 'http://52.220.122.42:3000';
+const API_URL = 'https://api.aegism.online';
 
 const RegisterPage = () => {
     const navigate = useNavigate();

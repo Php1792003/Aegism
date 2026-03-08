@@ -125,7 +125,7 @@ const AboutPage = () => {
                             <div className="relative order-2 md:order-1">
                                 <div className="absolute inset-0 bg-blue-600 rounded-2xl -rotate-3 opacity-10"></div>
                                 <img
-                                    src="https://placehold.co/600x400/f3f4f6/2563EB?text=Mission+Vision"
+                                    src="../img/img_about_us.png"
                                     alt="Sứ mệnh & Tầm nhìn"
                                     className="relative rounded-2xl shadow-xl w-full object-cover"
                                 />

@@ -10,9 +10,7 @@ import { FaRegClock } from 'react-icons/fa';
 
 const Tasks = () => {
     // --- Config ---
-    const [apiUrl] = useState((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://localhost:3000'
-        : 'https://aegism.online');
+    const [apiUrl] = 'https://api.aegism.online';
 
     // --- State ---
     const [user, setUser] = useState<any>({ name: 'Loading...', id: '', isSuperAdmin: false, isTenantAdmin: false, permissions: [] });

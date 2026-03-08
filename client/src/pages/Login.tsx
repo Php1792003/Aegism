@@ -10,9 +10,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000'
-        : 'https://aegism.online';
+    const API_URL = 'https://api.aegism.online';
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -87,7 +85,6 @@ const Login = () => {
                                     e.currentTarget.style.display = 'none';
                                 }}
                             />
-                            <h1 className="text-xl font-bold mt-2 tracking-wider">AEGISM</h1>
                         </div>
                         <div className="mt-auto">
                             <h2 className="text-3xl font-bold">An ninh Thông minh</h2>

@@ -12,25 +12,23 @@ import {
     HiBolt
 } from 'react-icons/hi2';
 
-// --- CONFIGURATION & DATA ---
 const colors = {
-    primary: 'text-[#2563EB]', // aegism-blue
+    primary: 'text-[#2563EB]',
     bgPrimary: 'bg-[#2563EB]',
     bgPrimaryHover: 'hover:bg-blue-700',
-    dark: 'text-[#1F2937]',    // aegism-dark
+    dark: 'text-[#1F2937]',
     lightBg: 'bg-[#F9FAFB]',
     white: 'bg-white',
 };
 
-// Dữ liệu chi tiết các tính năng (Dễ dàng chỉnh sửa nội dung tại đây)
 const featuresData = [
     {
         id: 'feature-management',
         title: 'Trung Tâm Chỉ Huy & Quản Lý Vận Hành',
         description: 'Dashboard trung tâm giúp bạn nắm bắt toàn bộ hoạt động của đội ngũ bảo vệ/nhân viên hiện trường theo thời gian thực. Phân công nhiệm vụ và theo dõi tiến độ chỉ với vài cú click.',
         icon: <HiOutlineClipboardDocumentList className="w-6 h-6 text-white" />,
-        image: 'https://placehold.co/600x450/f3f4f6/2563EB?text=Operations+Dashboard+UI', // Thay ảnh Dashboard thực tế của bạn vào đây
-        reverse: false, // Ảnh bên phải
+        image: '../img/img_tinh_nang_1.jpg',
+        reverse: false,
         subFeatures: [
             {
                 title: 'Bản đồ số (Digital Map)',
@@ -51,9 +49,9 @@ const featuresData = [
         title: 'Giám Sát Tuần Tra Thông Minh (QR & GPS)',
         description: 'Công nghệ lõi giúp loại bỏ gian lận. Nhân viên sử dụng ứng dụng di động để quét QR Code tại các điểm chốt, hệ thống tự động đối chiếu vị trí GPS để xác thực.',
         icon: <HiOutlineQrCode className="w-6 h-6 text-white" />,
-        image: 'https://placehold.co/600x450/e0e7ff/2563EB?text=Mobile+QR+Scanning+App', // Thay ảnh App Mobile vào đây
-        reverse: true, // Ảnh bên trái
-        bgGray: true,  // Nền xám nhạt
+        image: '../img/img_tinh_nang_2.png',
+        reverse: true,
+        bgGray: true,
         subFeatures: [
             {
                 title: 'Chống gian lận vị trí',
@@ -74,8 +72,8 @@ const featuresData = [
         title: 'Hệ Thống Báo Cáo & Phân Tích Dữ Liệu',
         description: 'Biến dữ liệu thô thành thông tin giá trị. Hệ thống tự động tổng hợp báo cáo giúp Ban quản lý đánh giá hiệu suất nhân sự và chất lượng dịch vụ.',
         icon: <HiOutlineChartBarSquare className="w-6 h-6 text-white" />,
-        image: 'https://placehold.co/600x450/ffffff/2563EB?text=Analytics+&+Reporting', // Thay ảnh Báo cáo vào đây
-        reverse: false, // Ảnh bên phải
+        image: '../img/img_tinh_nang_3.png',
+        reverse: false,
         subFeatures: [
             {
                 title: 'Dashboard trực quan',
@@ -96,7 +94,6 @@ const featuresData = [
 const FeaturesPage = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    // Xử lý scroll mượt khi click anchor link
     const scrollToSection = (id: string) => {
         const element = document.getElementById(id);
         if (element) {
@@ -107,9 +104,7 @@ const FeaturesPage = () => {
     return (
         <div className="bg-white text-gray-800 font-sans">
             <main>
-                {/* --- HERO SECTION --- */}
                 <section className="relative bg-gray-50 pt-24 pb-20 overflow-hidden">
-                    {/* Abstract Background Element */}
                     <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full z-0 pointer-events-none">
                         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
                         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
@@ -124,7 +119,6 @@ const FeaturesPage = () => {
                             Khám phá bộ công cụ mạnh mẽ của AEGISM giúp bạn quản lý đội ngũ từ xa, minh bạch hóa hoạt động tuần tra và xử lý sự cố tức thì.
                         </p>
 
-                        {/* Anchor Links */}
                         <div className="mt-10 flex flex-wrap justify-center gap-4">
                             <button onClick={() => scrollToSection('feature-management')} className="flex items-center px-6 py-3 rounded-full bg-white shadow-md text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition border border-gray-100">
                                 <HiMap className="mr-2 text-blue-500" /> Quản lý Vận hành
@@ -139,7 +133,6 @@ const FeaturesPage = () => {
                     </div>
                 </section>
 
-                {/* --- FEATURES LIST (Loop Render) --- */}
                 {featuresData.map((feature) => (
                     <section
                         key={feature.id}
@@ -149,7 +142,6 @@ const FeaturesPage = () => {
                         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center`}>
 
-                                {/* Image Column */}
                                 <div className={`relative ${feature.reverse ? 'lg:order-1' : 'lg:order-2'}`}>
                                     <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl transform rotate-2 opacity-10 blur-lg"></div>
                                     <img
@@ -157,7 +149,6 @@ const FeaturesPage = () => {
                                         alt={feature.title}
                                         className="relative w-full rounded-2xl shadow-2xl border border-gray-100 transform transition-transform duration-500 hover:scale-[1.02]"
                                     />
-                                    {/* Floating Badge Example */}
                                     <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-gray-100 hidden md:block">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-green-100 rounded-full">
@@ -171,7 +162,6 @@ const FeaturesPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Text Content Column */}
                                 <div className={`${feature.reverse ? 'lg:order-2' : 'lg:order-1'}`}>
                                     <div className="flex items-center gap-3 mb-6">
                                         <div className={`p-3 rounded-lg ${colors.bgPrimary} shadow-lg shadow-blue-500/30`}>
