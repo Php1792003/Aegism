@@ -13,7 +13,7 @@ import { FaRegEnvelope, FaRegFolderOpen } from 'react-icons/fa';
 
 const Staff = () => {
     // --- State Management ---
-    const [apiUrl] = 'https://api.aegism.online';
+    const apiUrl = 'https://api.aegism.online';
 
     const [activeTab, setActiveTab] = useState('staff'); // staff, roles
     const [currentPlan, setCurrentPlan] = useState('starter');

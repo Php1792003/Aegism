@@ -13,7 +13,7 @@ import {
 
 const Projects = () => {
     // --- State Management ---
-    const [apiUrl] = 'https://api.aegism.online';
+    const apiUrl = 'https://api.aegism.online';
 
     const [currentPlan, setCurrentPlan] = useState('starter');
     const [searchQuery, setSearchQuery] = useState('');
