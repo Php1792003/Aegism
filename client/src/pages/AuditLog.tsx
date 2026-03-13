@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-// Cấu hình API URL
-const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3000'
-    : 'https://aegism.online';
+const API_URL = 'https://api.aegism.online';
 
 // Định nghĩa kiểu dữ liệu cơ bản để fix lỗi TypeScript
 interface User {

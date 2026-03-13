@@ -1,13 +1,16 @@
-import { IsNotEmpty, IsString, IsOptional, IsArray, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsBoolean, IsArray } from 'class-validator';
 
 export class CreateScanDto {
-  @IsNotEmpty()
   @IsString()
   qrCodeData: string;
 
   @IsOptional()
   @IsString()
   location?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 
   @IsOptional()
   @IsNumber()
@@ -19,11 +22,11 @@ export class CreateScanDto {
 
   @IsOptional()
   @IsNumber()
-  accuracy?: number;
+  altitude?: number;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsNumber()
+  accuracy?: number;
 
   @IsOptional()
   @IsString()
@@ -35,6 +38,14 @@ export class CreateScanDto {
 
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
   images?: string[];
+
+  @IsOptional()
+  @IsNumber()
+  suspicionScore?: number;
+
+  // ← Field mới: user xác nhận lưu tọa độ cho QR point
+  @IsOptional()
+  @IsBoolean()
+  confirmSetLocation?: boolean;
 }

@@ -145,6 +145,7 @@ model QRCode {
   isActive  Boolean    @default(true)
   latitude  Float?
   longitude Float?
+  altitude  Float?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   projectId String
@@ -207,7 +208,7 @@ model ScanLog {
   qrCode      QRCode     @relation(fields: [qrCodeId], references: [id], onUpdate: NoAction)
   tenant      Tenant     @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
   user        User       @relation(fields: [userId], references: [id], onUpdate: NoAction)
-
+  suspicionScore Int @default(0)
   @@index([qrCodeId])
   @@index([userId])
 }

@@ -18,6 +18,9 @@ import FeaturesPage from './pages/FeaturesPage';
 import ContactPage from './pages/ContactPage';
 import RequestDemoPage from './pages/RequestDemoPage';
 import RegisterPage from './pages/RegisterPage';
+import Branding from './pages/Branding';
+import ApiIntegration from './pages/ApiIntegration';
+import ProfilePage from './pages/ProfilePage';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('accessToken');
@@ -49,7 +52,10 @@ function App() {
           <Route path="chat" element={<Chat />} />
           <Route path="reports" element={<ReportDashboard />} />
           <Route path="audit-log" element={<AuditLog />} />
-        </Route>
+	  <Route path="/branding" element={<Branding />} /> 
+	  <Route path="/api-integration" element={<ApiIntegration />} />
+	  <Route path="/profile" element={<ProfilePage />} />
+	</Route>
       </Routes>
     </BrowserRouter>
   );
