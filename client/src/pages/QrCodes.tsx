@@ -571,20 +571,43 @@ const QrCodes = () => {
             }
 
         } catch (e: any) {
-            // Lỗi mạng thật sự (offline, timeout) — KHÔNG hiện "Kết nối bị gián đoạn" khi đã check-in xong
             console.error('Network error:', e);
-            // Thử fetch lại logs để xem check-in có thực sự thành công không
-            await fetchLogs();
-            // Nếu status VALID → kiểm tra log mới nhất
             if (status === 'VALID') {
-                // Không hiện lỗi, fetchLogs sẽ cập nhật bảng — user tự thấy kết quả
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Mất kết nối tạm thời',
-                    text: 'Vui lòng kiểm tra nhật ký để xác nhận check-in.',
-                    timer: 2500,
-                    showConfirmButton: false,
-                });
+                // Fetch logs kiểm tra server đã ghi chưa
+                try {
+                    const logsRes = await fetch(`${apiUrl}/api/scans`, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+                    });
+                    if (logsRes.ok) {
+                        const logsData = await logsRes.json();
+                        const arr = Array.isArray(logsData) ? logsData : (logsData.logs || []);
+                        const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+                        const tenSeconds = Date.now() - 10000;
+                        const recentLog = arr.find((l: any) =>
+                            l.user?.id === userId &&
+                            l.status === 'VALID' &&
+                            new Date(l.scannedAt).getTime() > tenSeconds
+                        );
+                        if (recentLog) {
+                            // Server đã ghi thành công
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Check-in thành công!',
+                                html: `<p class="text-sm text-gray-500">Đã ghi nhận tại <b>${recentLog.qrCode?.name || 'điểm quét'}</b></p>`,
+                                timer: 2000,
+                                showConfirmButton: false,
+                            });
+                            setLastScanTime(Date.now());
+                            setScanLogs(prev => [recentLog, ...prev.slice(0, 49)]);
+                        } else {
+                            Swal.fire({ icon: 'warning', title: 'Mất kết nối tạm thời', text: 'Vui lòng thử lại.', timer: 2500, showConfirmButton: false });
+                        }
+                    } else {
+                        Swal.fire({ icon: 'warning', title: 'Mất kết nối tạm thời', text: 'Vui lòng thử lại.', timer: 2500, showConfirmButton: false });
+                    }
+                } catch {
+                    Swal.fire({ icon: 'warning', title: 'Mất kết nối tạm thời', text: 'Vui lòng thử lại.', timer: 2500, showConfirmButton: false });
+                }
             }
             resumeScanning();
         }
@@ -797,15 +820,74 @@ const QrCodes = () => {
                     issueDescription: incidentForm.description, images: incidentForm.images,
                 }),
             });
-            if (res.ok || res.status === 201) {
-                Swal.fire({ icon: 'success', title: 'Đã báo cáo sự cố!', timer: 1500, showConfirmButton: false });
-                setShowIssueModal(false); setIncidentForm({ description: '', images: [] });
-                fetchLogs(); fetchIncidents(); resumeScanning();
+
+            // Parse body trước, dù thành công hay lỗi
+            let resBody: any = {};
+            try { resBody = await res.json(); } catch { /* body rỗng */ }
+
+            if (res.ok) {
+                // Báo cáo sự cố thành công
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Báo cáo thành công!',
+                    text: 'Sự cố đã được ghi nhận và chuyển đến quản lý.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+                setShowIssueModal(false);
+                setIncidentForm({ description: '', images: [] });
+                fetchLogs();
+                fetchIncidents();
+                resumeScanning();
             } else {
-                const err = await res.json().catch(() => ({}));
-                Swal.fire({ icon: 'error', title: 'Không thể báo cáo', text: err.message || 'Vui lòng thử lại.' });
+                const errMsg = resBody?.message || 'Vui lòng thử lại.';
+                if (res.status === 400 && errMsg.includes('Thao tác quá nhanh')) {
+                    Swal.fire({ icon: 'warning', title: '⏱ Quá nhanh!', text: errMsg, timer: 2500, showConfirmButton: false });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Không thể báo cáo', text: errMsg });
+                }
             }
-        } catch { Swal.fire({ icon: 'error', title: 'Lỗi kết nối', text: 'Không thể kết nối máy chủ.' }); }
+        } catch (e: any) {
+            console.error('submitIncident error:', e);
+            // Fetch logs kiểm tra server đã ghi incident chưa
+            try {
+                const logsRes = await fetch(`${apiUrl}/api/scans`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+                });
+                if (logsRes.ok) {
+                    const logsData = await logsRes.json();
+                    const arr = Array.isArray(logsData) ? logsData : (logsData.logs || []);
+                    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+                    const tenSeconds = Date.now() - 10000;
+                    const recentIncident = arr.find((l: any) =>
+                        l.user?.id === userId &&
+                        l.status === 'ISSUE' &&
+                        new Date(l.scannedAt).getTime() > tenSeconds
+                    );
+                    if (recentIncident) {
+                        // Server đã ghi thành công
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Hệ thống đã ghi nhận sự cố!',
+                            text: 'Sự cố đang được chuyển đến bộ phận liên quan.',
+                            timer: 2500,
+                            showConfirmButton: false,
+                        });
+                        setShowIssueModal(false);
+                        setIncidentForm({ description: '', images: [] });
+                        fetchLogs();
+                        fetchIncidents();
+                        resumeScanning();
+                    } else {
+                        Swal.fire({ icon: 'warning', title: 'Mất kết nối', text: 'Vui lòng kiểm tra lại kết nối và thử lại.', confirmButtonText: 'OK' });
+                    }
+                } else {
+                    Swal.fire({ icon: 'warning', title: 'Mất kết nối', text: 'Vui lòng kiểm tra lại kết nối và thử lại.', confirmButtonText: 'OK' });
+                }
+            } catch {
+                Swal.fire({ icon: 'warning', title: 'Mất kết nối', text: 'Vui lòng kiểm tra lại kết nối và thử lại.', confirmButtonText: 'OK' });
+            }
+        }
         setIsSubmitting(false);
     };
 
