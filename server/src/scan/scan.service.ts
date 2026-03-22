@@ -6,11 +6,18 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateScanDto } from './dto/create-scan.dto';
+import { AiAnalysisService } from '../report/ai-analysis.service';
+import { IncidentService } from '../incident/incident.service';
 
 @Injectable()
 export class ScanService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    private aiService: AiAnalysisService,
+    private incidentService: IncidentService,
+  ) { }
 
+  // ── Tính khoảng cách ngang Haversine (2D) ──────────────────────────────────
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371000;
     const toRad = (val: number) => (val * Math.PI) / 180;
@@ -25,7 +32,8 @@ export class ScanService {
   }
 
   async create(dto: CreateScanDto, userId: string, tenantId: string) {
-    // 1. Validate Images
+
+    // ── 1. Validate Images ─────────────────────────────────────────────────────
     if (dto.images && dto.images.length > 0) {
       if (dto.images.length > 5) throw new BadRequestException('Tối đa 5 ảnh.');
       const maxSize = 20 * 1024 * 1024;
@@ -34,7 +42,7 @@ export class ScanService {
       }
     }
 
-    // 2. Validate QR Code
+    // ── 2. Validate QR Code ────────────────────────────────────────────────────
     const qrCode = await this.prisma.qRCode.findUnique({
       where: { data: dto.qrCodeData },
       include: { project: true },
@@ -42,9 +50,9 @@ export class ScanService {
     if (!qrCode || qrCode.tenantId !== tenantId)
       throw new ForbiddenException('Lỗi quyền truy cập hoặc QR không tồn tại.');
 
-    // 3. RATE LIMIT 30s — áp dụng cho TẤT CẢ trạng thái kể cả INVALID_LOCATION
+    // ── 3. Rate Limit 30s — áp dụng cho TẤT CẢ trạng thái ────────────────────
     const lastScan = await this.prisma.scanLog.findFirst({
-      where: { userId, tenantId },  // không filter status → chặn cả spam INVALID
+      where: { userId, tenantId },
       orderBy: { scannedAt: 'desc' },
       select: { scannedAt: true },
     });
@@ -55,11 +63,12 @@ export class ScanService {
       }
     }
 
-    // 4. CALIBRATION MODE: QR chưa có tọa độ + user xác nhận lưu vị trí
+    // ── 4. Calibration Mode ────────────────────────────────────────────────────
     if (
       (qrCode.latitude == null || qrCode.longitude == null) &&
       dto.confirmSetLocation === true &&
-      dto.latitude != null && dto.longitude != null
+      dto.latitude != null &&
+      dto.longitude != null
     ) {
       await this.prisma.qRCode.update({
         where: { id: qrCode.id },
@@ -73,8 +82,10 @@ export class ScanService {
         data: {
           qrCodeId: qrCode.id, userId, tenantId,
           location: dto.location,
-          latitude: dto.latitude, longitude: dto.longitude,
-          accuracy: dto.accuracy, status: 'VALID',
+          latitude: dto.latitude,
+          longitude: dto.longitude,
+          accuracy: dto.accuracy,
+          status: 'VALID',
           notes: '[Calibration] Đã lưu tọa độ điểm quét',
         },
         include: {
@@ -84,7 +95,7 @@ export class ScanService {
       });
     }
 
-    // 5. PENDING MODE: QR chưa có tọa độ, chưa confirm → hỏi xác nhận
+    // ── 5. Pending Mode: QR chưa có tọa độ ───────────────────────────────────
     if (qrCode.latitude == null || qrCode.longitude == null) {
       return {
         __needsCalibration: true,
@@ -94,26 +105,24 @@ export class ScanService {
       };
     }
 
-    // 6. GEOFENCING — chỉ check khi QR đã có tọa độ + user gửi tọa độ
+    // ── 6. Geofencing 3m ──────────────────────────────────────────────────────
     if (dto.latitude != null && dto.longitude != null) {
-      // Chỉ tính ngang, BỎ altitude để tránh drift dọc gây false positive
       const dist = this.calculateDistance(
         dto.latitude, dto.longitude,
         qrCode.latitude, qrCode.longitude,
       );
-
       if (dist > 3) {
-        // Ghi log INVALID nhưng KHÔNG throw — trả về flag để frontend xử lý modal
         await this.prisma.scanLog.create({
           data: {
             qrCodeId: qrCode.id, userId, tenantId,
             location: dto.location,
-            latitude: dto.latitude, longitude: dto.longitude,
-            accuracy: dto.accuracy, status: 'INVALID_LOCATION',
+            latitude: dto.latitude,
+            longitude: dto.longitude,
+            accuracy: dto.accuracy,
+            status: 'INVALID_LOCATION',
             notes: `Cách điểm QR ${Math.round(dist)}m`,
           },
         });
-        // Trả về object thay vì throw → frontend nhận được, không vào catch
         return {
           __invalidLocation: true,
           distance: Math.round(dist),
@@ -122,14 +131,18 @@ export class ScanService {
       }
     }
 
-    // 7. VALID — Ghi log check-in
-    return this.prisma.$transaction(async (tx) => {
-      const scanLog = await tx.scanLog.create({
+    // ── 7. Xử lý ISSUE: AI phân loại → tạo Incident → tạo Task → thông báo ───
+    if (dto.status === 'ISSUE') {
+
+      // 7a. Ghi ScanLog ISSUE trước
+      const scanLog = await this.prisma.scanLog.create({
         data: {
           qrCodeId: qrCode.id, userId, tenantId,
           location: dto.location,
-          latitude: dto.latitude, longitude: dto.longitude,
-          accuracy: dto.accuracy, status: dto.status || 'VALID',
+          latitude: dto.latitude,
+          longitude: dto.longitude,
+          accuracy: dto.accuracy,
+          status: 'ISSUE',
           notes: dto.notes,
         },
         include: {
@@ -138,24 +151,84 @@ export class ScanService {
         },
       });
 
-      if (dto.status === 'ISSUE') {
-        const incident = await tx.incident.create({
-          data: {
-            description: dto.issueDescription || dto.notes || 'Reported via Scan',
-            status: 'OPEN', tenantId, projectId: qrCode.projectId,
-            qrCodeId: qrCode.id, scanLogId: scanLog.id, reporterId: userId,
-          },
+      // 7b. Gọi AI phân loại sự cố (ngoài transaction để tránh timeout rollback)
+      let assignedDepartment: string | null = null;
+      try {
+        const projectRoles = await this.prisma.role.findMany({
+          where: { tenantId },
+          select: { name: true },
         });
-        if (dto.images?.length) {
-          await tx.incidentImage.createMany({
-            data: dto.images.map((img) => ({ incidentId: incident.id, url: img })),
-          });
+        const departments = projectRoles.map(r => r.name).filter(Boolean);
+
+        if (departments.length > 0) {
+          const classification = await this.aiService.classifyIncident(
+            dto.issueDescription || dto.notes || '',
+            qrCode.location || '',
+            departments,
+          );
+          assignedDepartment = classification.department;
+          console.log(
+            `[AI] Sự cố tại "${qrCode.name}" → phân công "${assignedDepartment}" (${classification.confidence}%)`
+          );
+        }
+      } catch (e) {
+        console.error('AI classify error (bỏ qua, dùng mặc định):', e?.message);
+      }
+
+      // 7c. Tạo Incident qua IncidentService (lưu ảnh đúng cách)
+      const incidentResult = await this.incidentService.create(
+        {
+          projectId: qrCode.projectId,
+          qrCode: dto.qrCodeData,
+          description: dto.issueDescription || dto.notes || 'Reported via Scan',
+          images: dto.images || [],
+        },
+        tenantId,
+        userId,
+      );
+
+      // 7d. Nếu AI phân loại được bộ phận → gọi assignIncident:
+      //     tạo Task, copy ảnh sang Task, cập nhật Incident.department,
+      //     gửi thông báo đến toàn bộ user có role tương ứng
+      if (assignedDepartment && incidentResult.incidentId) {
+        try {
+          await this.incidentService.assignIncident(
+            incidentResult.incidentId,
+            assignedDepartment,
+            tenantId,
+            userId,
+          );
+          console.log(
+            `[AI] Đã tạo Task và thông báo bộ phận "${assignedDepartment}" cho sự cố ${incidentResult.incidentId}`
+          );
+        } catch (e) {
+          // Không throw — sự cố đã được lưu, chỉ phân công thất bại
+          console.error('assignIncident error (sự cố đã lưu):', e?.message);
         }
       }
+
       return scanLog;
+    }
+
+    // ── 8. VALID: Ghi ScanLog bình thường ────────────────────────────────────
+    return this.prisma.scanLog.create({
+      data: {
+        qrCodeId: qrCode.id, userId, tenantId,
+        location: dto.location,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        accuracy: dto.accuracy,
+        status: dto.status || 'VALID',
+        notes: dto.notes,
+      },
+      include: {
+        qrCode: { select: { name: true, location: true } },
+        user: { select: { fullName: true } },
+      },
     });
   }
 
+  // ── findAll ────────────────────────────────────────────────────────────────
   async findAll(tenantId: string, limit: number = 50, offset: number = 0) {
     const logs = await this.prisma.scanLog.findMany({
       where: { tenantId },
@@ -172,6 +245,7 @@ export class ScanService {
     return { logs, total };
   }
 
+  // ── findByQrCode ───────────────────────────────────────────────────────────
   async findByQrCode(qrCodeId: string, tenantId: string) {
     const qrCode = await this.prisma.qRCode.findFirst({ where: { id: qrCodeId, tenantId } });
     if (!qrCode) throw new NotFoundException('QR code not found or access denied.');
@@ -186,6 +260,7 @@ export class ScanService {
     });
   }
 
+  // ── findMyScans ────────────────────────────────────────────────────────────
   async findMyScans(userId: string, tenantId: string) {
     return this.prisma.scanLog.findMany({
       where: { userId, tenantId },
