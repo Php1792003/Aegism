@@ -47,6 +47,7 @@
     "crypto": "^1.0.1",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
+    "firebase-admin": "^13.7.0",
     "generate-password": "^1.7.1",
     "hbs": "^4.2.0",
     "html5-qrcode": "^2.3.8",
