@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import PaymentModal from '../components/PaymentModal';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
@@ -37,6 +38,7 @@ const MainLayout = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const notifRef = useRef<HTMLDivElement>(null);
     const isFirstLoad = useRef(true);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:3000' : 'https://api.aegism.online';
@@ -148,6 +150,13 @@ const MainLayout = () => {
                 const u = await res.json();
                 localStorage.setItem('user', JSON.stringify(u));
                 updateUserUI(u);
+                // Check expiry
+                if (u.tenant?.subscriptionExpiresAt) {
+                    const exp = new Date(u.tenant.subscriptionExpiresAt);
+                    if (exp < new Date()) setShowPaymentModal(true);
+                } else {
+                    setShowPaymentModal(true);
+                }
                 if (u.tenant?.subscriptionPlan) {
                     const plan = u.tenant.subscriptionPlan.toLowerCase();
                     setCurrentPlan(plan);
@@ -315,6 +324,7 @@ const MainLayout = () => {
                     </div>
                 </header>
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6"><Outlet /></main>
+            <PaymentModal isOpen={showPaymentModal} isExpired={true} />
             </div>
         </div>
     );

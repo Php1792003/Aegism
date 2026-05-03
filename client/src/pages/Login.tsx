@@ -39,7 +39,7 @@ const Login = () => {
             // 3. Chuyển hướng
             // Nếu là SuperAdmin -> Vào trang Admin, ngược lại vào Dashboard thường
             if (data.user.isSuperAdmin) {
-                navigate('/dashboard');
+                navigate('/super-admin/dashboard');
             } else {
                 navigate('/dashboard');
             }

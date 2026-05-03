@@ -1,7 +1,16 @@
+import * as os from 'os';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { AuthService } from '../auth/auth.service';
+
+
+function formatUptime(seconds: number): string {
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return `${d}d ${h}h ${m}m`;
+}
 
 @Injectable()
 export class MasterAdminService {
@@ -71,4 +80,45 @@ export class MasterAdminService {
       user.role           // Tham số 7: role object
     );
   }
+
+  async getSystemStats() {
+    const cpus = os.cpus();
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const uptime = os.uptime();
+
+    // CPU usage (average across cores)
+    const cpuUsage = cpus.map(cpu => {
+      const total = Object.values(cpu.times).reduce((a, b) => a + b, 0);
+      const idle = cpu.times.idle;
+      return Math.round((1 - idle / total) * 100);
+    });
+    const avgCpu = Math.round(cpuUsage.reduce((a, b) => a + b, 0) / cpuUsage.length);
+
+    // Disk usage via /proc/mounts (Linux)
+    let diskTotal = 0, diskUsed = 0;
+    try {
+      const { execSync } = require('child_process');
+      const dfOutput = execSync("df / --output=size,used --block-size=1 | tail -1").toString().trim();
+      const [size, used] = dfOutput.split(/\s+/).map(Number);
+      diskTotal = size;
+      diskUsed = used;
+    } catch {}
+
+    // Tenant stats
+    const tenantCount = await this.prisma.tenant.count();
+    const userCount = await this.prisma.user.count();
+    const incidentCount = await this.prisma.incident.count();
+
+    return {
+      cpu: { usage: avgCpu, cores: cpus.length, model: cpus[0]?.model || 'Unknown' },
+      memory: { total: totalMem, used: usedMem, free: freeMem, percent: Math.round((usedMem / totalMem) * 100) },
+      disk: { total: diskTotal, used: diskUsed, free: diskTotal - diskUsed, percent: diskTotal ? Math.round((diskUsed / diskTotal) * 100) : 0 },
+      uptime: { seconds: uptime, formatted: formatUptime(uptime) },
+      os: { platform: os.platform(), hostname: os.hostname(), arch: os.arch() },
+      stats: { tenants: tenantCount, users: userCount, incidents: incidentCount }
+    };
+  }
+
 }

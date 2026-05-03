@@ -36,6 +36,12 @@ export class MasterAdminController {
     return this.masterAdminService.updateTenant(id, updateTenantDto);
   }
 
+  
+  @Get('system-stats')
+  getSystemStats() {
+    return this.masterAdminService.getSystemStats();
+  }
+
   @Post('impersonate/:userId')
   async impersonate(@Param('userId') userId: string) {
     return this.masterAdminService.impersonateUser(userId);

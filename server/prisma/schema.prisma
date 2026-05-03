@@ -28,6 +28,7 @@ model Tenant {
   qrcodes               QRCode[]
   rateLimitLogs         RateLimitLog[]
   rateLimitRules        RateLimitRule[]
+  paymentOrders         PaymentOrder[]
   roles                 Role[]
   scanLogs              ScanLog[]
   subscriptions         Subscription[]
@@ -621,4 +622,16 @@ model MessageDeletedFor {
   user      User     @relation(fields: [userId], references: [id], onUpdate: NoAction)
 
   @@id([messageId, userId])
+}
+
+model PaymentOrder {
+  id        String   @id @default(uuid())
+  orderCode String   @unique
+  tenantId  String
+  plan      String
+  amount    Int
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  @@index([tenantId])
 }

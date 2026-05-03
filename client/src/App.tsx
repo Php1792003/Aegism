@@ -1,3 +1,5 @@
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import SuperAdminLayout from './layouts/SuperAdminLayout';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
@@ -21,10 +23,18 @@ import RegisterPage from './pages/RegisterPage';
 import Branding from './pages/Branding';
 import ApiIntegration from './pages/ApiIntegration';
 import ProfilePage from './pages/ProfilePage';
-
+import SuperAdminCustomers from './pages/SuperAdminCustomers';
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('accessToken');
   return token ? children : <Navigate to="/login" />;
+};
+
+const SuperAdminRoute = ({ children }: { children: JSX.Element }) => {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return <Navigate to="/login" />;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!user.isSuperAdmin) return <Navigate to="/dashboard" />;
+  return children;
 };
 
 function App() {
@@ -42,7 +52,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Các trang cần đăng nhập sẽ nằm trong MainLayout */}
+        {/* User routes */}
         <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="projects" element={<Project />} />
@@ -52,10 +62,16 @@ function App() {
           <Route path="chat" element={<Chat />} />
           <Route path="reports" element={<ReportDashboard />} />
           <Route path="audit-log" element={<AuditLog />} />
-	  <Route path="/branding" element={<Branding />} /> 
-	  <Route path="/api-integration" element={<ApiIntegration />} />
-	  <Route path="/profile" element={<ProfilePage />} />
-	</Route>
+          <Route path="/branding" element={<Branding />} />
+          <Route path="/api-integration" element={<ApiIntegration />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+
+        {/* Super Admin routes */}
+        <Route element={<SuperAdminRoute><SuperAdminLayout /></SuperAdminRoute>}>
+          <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+	  <Route path="/super-admin/customers" element={<SuperAdminCustomers />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
