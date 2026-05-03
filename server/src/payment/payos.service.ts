@@ -1,23 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import * as crypto from 'crypto';
+
 const { PayOS } = require('@payos/node');
 
 @Injectable()
 export class PayosService {
     private payos: any;
-
-    constructor(
-        private configService: ConfigService,
-        private prisma: PrismaService,
-    ) {
-        this.payos = new PayOS(
-            this.configService.get<string>('PAYOS_CLIENT_ID')!,
-            this.configService.get<string>('PAYOS_API_KEY')!,
-            this.configService.get<string>('PAYOS_CHECKSUM_KEY')!,
-        );
-    }
 
     readonly PLANS: Record<string, { name: string; price: number; days: number }> = {
         STARTER: { name: 'Gói Starter', price: 499000, days: 30 },
@@ -25,15 +15,41 @@ export class PayosService {
         ENTERPRISE: { name: 'Gói Enterprise', price: 1499000, days: 30 },
     };
 
+    constructor(private configService: ConfigService, private prisma: PrismaService) {
+        this.payos = new PayOS(
+            this.configService.get<string>('PAYOS_CLIENT_ID'),
+            this.configService.get<string>('PAYOS_API_KEY'),
+            this.configService.get<string>('PAYOS_CHECKSUM_KEY'),
+        );
+    }
+
+    private createSignature(data: Record<string, any>): string {
+        const checksumKey = this.configService.get<string>('PAYOS_CHECKSUM_KEY')!;
+        const sortedKeys = Object.keys(data).sort();
+        const signStr = sortedKeys.map(k => `${k}=${data[k]}`).join('&');
+        return crypto.createHmac('sha256', checksumKey).update(signStr).digest('hex');
+    }
+
     async createPaymentLink(tenantId: string, plan: string, userInfo: { fullName: string; email: string }) {
         const planInfo = this.PLANS[plan.toUpperCase()];
         if (!planInfo) throw new BadRequestException('Gói không hợp lệ');
 
-        const orderCode = Date.now();
+        const orderCode = Math.floor(Date.now() / 1000);
         const returnUrl = this.configService.get<string>('PAYOS_RETURN_URL')!;
         const cancelUrl = this.configService.get<string>('PAYOS_CANCEL_URL')!;
+        const description = `AEGISM ${plan.toUpperCase()}`;
 
-        // Lưu order vào DB để webhook xử lý
+        // Tạo signature
+        const signData = {
+            amount: planInfo.price,
+            cancelUrl,
+            description,
+            orderCode,
+            returnUrl,
+        };
+        const signature = this.createSignature(signData);
+
+        // Lưu order
         await this.prisma.paymentOrder.create({
             data: {
                 orderCode: String(orderCode),
@@ -44,58 +60,70 @@ export class PayosService {
             }
         });
 
-        const paymentData = {
+        // Gọi PayOS API
+        const response = await this.payos.paymentRequests.create({
             orderCode,
             amount: planInfo.price,
-            description: `AEGISM ${planInfo.name}`,
+            description,
             buyerName: userInfo.fullName,
             buyerEmail: userInfo.email,
             items: [{ name: planInfo.name, quantity: 1, price: planInfo.price }],
             returnUrl,
             cancelUrl,
-        };
+            signature,
+        });
 
-        const response = await this.payos.createPaymentLink(paymentData);
-        return { checkoutUrl: response.checkoutUrl, orderCode };
+        return {
+            checkoutUrl: response.checkoutUrl,
+            qrCode: response.qrCode,
+            orderCode: String(orderCode),
+        };
     }
 
     async handleWebhook(webhookData: any) {
         try {
-            const data = this.payos.verifyPaymentWebhookData(webhookData);
-            if (data.code !== '00') return { success: false };
+            const checksumKey = this.configService.get<string>('PAYOS_CHECKSUM_KEY')!;
+            const { signature, ...data } = webhookData.data || webhookData;
+            const sortedKeys = Object.keys(data).sort();
+            const signStr = sortedKeys.map(k => `${k}=${data[k]}`).join('&');
+            const expectedSig = crypto.createHmac('sha256', checksumKey).update(signStr).digest('hex');
 
-            const order = await this.prisma.paymentOrder.findUnique({
-                where: { orderCode: String(data.orderCode) }
-            });
+            if (expectedSig !== (webhookData.signature || signature)) {
+                return { success: false, message: 'Invalid signature' };
+            }
+
+            const orderCode = String(data.orderCode);
+            const order = await this.prisma.paymentOrder.findUnique({ where: { orderCode } });
             if (!order || order.status === 'PAID') return { success: true };
 
-            // Gia hạn tenant 30 ngày
-            const planInfo = this.PLANS[order.plan];
-            const tenant = await this.prisma.tenant.findUnique({ where: { id: order.tenantId } });
-            const baseDate = (tenant?.subscriptionExpiresAt && tenant.subscriptionExpiresAt > new Date())
-                ? tenant.subscriptionExpiresAt : new Date();
-            const newExpiry = new Date(baseDate);
-            newExpiry.setDate(newExpiry.getDate() + planInfo.days);
-
-            await this.prisma.tenant.update({
-                where: { id: order.tenantId },
-                data: {
-                    subscriptionPlan: order.plan,
-                    subscriptionExpiresAt: newExpiry,
-                    isActive: true,
-                }
-            });
-
-            await this.prisma.paymentOrder.update({
-                where: { orderCode: String(data.orderCode) },
-                data: { status: 'PAID' }
-            });
+            if (data.code === '00' || webhookData.code === '00') {
+                await this.processPayment(order);
+            }
 
             return { success: true };
         } catch (e) {
             console.error('Webhook error:', e);
             return { success: false };
         }
+    }
+
+    private async processPayment(order: any) {
+        const planInfo = this.PLANS[order.plan];
+        const tenant = await this.prisma.tenant.findUnique({ where: { id: order.tenantId } });
+        const baseDate = (tenant?.subscriptionExpiresAt && tenant.subscriptionExpiresAt > new Date())
+            ? tenant.subscriptionExpiresAt : new Date();
+        const newExpiry = new Date(baseDate);
+        newExpiry.setDate(newExpiry.getDate() + planInfo.days);
+
+        await this.prisma.tenant.update({
+            where: { id: order.tenantId },
+            data: { subscriptionPlan: order.plan, subscriptionExpiresAt: newExpiry, isActive: true }
+        });
+
+        await this.prisma.paymentOrder.update({
+            where: { orderCode: order.orderCode },
+            data: { status: 'PAID' }
+        });
     }
 
     async getPaymentStatus(orderCode: string) {

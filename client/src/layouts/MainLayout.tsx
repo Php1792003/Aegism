@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import PaymentModal from '../components/PaymentModal';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
@@ -36,9 +35,9 @@ const MainLayout = () => {
     const [notifications, setNotifications] = useState<any[]>([]);
     const [notifOpen, setNotifOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [showExpiredModal, setShowExpiredModal] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
     const isFirstLoad = useRef(true);
-    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:3000' : 'https://api.aegism.online';
@@ -68,36 +67,29 @@ const MainLayout = () => {
         return 'Trung tâm Điều hành';
     };
 
-    const playSound = () => {
-        notifSound.currentTime = 0;
-        notifSound.play().catch(() => {});
-    };
+    const playSound = () => { notifSound.currentTime = 0; notifSound.play().catch(() => {}); };
 
     const fetchNotifications = async () => {
         const token = localStorage.getItem('accessToken');
         if (!token) return;
         try {
-            const res = await fetch(`${apiUrl}/api/notifications?limit=20`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await fetch(`${apiUrl}/api/notifications?limit=20`, { headers: { Authorization: `Bearer ${token}` } });
             if (res.ok) {
                 const data = await res.json();
                 setNotifications(data);
                 setUnreadCount(data.filter((n: any) => !n.isRead).length);
             }
-        } catch (e) { console.error('Fetch notifications error:', e); }
+        } catch {}
     };
 
     const markAsRead = async (id: string) => {
         const token = localStorage.getItem('accessToken');
         if (!token) return;
         try {
-            await fetch(`${apiUrl}/api/notifications/${id}/read`, {
-                method: 'PUT', headers: { Authorization: `Bearer ${token}` }
-            });
+            await fetch(`${apiUrl}/api/notifications/${id}/read`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` } });
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch (e) { console.error('Mark read error:', e); }
+        } catch {}
     };
 
     const markAllAsRead = () => notifications.filter(n => !n.isRead).forEach(n => markAsRead(n.id));
@@ -136,7 +128,7 @@ const MainLayout = () => {
     useEffect(() => {
         const userStr = localStorage.getItem('user');
         const planStr = localStorage.getItem('userPlan');
-        if (userStr) { try { updateUserUI(JSON.parse(userStr)); } catch (e) { console.error(e); } }
+        if (userStr) { try { updateUserUI(JSON.parse(userStr)); } catch {} }
         if (planStr) setCurrentPlan(planStr);
         fetchUserProfile();
     }, []);
@@ -150,12 +142,10 @@ const MainLayout = () => {
                 const u = await res.json();
                 localStorage.setItem('user', JSON.stringify(u));
                 updateUserUI(u);
-                // Check expiry
-                if (u.tenant?.subscriptionExpiresAt) {
-                    const exp = new Date(u.tenant.subscriptionExpiresAt);
-                    if (exp < new Date()) setShowPaymentModal(true);
-                } else {
-                    setShowPaymentModal(true);
+                // Check hết hạn - chỉ với user thường, không check SuperAdmin
+                if (!u.isSuperAdmin) {
+                    const exp = u.tenant?.subscriptionExpiresAt ? new Date(u.tenant.subscriptionExpiresAt) : null;
+                    if (!exp || exp < new Date()) setShowExpiredModal(true);
                 }
                 if (u.tenant?.subscriptionPlan) {
                     const plan = u.tenant.subscriptionPlan.toLowerCase();
@@ -206,6 +196,7 @@ const MainLayout = () => {
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden font-sans text-gray-800">
             {sidebarOpen && <div className="fixed inset-0 z-40 bg-black bg-opacity-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+
             <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-lg lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div>
                     <div className="relative flex items-center justify-center h-20 border-b border-gray-100 px-4">
@@ -252,17 +243,9 @@ const MainLayout = () => {
                             <span className={`text-sm font-bold uppercase px-2 ${planStyle.text}`}>{planStyle.label}</span>
                         </div>
 
-                        {/* NOTIFICATION BELL */}
                         <div className="relative" ref={notifRef}>
-                            <button
-                                onClick={() => { setNotifOpen(prev => !prev); fetchNotifications(); }}
-                                className="relative p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none"
-                            >
-                                {unreadCount > 0 && (
-                                    <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
-                                        {unreadCount > 99 ? '99+' : unreadCount}
-                                    </span>
-                                )}
+                            <button onClick={() => { setNotifOpen(prev => !prev); fetchNotifications(); }} className="relative p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none">
+                                {unreadCount > 0 && <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">{unreadCount > 99 ? '99+' : unreadCount}</span>}
                                 <HiOutlineBell className="text-2xl" />
                             </button>
                             {notifOpen && (
@@ -275,8 +258,7 @@ const MainLayout = () => {
                                         {notifications.length === 0
                                             ? <div className="p-6 text-center text-gray-400 text-sm">Không có thông báo nào</div>
                                             : notifications.map(n => (
-                                                <div key={n.id} onClick={() => handleNotifClick(n)}
-                                                    className={`flex items-start gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${!n.isRead ? 'bg-blue-50' : ''}`}>
+                                                <div key={n.id} onClick={() => handleNotifClick(n)} className={`flex items-start gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${!n.isRead ? 'bg-blue-50' : ''}`}>
                                                     <span className="text-lg flex-shrink-0 mt-0.5">{getNotifIcon(n.type)}</span>
                                                     <div className="flex-1 min-w-0">
                                                         <p className={`text-sm ${!n.isRead ? 'font-semibold text-gray-800' : 'text-gray-600'}`}>{n.title}</p>
@@ -285,8 +267,7 @@ const MainLayout = () => {
                                                     </div>
                                                     {!n.isRead && <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />}
                                                 </div>
-                                            ))
-                                        }
+                                            ))}
                                     </div>
                                 </div>
                             )}
@@ -315,7 +296,7 @@ const MainLayout = () => {
                                         <div className="flex items-center text-sm text-gray-600"><span className="truncate w-full">{user.email}</span></div>
                                         <div className="flex items-center text-sm text-gray-600"><span>Tenant: <span className="font-semibold">{user.tenantName}</span></span></div>
                                     </div>
-                                    <div className="mt-5 pt-3 border-t border-gray-100 flex justify-between items-center">
+                                    <div className="mt-5 pt-3 border-t border-gray-100">
                                         <Link to="/profile" className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors">Cài đặt tài khoản</Link>
                                     </div>
                                 </div>
@@ -323,9 +304,30 @@ const MainLayout = () => {
                         </div>
                     </div>
                 </header>
+
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6"><Outlet /></main>
-            <PaymentModal isOpen={showPaymentModal} isExpired={true} />
             </div>
+
+            {showExpiredModal && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" />
+                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-3xl">⏰</span>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Tài khoản hết hạn</h2>
+                        <p className="text-gray-500 mb-6">Gói dịch vụ của bạn đã hết hạn. Vui lòng gia hạn để tiếp tục sử dụng đầy đủ tính năng.</p>
+                        <div className="space-y-3">
+                            <button onClick={() => { navigate('/pricing'); setShowExpiredModal(false); }} className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors">
+                                🚀 Xem gói & Gia hạn ngay
+                            </button>
+                            <button onClick={() => setShowExpiredModal(false)} className="w-full py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+                                Tiếp tục dùng thử (giới hạn tính năng)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
