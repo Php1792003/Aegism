@@ -7,8 +7,20 @@ const apiUrl = (window.location.hostname === 'localhost' || window.location.host
 
 interface Colors { primary: string; bgPrimary: string; bgPrimaryHover: string; dark: string; lightBg: string; cardBg: string; borderPrimary: string; }
 interface UserInfo { fullName: string; email: string; phone: string; company: string; }
+const DISCOUNT_CODES: Record<string, {type: 'percent'|'fixed', value: number, label: string}> = {
+    'AEGISM20': { type: 'percent', value: 20, label: 'Giảm 20%' },
+    'WELCOME': { type: 'fixed', value: 100000, label: 'Giảm 100.000đ' },
+    'SALE50': { type: 'percent', value: 50, label: 'Giảm 50%' },
+    'NEW100': { type: 'fixed', value: 200000, label: 'Giảm 200.000đ' },
+};
+
 const PLAN_KEY_MAP: Record<string, string> = { starter: 'STARTER', business: 'PROFESSIONAL' };
 const formatMoney = (n: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
+const applyDiscount = (price: number, discount: {type: 'percent'|'fixed', value: number} | null) => {
+    if (!discount) return price;
+    if (discount.type === 'percent') return Math.max(0, price - Math.round(price * discount.value / 100));
+    return Math.max(0, price - discount.value);
+};
 const fmtCountdown = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 const PricingPage = () => {
@@ -21,6 +33,10 @@ const PricingPage = () => {
     const [checkoutUrl, setCheckoutUrl] = useState('');
     const [countdown, setCountdown] = useState(600);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [discountCode, setDiscountCode] = useState('');
+    const [discountResult, setDiscountResult] = useState<{valid: boolean; type: 'percent'|'fixed'; value: number; message: string} | null>(null);
+    const [checkingCode, setCheckingCode] = useState(false);
     const [userInfo, setUserInfo] = useState<UserInfo>({ fullName: '', email: '', phone: '', company: '' });
     const pollingRef = useRef<any>(null);
     const countdownRef = useRef<any>(null);
@@ -43,13 +59,34 @@ const PricingPage = () => {
     const toggleCycle = () => setCycle(p => p === 'monthly' ? 'yearly' : 'monthly');
 
     const openModal = (plan: 'starter' | 'business') => {
-        if (!isLoggedIn) { navigate('/login'); return; }
+        if (!isLoggedIn) { setShowLoginModal(true); return; }
         setSelectedPlan(plan); setPaymentStep('info'); setOrderCode(''); setCheckoutUrl(''); setIsModalOpen(true);
+    };
+
+    const checkDiscountCode = async () => {
+        if (!discountCode.trim()) return;
+        setCheckingCode(true);
+        await new Promise(r => setTimeout(r, 500));
+        const code = discountCode.trim().toUpperCase();
+        const found = DISCOUNT_CODES[code];
+        if (found) {
+            setDiscountResult({ valid: true, type: found.type, value: found.value, message: `✅ Áp dụng thành công: ${found.label}` });
+        } else {
+            setDiscountResult({ valid: false, type: 'percent', value: 0, message: '❌ Mã giảm giá không hợp lệ hoặc đã hết hạn' });
+        }
+        setCheckingCode(false);
+    };
+
+    const getFinalPrice = () => {
+        const base = calculateSubTotal();
+        if (!discountResult?.valid) return base;
+        return applyDiscount(base, discountResult);
     };
 
     const closeModal = () => {
         clearInterval(pollingRef.current); clearInterval(countdownRef.current);
         setIsModalOpen(false); setPaymentStep('info'); setOrderCode(''); setCheckoutUrl('');
+        setDiscountCode(''); setDiscountResult(null);
     };
 
     const handlePay = async () => {
@@ -60,7 +97,7 @@ const PricingPage = () => {
             const res = await fetch(`${apiUrl}/api/payment/payos/create`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plan: PLAN_KEY_MAP[selectedPlan] || 'STARTER' }),
+                body: JSON.stringify({ plan: PLAN_KEY_MAP[selectedPlan] || 'STARTER', discountCode: discountResult?.valid ? discountCode.toUpperCase() : undefined }),
             });
             if (!res.ok) throw new Error('Lỗi');
             const data = await res.json();
@@ -103,11 +140,6 @@ const PricingPage = () => {
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
                         <h1 className={`text-4xl md:text-5xl font-extrabold ${colors.dark} tracking-tight`}>Gói dịch vụ phù hợp cho mọi quy mô</h1>
                         <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">Chọn gói phù hợp nhất với nhu cầu của bạn. Nâng cấp, hạ cấp hoặc hủy bỏ bất cứ lúc nào.</p>
-                        {!isLoggedIn && (
-                            <div className="mt-4 inline-flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-2 rounded-lg text-sm">
-                                ⚠️ Bạn cần <Link to="/login" className="font-bold underline ml-1">đăng nhập</Link> để mua gói
-                            </div>
-                        )}
                         <div className="mt-10 flex justify-center items-center space-x-4 cursor-pointer" onClick={toggleCycle}>
                             <span className={`font-medium ${cycle === 'monthly' ? colors.dark : 'text-gray-400'}`}>Hàng tháng</span>
                             <div className="relative inline-block w-14 align-middle select-none">
@@ -183,7 +215,6 @@ const PricingPage = () => {
                                 <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"><HiXMark className="text-2xl" /></button>
                             )}
                             <div className="grid grid-cols-1 lg:grid-cols-12 h-full lg:min-h-[600px]">
-                                {/* Sidebar */}
                                 <div className="lg:col-span-4 bg-gray-50 p-6 border-r border-gray-200 flex flex-col">
                                     <h3 className="text-lg font-bold text-gray-900 mb-6">Đơn hàng của bạn</h3>
                                     <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm mb-4">
@@ -207,15 +238,31 @@ const PricingPage = () => {
                                         </div>
                                     </div>
                                     <div className="border-t border-gray-200 pt-4 mt-6">
-                                        <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                                            <span className="font-bold text-gray-900">Tổng cộng:</span>
-                                            <span className={`text-2xl font-bold ${colors.primary}`}>{formatMoney(calculateSubTotal())}</span>
+                                        <div className="mt-3 pt-3 border-t border-gray-200">
+                                            <p className="text-xs text-gray-500 mb-2 font-medium">Mã giảm giá:</p>
+                                            <div className="flex gap-2">
+                                                <input type="text" value={discountCode} onChange={e => { setDiscountCode(e.target.value.toUpperCase()); setDiscountResult(null); }} placeholder="Nhập mã..." className="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-[#4F46E5] uppercase" />
+                                                <button onClick={checkDiscountCode} disabled={checkingCode || !discountCode.trim()} className="px-3 py-1.5 bg-[#4F46E5] text-white text-xs rounded-lg font-bold disabled:opacity-40 hover:bg-indigo-700 transition-colors">
+                                                    {checkingCode ? '...' : 'Áp dụng'}
+                                                </button>
+                                            </div>
+                                            {discountResult && <p className={`text-xs mt-1.5 font-medium ${discountResult.valid ? 'text-green-600' : 'text-red-500'}`}>{discountResult.message}</p>}
+                                        </div>
+                                        <div className="flex justify-between items-center pt-3 border-t border-gray-200 mt-3">
+                                            {discountResult?.valid && (
+                                                <div className="w-full mb-2">
+                                                    <div className="flex justify-between text-sm text-gray-500"><span>Tạm tính:</span><span>{formatMoney(calculateSubTotal())}</span></div>
+                                                    <div className="flex justify-between text-sm text-green-600 font-medium"><span>Giảm giá:</span><span>-{formatMoney(calculateSubTotal() - getFinalPrice())}</span></div>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between items-center w-full border-t border-gray-100 pt-2">
+                                                <span className="font-bold text-gray-900">Tổng cộng:</span>
+                                                <span className={`text-2xl font-bold ${colors.primary}`}>{formatMoney(getFinalPrice())}</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="mt-4 text-xs text-gray-400">🔒 Bảo mật bởi PayOS & VietQR</div>
                                 </div>
-
-                                {/* Main */}
                                 <div className="lg:col-span-8 p-6 lg:p-8 relative">
                                     {paymentStep === 'info' && (
                                         <div>
@@ -238,20 +285,17 @@ const PricingPage = () => {
                                                     <input type="text" value={userInfo.company} onChange={e => setUserInfo(p => ({ ...p, company: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-[#4F46E5]" placeholder="Tên công ty" />
                                                 </div>
                                             </div>
-                                            <div className="border border-indigo-200 bg-indigo-50 rounded-xl p-4 mb-6 flex items-center gap-4">
-                                                <div>
-                                                    <p className="font-semibold text-gray-900 text-sm">Thanh toán qua PayOS</p>
-                                                    <p className="text-xs text-gray-500">Hỗ trợ VietQR & chuyển khoản ngân hàng. Xác nhận tự động.</p>
-                                                </div>
+                                            <div className="border border-indigo-200 bg-indigo-50 rounded-xl p-4 mb-6">
+                                                <p className="font-semibold text-gray-900 text-sm">Thanh toán qua PayOS</p>
+                                                <p className="text-xs text-gray-500">Hỗ trợ VietQR & chuyển khoản ngân hàng. Xác nhận tự động.</p>
                                             </div>
                                             <button onClick={handlePay} disabled={!userInfo.fullName || !userInfo.email}
                                                 className="w-full py-4 bg-[#4F46E5] text-white rounded-lg font-bold text-lg hover:bg-indigo-700 shadow-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
-                                                Thanh toán {formatMoney(calculateSubTotal())} qua PayOS
+                                                Thanh toán {formatMoney(getFinalPrice())} qua PayOS
                                             </button>
                                             {(!userInfo.fullName || !userInfo.email) && <p className="text-xs text-red-500 mt-2 text-center">* Vui lòng điền đầy đủ họ tên và email</p>}
                                         </div>
                                     )}
-
                                     {paymentStep === 'processing' && (
                                         <div className="absolute inset-0 bg-white z-10 flex flex-col items-center justify-center p-8 text-center">
                                             <div className="w-16 h-16 border-4 border-gray-200 border-t-[#4F46E5] rounded-full animate-spin mb-6"></div>
@@ -259,7 +303,6 @@ const PricingPage = () => {
                                             <p className="text-gray-500 mt-2">Vui lòng không tắt trình duyệt.</p>
                                         </div>
                                     )}
-
                                     {paymentStep === 'waiting' && (
                                         <div className="absolute inset-0 bg-white z-10 flex flex-col items-center justify-center p-8 text-center">
                                             <h3 className="text-lg font-bold mb-2">Quét mã VietQR để thanh toán</h3>
@@ -268,8 +311,7 @@ const PricingPage = () => {
                                                 <img src={`https://img.vietqr.io/image/MB-12345678-compact2.png?amount=${calculateSubTotal()}&addInfo=AEGISM${selectedPlan.toUpperCase()}${orderCode}&accountName=AEGISM`} alt="VietQR" className="w-48 h-48 object-contain" />
                                             </div>
                                             {checkoutUrl && (
-                                                <a href={checkoutUrl} target="_blank" rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 px-6 py-2 bg-[#4F46E5] text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors mb-4">
+                                                <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 bg-[#4F46E5] text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors mb-4">
                                                     🔗 Mở trang thanh toán PayOS
                                                 </a>
                                             )}
@@ -280,7 +322,6 @@ const PricingPage = () => {
                                             </div>
                                         </div>
                                     )}
-
                                     {paymentStep === 'success' && (
                                         <div className="absolute inset-0 bg-white z-10 flex flex-col items-center justify-center p-8 text-center">
                                             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -297,7 +338,6 @@ const PricingPage = () => {
                                             <Link to="/dashboard" className="px-8 py-3 bg-[#4F46E5] text-white font-bold rounded-lg shadow hover:bg-indigo-700">🚀 Vào Dashboard</Link>
                                         </div>
                                     )}
-
                                     {paymentStep === 'error' && (
                                         <div className="absolute inset-0 bg-white z-10 flex flex-col items-center justify-center p-8 text-center">
                                             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><span className="text-3xl">❌</span></div>
@@ -308,6 +348,31 @@ const PricingPage = () => {
                                     )}
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* LOGIN REQUIRED MODAL */}
+            {showLoginModal && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onClick={() => setShowLoginModal(false)} />
+                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center">
+                        <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-3xl">🔐</span>
+                        </div>
+                        <h2 className="text-xl font-bold text-gray-900 mb-2">Yêu cầu đăng nhập</h2>
+                        <p className="text-gray-500 text-sm mb-6">Để mua gói dịch vụ, bạn cần có tài khoản AEGISM. Vui lòng đăng nhập hoặc tạo tài khoản mới để tiếp tục.</p>
+                        <div className="space-y-3">
+                            <Link to="/login" className="block w-full py-3 bg-[#4F46E5] hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors">
+                                Đăng nhập ngay
+                            </Link>
+                            <Link to="/register" className="block w-full py-3 border-2 border-[#4F46E5] text-[#4F46E5] font-bold rounded-xl hover:bg-indigo-50 transition-colors">
+                                Tạo tài khoản miễn phí
+                            </Link>
+                            <button onClick={() => setShowLoginModal(false)} className="w-full py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+                                Đóng
+                            </button>
                         </div>
                     </div>
                 </div>

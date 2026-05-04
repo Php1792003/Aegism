@@ -448,7 +448,6 @@ model TaskComment {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   taskId    String
   userId    String
   tenantId  String
@@ -625,13 +624,14 @@ model MessageDeletedFor {
 }
 
 model PaymentOrder {
-  id        String   @id @default(uuid())
-  orderCode String   @unique
-  tenantId  String
-  plan      String
-  amount    Int
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
-  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  @@index([tenantId])
+    id          String   @id @default(cuid())
+    orderCode   String   @unique
+    tenantId    String
+    plan        String
+    amount      Int
+    status      String   @default("PENDING")
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    tenant      Tenant   @relation(fields: [tenantId], references: [id])
 }
