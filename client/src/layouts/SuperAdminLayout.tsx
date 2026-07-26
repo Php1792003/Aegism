@@ -16,6 +16,9 @@ const SuperAdminLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:3000' : 'https://api.aegism.online';
+
     const syncUser = () => {
         const u = JSON.parse(localStorage.getItem('user') || '{}');
         if (!u.isSuperAdmin) { navigate('/dashboard'); return; }
@@ -23,8 +26,22 @@ const SuperAdminLayout = () => {
         setUser({ name: u.fullName || u.name || 'Super Admin', avatar: avatarUrl });
     };
 
+    const fetchUserProfile = async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) return;
+            const res = await fetch(`${apiUrl}/api/users/profile`, { headers: { Authorization: `Bearer ${token}` } });
+            if (res.ok) {
+                const u = await res.json();
+                localStorage.setItem('user', JSON.stringify(u));
+                syncUser();
+            }
+        } catch (e) { console.error('SuperAdmin profile sync error:', e); }
+    };
+
     useEffect(() => {
         syncUser();
+        fetchUserProfile();
         window.addEventListener('user-profile-updated', syncUser);
         window.addEventListener('storage', syncUser);
         return () => {
@@ -173,9 +190,8 @@ const SuperAdminLayout = () => {
                                 key={item.path}
                                 to={item.path}
                                 onClick={() => setMobileSidebarOpen(false)}
-                                className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${
-                                    location.pathname === item.path ? 'text-purple-400' : 'text-gray-500 hover:text-gray-300'
-                                }`}
+                                className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${location.pathname === item.path ? 'text-purple-400' : 'text-gray-500 hover:text-gray-300'
+                                    }`}
                             >
                                 <span className="w-6 h-6">{item.icon}</span>
                                 <span className="text-[9px] font-medium leading-tight text-center">{item.shortLabel}</span>

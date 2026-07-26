@@ -383,9 +383,28 @@ const SuperAdminUsers = () => {
 
     const handleSave = async (id: string, data: any) => {
         try {
-            await api.updateUser(id, data);
+            const updatedUser = await api.updateUser(id, data);
             Toast.fire({ icon: 'success', title: 'Cập nhật thành công' });
             setEditingUser(null);
+            // Nếu user đang sửa chính là user đang đăng nhập → đồng bộ sidebar
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            if (currentUser.id === id) {
+                // Fetch lại profile đầy đủ từ server (bao gồm tenant, role, avatar path thực)
+                try {
+                    const res = await fetch(`${apiUrl}/api/users/profile`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+                    });
+                    if (res.ok) {
+                        const freshProfile = await res.json();
+                        localStorage.setItem('user', JSON.stringify(freshProfile));
+                    }
+                } catch {
+                    // Fallback: dùng response từ updateUser
+                    const merged = { ...currentUser, ...updatedUser };
+                    localStorage.setItem('user', JSON.stringify(merged));
+                }
+                window.dispatchEvent(new Event('user-profile-updated'));
+            }
             load();
         } catch { Toast.fire({ icon: 'error', title: 'Cập nhật thất bại' }); }
     };
