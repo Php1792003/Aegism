@@ -280,19 +280,22 @@ const CustomerFormModal = ({ customer, onClose, onSave, planConfigs }: { custome
 };
 
 // ─── RENEW MODAL ──────────────────────────────────────────────────────────────
-const RenewModal = ({ customer, onClose, onRenew }: { customer: Customer; onClose: () => void; onRenew: (plan: string, months: number, note: string) => void }) => {
+const RenewModal = ({ customer, onClose, onRenew, planConfigs }: { customer: Customer; onClose: () => void; onRenew: (plan: string, months: number, note: string) => void; planConfigs: any[] }) => {
+    const paidPlans = planConfigs.filter(p => p.isActive && p.monthlyPrice > 0);
     const [plan, setPlan] = useState(() => {
         let p = customer.plan.toUpperCase();
         if (p === 'FREE') p = 'NONE';
         if (p === 'PRO') p = 'BUSINESS';
-        return p;
+        // If the current plan exists in planConfigs, use it; otherwise default to first paid plan
+        const exists = paidPlans.find(pc => pc.planKey.toUpperCase() === p);
+        return exists ? p : (paidPlans[0]?.planKey?.toUpperCase() || 'STARTER');
     });
     const [months, setMonths] = useState(1);
     const [note, setNote] = useState('');
     const [saving, setSaving] = useState(false);
 
-    const planObj = PLANS.find(p => p.value === plan) || PLANS[1];
-    const total = planObj.price * months;
+    const planObj = paidPlans.find(p => p.planKey.toUpperCase() === plan);
+    const total = (planObj?.monthlyPrice || 0) * months;
     const baseDate = customer.subscriptionExpiresAt ? new Date(customer.subscriptionExpiresAt) : new Date();
     const newExpiry = new Date(Math.max(Date.now(), baseDate.getTime()));
     newExpiry.setMonth(newExpiry.getMonth() + months);
@@ -330,12 +333,12 @@ const RenewModal = ({ customer, onClose, onRenew }: { customer: Customer; onClos
                     {/* Plan selector */}
                     <div>
                         <label className="block text-xs font-medium text-gray-400 mb-2">Chọn gói gia hạn</label>
-                        <div className="grid grid-cols-2 gap-2">
-                            {PLANS.filter(p => p.value !== 'NONE').map(p => (
-                                <button key={p.value} onClick={() => setPlan(p.value)}
-                                    className={`p-3 rounded-xl border text-left transition-all ${plan === p.value ? 'border-purple-500 bg-purple-900/30' : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'}`}>
-                                    <div className={`text-sm font-semibold ${plan === p.value ? 'text-purple-300' : 'text-gray-300'}`}>{p.label}</div>
-                                    <div className="text-xs text-gray-500 mt-0.5">{fmtCurrency(p.price)}/tháng</div>
+                        <div className={`grid gap-2 ${paidPlans.length <= 2 ? 'grid-cols-2' : paidPlans.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                            {paidPlans.map(p => (
+                                <button key={p.planKey} onClick={() => setPlan(p.planKey.toUpperCase())}
+                                    className={`p-3 rounded-xl border text-left transition-all ${plan === p.planKey.toUpperCase() ? 'border-purple-500 bg-purple-900/30' : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'}`}>
+                                    <div className={`text-sm font-semibold ${plan === p.planKey.toUpperCase() ? 'text-purple-300' : 'text-gray-300'}`}>{p.displayName}</div>
+                                    <div className="text-xs text-gray-500 mt-0.5">{fmtCurrency(p.monthlyPrice)}/tháng</div>
                                 </button>
                             ))}
                         </div>
@@ -541,10 +544,10 @@ const SuperAdminCustomers = () => {
         const matchEmail = (c.adminEmail || '').toLowerCase().includes(q);
         const matchAdmin = (c.adminName || '').toLowerCase().includes(q);
         const matchSearch = !q || matchName || matchEmail || matchAdmin;
-        
+
         const cPlan = c.plan.toUpperCase() === 'PRO' ? 'BUSINESS' : (c.plan.toUpperCase() === 'FREE' ? 'NONE' : c.plan.toUpperCase());
         const matchPlan = !filterPlan || cPlan === filterPlan.toUpperCase();
-        
+
         const matchStatus = !filterStatus || c.status === filterStatus;
         return matchSearch && matchPlan && matchStatus;
     });
@@ -772,7 +775,7 @@ const SuperAdminCustomers = () => {
             {/* Modals */}
             {modal === 'create' && <CustomerFormModal planConfigs={planConfigs} onClose={() => setModal(null)} onSave={handleCreate} />}
             {modal === 'edit' && selected && <CustomerFormModal customer={selected} planConfigs={planConfigs} onClose={() => setModal(null)} onSave={handleUpdate} />}
-            {modal === 'renew' && selected && <RenewModal customer={selected} onClose={() => setModal(null)} onRenew={handleRenew} />}
+            {modal === 'renew' && selected && <RenewModal customer={selected} planConfigs={planConfigs} onClose={() => setModal(null)} onRenew={handleRenew} />}
             {detailOpen && selected && (
                 <DetailDrawer
                     customer={customers.find(c => c.id === selected.id) || selected}
