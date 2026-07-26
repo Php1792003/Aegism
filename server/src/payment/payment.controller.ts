@@ -4,12 +4,21 @@ import { PayosService } from './payos.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PrismaService } from '../prisma/prisma.service';
+
+const DEFAULT_PLANS = [
+    { planKey: 'NONE', displayName: 'Miễn phí', monthlyPrice: 0, yearlyPrice: 0, maxUsers: 2, maxProjects: 0, maxQRCodes: 0, features: [], sortOrder: 0 },
+    { planKey: 'STARTER', displayName: 'Starter', monthlyPrice: 499000, yearlyPrice: 399000, maxUsers: 10, maxProjects: 3, maxQRCodes: 100, features: ['Tối đa 10 người dùng', 'Tối đa 3 dự án', '100 mã QR', 'Quản lý công việc cơ bản', 'Báo cáo tiêu chuẩn', 'Hỗ trợ email'], sortOrder: 1 },
+    { planKey: 'BUSINESS', displayName: 'Business', monthlyPrice: 999000, yearlyPrice: 799000, maxUsers: 50, maxProjects: 20, maxQRCodes: 500, features: ['Tối đa 50 người dùng', 'Dự án không giới hạn', '500 mã QR', 'Quản lý công việc nâng cao', 'Báo cáo chi tiết', 'Chat nhóm & File sharing', 'Hỗ trợ ưu tiên 24/7', 'API Integration'], sortOrder: 2 },
+    { planKey: 'ENTERPRISE', displayName: 'Enterprise', monthlyPrice: 0, yearlyPrice: 0, maxUsers: 999, maxProjects: 999, maxQRCodes: 9999, features: ['Người dùng không giới hạn', 'Dự án không giới hạn', 'QR Code không giới hạn', 'Tính năng tùy chỉnh theo yêu cầu', 'SLA đảm bảo 99.9%', 'Dedicated support'], sortOrder: 3 },
+];
 
 @Controller('payment')
 export class PaymentController {
     constructor(
         private readonly paymentService: PaymentService,
         private readonly payosService: PayosService,
+        private readonly prisma: PrismaService,
     ) { }
 
     @Post('vnpay')
@@ -65,5 +74,23 @@ export class PaymentController {
     @UseGuards(JwtAuthGuard)
     async getPayosStatus(@Query('orderCode') orderCode: string) {
         return this.payosService.getPaymentStatus(orderCode);
+    }
+
+    // Public endpoint — no auth required (for PricingPage)
+    @Get('plan-config')
+    async getPublicPlanConfig() {
+        try {
+            const configs = await this.prisma.planConfig.findMany({
+                where: { isActive: true },
+                orderBy: { sortOrder: 'asc' },
+            });
+            if (configs.length === 0) return DEFAULT_PLANS;
+            return configs.map(c => ({
+                ...c,
+                features: (() => { try { return JSON.parse(c.features); } catch { return []; } })(),
+            }));
+        } catch {
+            return DEFAULT_PLANS;
+        }
     }
 }

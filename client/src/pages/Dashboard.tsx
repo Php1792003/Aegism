@@ -11,9 +11,11 @@ const apiUrl = (window.location.hostname === 'localhost' || window.location.host
     ? 'http://localhost:3000' : 'https://api.aegism.online';
 
 const PLAN_CONFIG: any = {
-    STARTER:      { label: 'STARTER',      color: 'blue',   price: 'Liên hệ' },
-    PROFESSIONAL: { label: 'PROFESSIONAL', color: 'purple', price: '599.000 VNĐ' },
-    ENTERPRISE:   { label: 'ENTERPRISE',   color: 'indigo', price: '1.499.000 VNĐ+' },
+    STARTER:      { label: 'STARTER',      color: 'blue',   price: '499.000 VNĐ' },
+    BUSINESS:     { label: 'BUSINESS',     color: 'purple', price: '999.000 VNĐ' },
+    PRO:          { label: 'BUSINESS',     color: 'purple', price: '999.000 VNĐ' },
+    PROFESSIONAL: { label: 'BUSINESS',     color: 'purple', price: '999.000 VNĐ' },
+    ENTERPRISE:   { label: 'ENTERPRISE',   color: 'indigo', price: 'Liên hệ' },
 };
 
 const Dashboard = () => {

@@ -209,8 +209,8 @@ const RegisterPage = () => {
                                 </button>
                             </div>
 
-                            <p className="text-center text-sm text-gray-500">
-                                Bằng việc đăng ký, bạn đồng ý với <Link to="#" className={`font-medium ${colors.primary} hover:text-blue-700`}>Điều khoản dịch vụ</Link> và <Link to="/policy" className={`font-medium ${colors.primary} hover:text-blue-700`}>Chính sách bảo mật</Link> của chúng tôi.
+                             <p className="text-center text-sm text-gray-500">
+                                Bằng việc đăng ký, bạn đồng ý với <Link to="/terms" className={`font-medium ${colors.primary} hover:text-blue-700`}>Điều khoản dịch vụ</Link> và <Link to="/policy" className={`font-medium ${colors.primary} hover:text-blue-700`}>Chính sách bảo mật</Link> của chúng tôi.
                             </p>
                         </form>
                     </div>

@@ -21,7 +21,9 @@ function headerApp() {
 
         plans: {
             starter: { name: 'STARTER', limits: { projects: 1 } },
+            pro: { name: 'PRO', limits: { projects: 5 } },
             professional: { name: 'PROFESSIONAL', limits: { projects: 5 } },
+            business: { name: 'BUSINESS', limits: { projects: 5 } },
             enterprise: { name: 'ENTERPRISE', limits: { projects: 'unlimited' } }
         },
 

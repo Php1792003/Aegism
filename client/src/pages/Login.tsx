@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { HiOutlineExclamationCircle, HiOutlineX } from 'react-icons/hi';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -8,9 +9,12 @@ const Login = () => {
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showSuspendedToast, setShowSuspendedToast] = useState(false);
     const navigate = useNavigate();
 
-    const API_URL = 'https://api.aegism.online';
+    const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:3000'
+        : 'https://api.aegism.online';
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,6 +52,10 @@ const Login = () => {
             console.error(err);
             if (err.response && err.response.status === 401) {
                 setError('Email hoặc mật khẩu không chính xác.');
+            } else if (err.response && err.response.status === 403 && 
+                      (err.response.data?.message === 'USER_SUSPENDED' || err.response.data?.message === 'TENANT_SUSPENDED')) {
+                setError('Vi phạm chính sách bảo mật của hệ thống nên đã tạm khoá tài khoản vui lòng liên hệ admin để được hỗ trợ.');
+                setShowSuspendedToast(true);
             } else {
                 setError(err.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại.');
             }
@@ -197,6 +205,27 @@ const Login = () => {
                     </div>
                 </div>
             </div>
+
+            {/* TOAST THÔNG BÁO TÀI KHOẢN BỊ KHÓA */}
+            {showSuspendedToast && (
+                <div className="fixed bottom-5 right-5 z-50 max-w-md w-full bg-red-950/90 border border-red-800 backdrop-blur-md p-4 rounded-xl shadow-2xl flex gap-3.5 transition-all duration-300">
+                    <div className="w-10 h-10 rounded-lg bg-red-900/50 flex items-center justify-center flex-shrink-0 text-red-400 border border-red-800/50">
+                        <HiOutlineExclamationCircle className="w-6 h-6 animate-bounce" />
+                    </div>
+                    <div className="flex-1">
+                        <h4 className="text-white font-bold text-sm tracking-wide uppercase">Tài khoản bị khóa</h4>
+                        <p className="text-red-200 text-xs mt-1.5 leading-relaxed font-medium">
+                            Vi phạm chính sách bảo mật của hệ thống nên đã tạm khoá tài khoản vui lòng liên hệ admin để được hỗ trợ.
+                        </p>
+                    </div>
+                    <button 
+                        onClick={() => setShowSuspendedToast(false)} 
+                        className="p-1 rounded-lg text-red-400 hover:text-white hover:bg-red-900/30 transition-colors self-start"
+                    >
+                        <HiOutlineX className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

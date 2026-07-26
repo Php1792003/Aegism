@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { getAvatar } from '../utils/helpers';
 import {
     HiOutlineHome, HiOutlineBriefcase, HiOutlineQrcode, HiOutlineUsers,
     HiOutlineClipboardList, HiOutlineChatAlt2, HiOutlineChartBar,
@@ -47,7 +48,9 @@ const MainLayout = () => {
     const getPlanStyle = (plan: string) => {
         switch (plan?.toLowerCase()) {
             case 'enterprise': return { bg: 'bg-indigo-50 border-indigo-100', text: 'text-indigo-700', label: 'ENTERPRISE' };
-            case 'professional': return { bg: 'bg-orange-50 border-orange-100', text: 'text-orange-600', label: 'PROFESSIONAL' };
+            case 'business':
+            case 'pro':
+            case 'professional': return { bg: 'bg-orange-50 border-orange-100', text: 'text-orange-600', label: 'BUSINESS' };
             default: return { bg: 'bg-blue-50 border-blue-100', text: 'text-blue-600', label: 'STARTER' };
         }
     };
@@ -131,6 +134,17 @@ const MainLayout = () => {
         if (userStr) { try { updateUserUI(JSON.parse(userStr)); } catch {} }
         if (planStr) setCurrentPlan(planStr);
         fetchUserProfile();
+
+        const handleSync = () => {
+            const currentStr = localStorage.getItem('user');
+            if (currentStr) { try { updateUserUI(JSON.parse(currentStr)); } catch {} }
+        };
+        window.addEventListener('user-profile-updated', handleSync);
+        window.addEventListener('storage', handleSync);
+        return () => {
+            window.removeEventListener('user-profile-updated', handleSync);
+            window.removeEventListener('storage', handleSync);
+        };
     }, []);
 
     const fetchUserProfile = async () => {
@@ -170,8 +184,7 @@ const MainLayout = () => {
                 else if (typeof u.role.permissions === 'string') permissions = JSON.parse(u.role.permissions);
             } catch { permissions = []; }
         }
-        let avatarUrl = u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.fullName || 'User')}&background=2563EB&color=fff`;
-        if (avatarUrl.startsWith('/uploads')) avatarUrl = `${apiUrl}${avatarUrl}`;
+        const avatarUrl = getAvatar(u);
         setUser({ id: u.id, name: u.fullName || 'Người dùng', email: u.email, avatar: avatarUrl, roleName: roleDisplay, tenantName: u.tenant?.name || '...', isSuperAdmin: isSuper, isTenantAdmin: isTenant, permissions });
     };
 
@@ -210,7 +223,7 @@ const MainLayout = () => {
                         <Link to="/staff" onClick={() => setSidebarOpen(false)} className={getLinkClass('/staff')}><HiOutlineUsers className="w-5 h-5 mr-3" />Nhân sự & Phân quyền</Link>
                         <Link to="/tasks" onClick={() => setSidebarOpen(false)} className={getLinkClass('/tasks')}><HiOutlineClipboardList className="w-5 h-5 mr-3" />Công việc & Task</Link>
                         <Link to="/chat" onClick={() => setSidebarOpen(false)} className={getLinkClass('/chat')}><HiOutlineChatAlt2 className="w-5 h-5 mr-3" />Trò chuyện</Link>
-                        {['professional', 'enterprise'].includes(currentPlan) && (
+                        {['business', 'professional', 'enterprise'].includes(currentPlan) && (
                             <div className="pt-2 mt-2 border-t border-gray-100">
                                 <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nâng cao</p>
                                 <Link to="/reports" onClick={() => setSidebarOpen(false)} className={getLinkClass('/reports', 'purple')}><HiOutlineChartBar className="w-5 h-5 mr-3" />Báo cáo Thống kê</Link>
@@ -239,7 +252,7 @@ const MainLayout = () => {
                     </div>
                     <div className="flex items-center space-x-6">
                         <div className={`hidden md:flex items-center rounded-lg p-1.5 border ${planStyle.bg}`}>
-                            <span className="text-xs font-medium text-gray-500 px-2">Gói hiện tại:</span>
+                            <span className="text-xs font-medium text-gray-500 px-2">Gói:</span>
                             <span className={`text-sm font-bold uppercase px-2 ${planStyle.text}`}>{planStyle.label}</span>
                         </div>
 
@@ -305,7 +318,45 @@ const MainLayout = () => {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6"><Outlet /></main>
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6 pb-24 lg:pb-6"><Outlet /></main>
+
+                {/* Mobile Bottom Navigation Bar */}
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
+                    <div className="flex items-center justify-around h-16 px-1">
+                        <Link to="/dashboard" onClick={() => setSidebarOpen(false)}
+                            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${location.pathname === '/dashboard' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}>
+                            <HiOutlineHome className="w-6 h-6" />
+                            <span className="text-[10px] font-medium leading-tight">Tổng quan</span>
+                        </Link>
+                        <Link to="/qrcodes" onClick={() => setSidebarOpen(false)}
+                            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${location.pathname === '/qrcodes' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}>
+                            <HiOutlineQrcode className="w-6 h-6" />
+                            <span className="text-[10px] font-medium leading-tight">QR Code</span>
+                        </Link>
+                        <Link to="/tasks" onClick={() => setSidebarOpen(false)}
+                            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${location.pathname === '/tasks' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}>
+                            <HiOutlineClipboardList className="w-6 h-6" />
+                            <span className="text-[10px] font-medium leading-tight">Công việc</span>
+                        </Link>
+                        <Link to="/chat" onClick={() => setSidebarOpen(false)}
+                            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${location.pathname === '/chat' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}>
+                            <HiOutlineChatAlt2 className="w-6 h-6" />
+                            <span className="text-[10px] font-medium leading-tight">Chat</span>
+                        </Link>
+                        <button onClick={() => setSidebarOpen(true)}
+                            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 text-gray-400 hover:text-gray-600 transition-colors relative">
+                            <div className="relative">
+                                <HiOutlineMenu className="w-6 h-6" />
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-red-500 rounded-full">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-[10px] font-medium leading-tight">Menu</span>
+                        </button>
+                    </div>
+                </nav>
             </div>
 
             {showExpiredModal && (

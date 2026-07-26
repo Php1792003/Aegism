@@ -2,7 +2,8 @@ import {
   Injectable,
   ConflictException,
   InternalServerErrorException,
-  UnauthorizedException, // Thêm cái này nếu chưa có
+  UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
@@ -39,10 +40,16 @@ export class AuthService {
     try {
       result = await this.prisma.$transaction(async (tx) => {
         // A. Tạo Tenant
+        const defaultPlan = await tx.planConfig.findUnique({
+          where: { planKey: 'STARTER' }
+        });
         const newTenant = await tx.tenant.create({
           data: {
             name: dto.companyName,
-            subscriptionPlan: 'STARTER'
+            subscriptionPlan: 'STARTER',
+            maxUsers: defaultPlan ? defaultPlan.maxUsers : 10,
+            maxProjects: defaultPlan ? defaultPlan.maxProjects : 3,
+            maxQRCodes: defaultPlan ? defaultPlan.maxQRCodes : 100,
           },
         });
 
@@ -120,6 +127,21 @@ export class AuthService {
 
     if (!user || !(await bcrypt.compare(dto.password, user.password.trim()))) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if the user is suspended or inactive
+    if (user.status === 'suspended' || user.status === 'inactive') {
+      throw new ForbiddenException('USER_SUSPENDED');
+    }
+
+    // Check if tenant is suspended (only for non-superadmins)
+    if (!user.isSuperAdmin && user.tenantId) {
+      const tenant = await this.prisma.tenant.findUnique({
+        where: { id: user.tenantId },
+      });
+      if (tenant && !tenant.isActive) {
+        throw new ForbiddenException('TENANT_SUSPENDED');
+      }
     }
 
     // ... audit log ...

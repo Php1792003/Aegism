@@ -624,14 +624,76 @@ model MessageDeletedFor {
 }
 
 model PaymentOrder {
-    id          String   @id @default(cuid())
-    orderCode   String   @unique
-    tenantId    String
-    plan        String
-    amount      Int
-    status      String   @default("PENDING")
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id             String   @id @default(cuid())
+    orderCode      String   @unique
+    tenantId       String
+    plan           String
+    amount         Int
+    originalAmount Int?
+    discountAmount Int?
+    voucherCode    String?
+    status         String   @default("PENDING")
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 
-    tenant      Tenant   @relation(fields: [tenantId], references: [id])
+    tenant         Tenant   @relation(fields: [tenantId], references: [id])
 }
+
+model PlanConfig {
+    id            String   @id @default(cuid())
+    planKey       String   @unique  // "NONE" | "STARTER" | "BUSINESS" | "ENTERPRISE"
+    displayName   String
+    monthlyPrice  Int      @default(0)
+    yearlyPrice   Int      @default(0)
+    maxUsers      Int      @default(5)
+    maxProjects   Int      @default(1)
+    maxQRCodes    Int      @default(100)
+    features      String   // JSON array string
+    isActive      Boolean  @default(true)
+    sortOrder     Int      @default(0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    @@index([planKey])
+    @@index([isActive])
+}
+
+model Voucher {
+    id            String   @id @default(cuid())
+    code          String   @unique
+    type          String   // "percent" | "fixed"
+    value         Int
+    maxUses       Int?     
+    usedCount     Int      @default(0)
+    isActive      Boolean  @default(true)
+    expiresAt     DateTime?
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+model AuditLog {
+    id             String   @id @default(cuid())
+    userId         String?
+    tenantId       String?
+    action         String
+    endpoint       String
+    method         String
+    ipAddress      String
+    userAgent      String?
+    payload        String?  @db.Text
+    headers        String?  @db.Text
+    isSuspicious   Boolean  @default(false)
+    aiAnalysis     String?  @db.Text
+    createdAt      DateTime @default(now())
+}
+
+model BlacklistedIP {
+    id             String   @id @default(cuid())
+    ipAddress      String   @unique
+    reason         String
+    evidenceLogId  String?
+    isBlocked      Boolean  @default(true)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+}
+

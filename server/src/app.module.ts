@@ -27,6 +27,9 @@ import { IncidentModule } from './incident/incident.module';
 import { ChatModule } from './chat/chat.module';
 import { UsersModule } from './users/users.module';
 import { PaymentModule } from './payment/payment.module';
+import { SecurityModule } from './security/security.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AuditInterceptor } from './security/audit.interceptor';
 
 @Module({
   imports: [
@@ -62,8 +65,15 @@ import { PaymentModule } from './payment/payment.module';
     ChatModule,
     UsersModule,
     PaymentModule,
+    SecurityModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
+    },
+  ],
 })
 export class AppModule { }

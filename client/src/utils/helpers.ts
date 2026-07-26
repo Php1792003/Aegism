@@ -1,14 +1,18 @@
 export const getAvatar = (user: any) => {
-    if (user && user.avatar && !user.avatar.includes('ui-avatars.com')) {
-        if (user.avatar.startsWith('/uploads')) {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            return API_URL + user.avatar;
+    if (user && user.avatar && user.avatar.trim() !== '') {
+        const avatar = user.avatar.trim();
+        if (avatar.startsWith('data:') || avatar.startsWith('http')) {
+            return avatar;
         }
-        return user.avatar;
+        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:3000' : 'https://api.aegism.online';
+        const normalized = avatar.startsWith('/') ? avatar : `/${avatar}`;
+        return API_URL + normalized;
     }
-    const name = user?.name || user?.fullName || 'User';
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&bold=true&size=128&font-size=0.33`;
+    const name = user?.fullName || user?.name || 'User';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4F46E5&color=fff&bold=true&size=128`;
 };
+
 
 export const formatDateTime = (isoString: string, short = false) => {
     if (!isoString) return '';

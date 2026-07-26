@@ -9,12 +9,6 @@ const { PayOS } = require('@payos/node');
 export class PayosService {
     private payos: any;
 
-    readonly PLANS: Record<string, { name: string; price: number; days: number }> = {
-        STARTER: { name: 'Gói Starter', price: 499000, days: 30 },
-        PROFESSIONAL: { name: 'Gói Professional', price: 999000, days: 30 },
-        ENTERPRISE: { name: 'Gói Enterprise', price: 1499000, days: 30 },
-    };
-
     constructor(private configService: ConfigService, private prisma: PrismaService) {
         this.payos = new PayOS(
             this.configService.get<string>('PAYOS_CLIENT_ID'),
@@ -31,17 +25,21 @@ export class PayosService {
     }
 
     async createPaymentLink(tenantId: string, plan: string, userInfo: { fullName: string; email: string }) {
-        const planInfo = this.PLANS[plan.toUpperCase()];
-        if (!planInfo) throw new BadRequestException('Gói không hợp lệ');
+        const rawPlan = plan.toUpperCase();
+        const planKey = rawPlan === 'PROFESSIONAL' ? 'BUSINESS' : rawPlan;
+        const planConfig = await this.prisma.planConfig.findUnique({
+            where: { planKey }
+        });
+        if (!planConfig || !planConfig.isActive) throw new BadRequestException('Gói không hợp lệ');
 
         const orderCode = Math.floor(Date.now() / 1000);
         const returnUrl = this.configService.get<string>('PAYOS_RETURN_URL')!;
         const cancelUrl = this.configService.get<string>('PAYOS_CANCEL_URL')!;
-        const description = `AEGISM ${plan.toUpperCase()}`;
+        const description = `AEGISM ${planKey}`;
 
         // Tạo signature
         const signData = {
-            amount: planInfo.price,
+            amount: planConfig.monthlyPrice,
             cancelUrl,
             description,
             orderCode,
@@ -54,8 +52,8 @@ export class PayosService {
             data: {
                 orderCode: String(orderCode),
                 tenantId,
-                plan: plan.toUpperCase(),
-                amount: planInfo.price,
+                plan: planKey,
+                amount: planConfig.monthlyPrice,
                 status: 'PENDING',
             }
         });
@@ -63,11 +61,11 @@ export class PayosService {
         // Gọi PayOS API
         const response = await this.payos.paymentRequests.create({
             orderCode,
-            amount: planInfo.price,
+            amount: planConfig.monthlyPrice,
             description,
             buyerName: userInfo.fullName,
             buyerEmail: userInfo.email,
-            items: [{ name: planInfo.name, quantity: 1, price: planInfo.price }],
+            items: [{ name: planConfig.displayName, quantity: 1, price: planConfig.monthlyPrice }],
             returnUrl,
             cancelUrl,
             signature,
@@ -108,16 +106,29 @@ export class PayosService {
     }
 
     private async processPayment(order: any) {
-        const planInfo = this.PLANS[order.plan];
+        const rawPlan = order.plan.toUpperCase();
+        const planKey = rawPlan === 'PROFESSIONAL' ? 'BUSINESS' : rawPlan;
+        const planConfig = await this.prisma.planConfig.findUnique({
+            where: { planKey }
+        });
+        if (!planConfig) throw new BadRequestException('Không tìm thấy cấu hình gói');
+
         const tenant = await this.prisma.tenant.findUnique({ where: { id: order.tenantId } });
         const baseDate = (tenant?.subscriptionExpiresAt && tenant.subscriptionExpiresAt > new Date())
             ? tenant.subscriptionExpiresAt : new Date();
         const newExpiry = new Date(baseDate);
-        newExpiry.setDate(newExpiry.getDate() + planInfo.days);
+        newExpiry.setDate(newExpiry.getDate() + 30);
 
         await this.prisma.tenant.update({
             where: { id: order.tenantId },
-            data: { subscriptionPlan: order.plan, subscriptionExpiresAt: newExpiry, isActive: true }
+            data: { 
+                subscriptionPlan: planKey, 
+                subscriptionExpiresAt: newExpiry, 
+                isActive: true,
+                maxUsers: planConfig.maxUsers,
+                maxProjects: planConfig.maxProjects,
+                maxQRCodes: planConfig.maxQRCodes
+            }
         });
 
         await this.prisma.paymentOrder.update({

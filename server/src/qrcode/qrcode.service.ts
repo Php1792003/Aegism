@@ -8,14 +8,6 @@ import { CreateQrCodeDto } from './dto/create-qrcode.dto';
 import { UpdateQrCodeDto } from './dto/update-qrcode.dto';
 import { AuditService } from '../audit/audit.service';
 
-type SubscriptionPlan = 'STARTER' | 'PRO' | 'ENTERPRISE';
-
-const PLAN_LIMITS: Record<SubscriptionPlan, number> = {
-  STARTER: 100,
-  PRO: 500,
-  ENTERPRISE: 2000,
-};
-
 @Injectable()
 export class QrCodeService {
   constructor(
@@ -26,7 +18,7 @@ export class QrCodeService {
   async create(dto: CreateQrCodeDto, tenantId: string, creatorId: string) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
-      select: { subscriptionPlan: true },
+      select: { subscriptionPlan: true, maxQRCodes: true },
     });
     if (!tenant) {
       throw new ForbiddenException('Tenant not found.');
@@ -35,8 +27,7 @@ export class QrCodeService {
     const currentQrCount = await this.prisma.qRCode.count({
       where: { tenantId: tenantId },
     });
-    const plan = (tenant.subscriptionPlan as SubscriptionPlan) || 'STARTER';
-    const limit = PLAN_LIMITS[plan] ?? 100;
+    const limit = tenant.maxQRCodes ?? 100;
 
     if (currentQrCount >= limit) {
       throw new ForbiddenException(

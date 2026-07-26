@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { getAvatar } from '../utils/helpers';
 import {
     HiOutlineChartBar, HiOutlineOfficeBuilding, HiOutlineUsers,
     HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX,
@@ -15,11 +16,21 @@ const SuperAdminLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    useEffect(() => {
+    const syncUser = () => {
         const u = JSON.parse(localStorage.getItem('user') || '{}');
         if (!u.isSuperAdmin) { navigate('/dashboard'); return; }
-        const avatarUrl = `https://ui-avatars.com/api/?name=Super+Admin&background=7C3AED&color=fff`;
-        setUser({ name: u.name || u.fullName || 'Super Admin', avatar: u.avatar || avatarUrl });
+        const avatarUrl = getAvatar(u);
+        setUser({ name: u.fullName || u.name || 'Super Admin', avatar: avatarUrl });
+    };
+
+    useEffect(() => {
+        syncUser();
+        window.addEventListener('user-profile-updated', syncUser);
+        window.addEventListener('storage', syncUser);
+        return () => {
+            window.removeEventListener('user-profile-updated', syncUser);
+            window.removeEventListener('storage', syncUser);
+        };
     }, []);
 
     const handleLogout = () => {
@@ -28,13 +39,14 @@ const SuperAdminLayout = () => {
     };
 
     const navItems = [
-        { path: '/super-admin/dashboard', icon: <HiOutlineChartBar className="w-5 h-5 flex-shrink-0" />, label: 'Tổng quan hệ thống' },
-        { path: '/super-admin/customers', icon: <HiOutlineOfficeBuilding className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý Khách hàng' },
-        { path: '/super-admin/users', icon: <HiOutlineUsers className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý người dùng' },
-        { path: '/super-admin/revenue', icon: <HiOutlineCurrencyDollar className="w-5 h-5 flex-shrink-0" />, label: 'Doanh thu & Gói' },
-        { path: '/super-admin/logs', icon: <HiOutlineDocumentReport className="w-5 h-5 flex-shrink-0" />, label: 'Nhật ký hệ thống' },
-        { path: '/super-admin/settings', icon: <HiOutlineCog className="w-5 h-5 flex-shrink-0" />, label: 'Cấu hình hệ thống' },
+        { path: '/super-admin/dashboard', icon: <HiOutlineChartBar className="w-5 h-5 flex-shrink-0" />, label: 'Tổng quan hệ thống', shortLabel: 'Tổng quan' },
+        { path: '/super-admin/customers', icon: <HiOutlineOfficeBuilding className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý Khách hàng', shortLabel: 'Khách hàng' },
+        { path: '/super-admin/users', icon: <HiOutlineUsers className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý người dùng', shortLabel: 'Người dùng' },
+        { path: '/super-admin/revenue', icon: <HiOutlineCurrencyDollar className="w-5 h-5 flex-shrink-0" />, label: 'Doanh thu', shortLabel: 'Doanh thu' },
+        { path: '/super-admin/plans', icon: <HiOutlineDocumentReport className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý Gói', shortLabel: 'Gói dịch vụ' },
+        { path: '/super-admin/security', icon: <HiOutlineShieldCheck className="w-5 h-5 flex-shrink-0" />, label: 'Bảo mật & Nhật ký', shortLabel: 'Bảo mật' },
     ];
+
 
     const getLinkClass = (path: string) => {
         const isActive = location.pathname === path;
@@ -149,9 +161,35 @@ const SuperAdminLayout = () => {
                         </Link>
                     </div>
                 </header>
-                <main className="flex-1 overflow-y-auto bg-gray-950 p-6">
+                <main className="flex-1 overflow-y-auto bg-gray-950 p-4 md:p-6 pb-24 lg:pb-6">
                     <Outlet />
                 </main>
+
+                {/* Mobile Bottom Navigation */}
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900 border-t border-gray-800 shadow-lg">
+                    <div className="flex items-center justify-around h-16 px-1">
+                        {navItems.slice(0, 4).map(item => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                onClick={() => setMobileSidebarOpen(false)}
+                                className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${
+                                    location.pathname === item.path ? 'text-purple-400' : 'text-gray-500 hover:text-gray-300'
+                                }`}
+                            >
+                                <span className="w-6 h-6">{item.icon}</span>
+                                <span className="text-[9px] font-medium leading-tight text-center">{item.shortLabel}</span>
+                            </Link>
+                        ))}
+                        <button
+                            onClick={() => setMobileSidebarOpen(true)}
+                            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 text-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                            <HiOutlineMenu className="w-6 h-6" />
+                            <span className="text-[9px] font-medium leading-tight">Thêm</span>
+                        </button>
+                    </div>
+                </nav>
             </div>
         </div>
     );

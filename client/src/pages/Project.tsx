@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Swal from 'sweetalert2';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
+import { getAvatar } from '../utils/helpers';
+import { useTenantLimits } from '../utils/useTenantLimits';
 
 // Import các icon tương ứng từ FontAwesome 6 trong React Icons
 import {
@@ -12,10 +14,12 @@ import {
 } from 'react-icons/fa6';
 
 const Projects = () => {
-    // --- State Management ---
-    const apiUrl = 'https://api.aegism.online';
+    const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:3000' : 'https://api.aegism.online';
 
-    const [currentPlan, setCurrentPlan] = useState('starter');
+    // ── Lấy giới hạn thực tế từ DB ──────────────────────────────────────────
+    const { limits: tenantLimits } = useTenantLimits();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [user, setUser] = useState<any>({ name: 'Loading...', email: '', avatar: '', roleName: 'User', isSuperAdmin: false, isTenantAdmin: false, permissions: [] });
@@ -37,13 +41,6 @@ const Projects = () => {
     const imageRef = useRef<HTMLImageElement>(null);
     const cropperRef = useRef<Cropper | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    // Plans Configuration
-    const plans: any = {
-        starter: { limits: { projects: 1 } },
-        professional: { limits: { projects: 5 } },
-        enterprise: { limits: { projects: 'unlimited' } }
-    };
 
     // --- Effects ---
     useEffect(() => {
@@ -111,15 +108,14 @@ const Projects = () => {
             } catch (e) { permissions = []; }
         }
 
-        let avatarUrl = u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.fullName)}&background=2563EB&color=fff`;
-        if (avatarUrl.startsWith('/uploads')) avatarUrl = `${apiUrl}${avatarUrl}`;
+        let avatarUrl = getAvatar(u);
 
         setUser({
             id: u.id, name: u.fullName || 'User', email: u.email, avatar: avatarUrl,
             roleName: roleDisplay, isSuperAdmin: isSuper, isTenantAdmin: isTenant, permissions: permissions
         });
 
-        if (u.tenant) setCurrentPlan(u.tenant.subscriptionPlan?.toLowerCase() || 'starter');
+        // plan display only - limits đến từ tenantLimits hook
     };
 
     const hasPermission = (perm: string) => {
@@ -181,11 +177,6 @@ const Projects = () => {
         });
     };
 
-    const getLimitText = (type: string) => {
-        const limit = plans[currentPlan]?.limits[type];
-        return limit === 'unlimited' ? '∞' : limit;
-    };
-
     // --- Computed Properties ---
     const filteredProjects = useMemo(() => {
         return projects.filter(project => {
@@ -198,17 +189,20 @@ const Projects = () => {
         });
     }, [projects, searchQuery, filterStatus]);
 
+    // Sử dụng giới hạn thực từ DB thay vì giá trị cố định
     const canAddProject = useMemo(() => {
-        const limit = plans[currentPlan]?.limits?.projects;
-        if (limit === 'unlimited') return true;
-        return projects.length < limit;
-    }, [projects, currentPlan, plans]);
+        return projects.length < tenantLimits.maxProjects;
+    }, [projects, tenantLimits.maxProjects]);
 
     // --- Action Handlers ---
     const createNewProject = () => {
         if (!checkPermissionAction('CREATE_PROJECT')) return;
         if (!canAddProject) {
-            Swal.fire({ icon: 'warning', title: 'Giới hạn gói', text: `Bạn đã đạt giới hạn gói ${currentPlan.toUpperCase()}.` });
+            Swal.fire({
+                icon: 'warning',
+                title: 'Đã đạt giới hạn gói',
+                text: `Gói ${tenantLimits.plan} của bạn chỉ cho phép tối đa ${tenantLimits.maxProjects} dự án. Vui lòng nâng cấp gói để tạo thêm.`,
+            });
             return;
         }
         setEditingProject({ name: '', description: '', address: '', status: 'active', image: '' });
@@ -404,8 +398,13 @@ const Projects = () => {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-500 mr-2">
-                            Đã dùng: <span className="font-bold text-gray-800">{projects.length}</span> / <span>{getLimitText('projects')}</span>
+                        <span className={`text-sm mr-2 font-medium px-3 py-1 rounded-full ${projects.length >= tenantLimits.maxProjects
+                                ? 'bg-red-100 text-red-600'
+                                : projects.length >= tenantLimits.maxProjects * 0.8
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-green-100 text-green-700'
+                            }`}>
+                            📁 {projects.length} / {tenantLimits.maxProjects} dự án
                         </span>
 
                         {(hasPermission('CREATE_PROJECT') || hasPermission('MANAGE_PROJECT')) && (
@@ -536,7 +535,7 @@ const Projects = () => {
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 font-semibold uppercase">Gói dịch vụ</p>
-                                        <p className="text-sm font-bold text-gray-800 mt-0.5 uppercase">{currentPlan}</p>
+                                        <p className="text-sm font-bold text-gray-800 mt-0.5 uppercase">{tenantLimits.plan}</p>
                                     </div>
                                 </div>
 

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -41,6 +41,22 @@ export class ProjectService {
     tenantId: string,
     creatorId: string,
   ): Promise<ProjectResponse> {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { maxProjects: true }
+    });
+    if (!tenant) {
+      throw new ForbiddenException('Tenant not found.');
+    }
+    const currentProjectsCount = await this.prisma.project.count({
+      where: { tenantId }
+    });
+    if (currentProjectsCount >= tenant.maxProjects) {
+      throw new ForbiddenException(
+        `Project limit reached for your plan (${tenant.maxProjects}). Please upgrade.`
+      );
+    }
+
     const newProject = await this.prisma.project.create({
       data: {
         name: dto.name,

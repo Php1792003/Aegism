@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { HiCheck, HiXMark, HiChevronDown, HiCheckCircle } from 'react-icons/hi2';
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -7,16 +7,30 @@ const apiUrl = (window.location.hostname === 'localhost' || window.location.host
 
 interface Colors { primary: string; bgPrimary: string; bgPrimaryHover: string; dark: string; lightBg: string; cardBg: string; borderPrimary: string; }
 interface UserInfo { fullName: string; email: string; phone: string; company: string; }
-const DISCOUNT_CODES: Record<string, {type: 'percent'|'fixed', value: number, label: string}> = {
+const DISCOUNT_CODES: Record<string, { type: 'percent' | 'fixed', value: number, label: string }> = {
     'AEGISM20': { type: 'percent', value: 20, label: 'Giảm 20%' },
     'WELCOME': { type: 'fixed', value: 100000, label: 'Giảm 100.000đ' },
     'SALE50': { type: 'percent', value: 50, label: 'Giảm 50%' },
     'NEW100': { type: 'fixed', value: 200000, label: 'Giảm 200.000đ' },
 };
 
-const PLAN_KEY_MAP: Record<string, string> = { starter: 'STARTER', business: 'PROFESSIONAL' };
+// Map planKey (uppercase from DB) -> lowercase for local state
+const toPlanKey = (k: string) => k.toLowerCase();
+const toApiPlanKey = (k: string) => k.toUpperCase();
+
+interface PlanConfig {
+    planKey: string;
+    displayName: string;
+    monthlyPrice: number;
+    yearlyPrice: number;
+    maxUsers: number;
+    maxProjects: number;
+    maxQRCodes: number;
+    features: string[];
+    isActive: boolean;
+}
 const formatMoney = (n: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
-const applyDiscount = (price: number, discount: {type: 'percent'|'fixed', value: number} | null) => {
+const applyDiscount = (price: number, discount: { type: 'percent' | 'fixed', value: number } | null) => {
     if (!discount) return price;
     if (discount.type === 'percent') return Math.max(0, price - Math.round(price * discount.value / 100));
     return Math.max(0, price - discount.value);
@@ -24,10 +38,9 @@ const applyDiscount = (price: number, discount: {type: 'percent'|'fixed', value:
 const fmtCountdown = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 const PricingPage = () => {
-    const navigate = useNavigate();
     const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<'starter' | 'business'>('starter');
+    const [selectedPlanKey, setSelectedPlanKey] = useState<string>('STARTER');
     const [paymentStep, setPaymentStep] = useState<'info' | 'processing' | 'waiting' | 'success' | 'error'>('info');
     const [orderCode, setOrderCode] = useState('');
     const [checkoutUrl, setCheckoutUrl] = useState('');
@@ -35,13 +48,16 @@ const PricingPage = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [discountCode, setDiscountCode] = useState('');
-    const [discountResult, setDiscountResult] = useState<{valid: boolean; type: 'percent'|'fixed'; value: number; message: string} | null>(null);
+    const [discountResult, setDiscountResult] = useState<{ valid: boolean; type: 'percent' | 'fixed'; value: number; message: string } | null>(null);
     const [checkingCode, setCheckingCode] = useState(false);
     const [userInfo, setUserInfo] = useState<UserInfo>({ fullName: '', email: '', phone: '', company: '' });
     const pollingRef = useRef<any>(null);
     const countdownRef = useRef<any>(null);
+    const [dynamicPlans, setDynamicPlans] = useState<PlanConfig[]>([]);
+    const [plansLoading, setPlansLoading] = useState(true);
 
-    const plans = { starter: { monthly: 499000, yearly: 399000 }, business: { monthly: 999000, yearly: 799000 } };
+    // Get current selected plan object
+    const selectedPlanObj = dynamicPlans.find(p => p.planKey === selectedPlanKey) || null;
     const colors: Colors = { primary: 'text-[#4F46E5]', bgPrimary: 'bg-[#4F46E5]', bgPrimaryHover: 'hover:bg-[#4338ca]', dark: 'text-[#1e293b]', lightBg: 'bg-[#f8fafc]', cardBg: 'bg-white', borderPrimary: 'border-[#4F46E5]' };
 
     useEffect(() => {
@@ -51,16 +67,36 @@ const PricingPage = () => {
             setIsLoggedIn(true);
             setUserInfo({ fullName: user.name || user.fullName || '', email: user.email || '', phone: user.phone || '', company: user.tenantName || user.tenant?.name || '' });
         }
+        // Fetch all active plans dynamically from API
+        setPlansLoading(true);
+        fetch(`${apiUrl}/api/payment/plan-config`)
+            .then(r => r.json())
+            .then((configs: PlanConfig[]) => {
+                // Filter active plans and exclude free/enterprise (no price) for display
+                const active = configs.filter(c => c.isActive);
+                setDynamicPlans(active);
+                // Default select first paid plan
+                const firstPaid = active.find(c => c.monthlyPrice > 0);
+                if (firstPaid) setSelectedPlanKey(firstPaid.planKey);
+            })
+            .catch(() => {
+                // Fallback static plans
+                setDynamicPlans([
+                    { planKey: 'STARTER', displayName: 'Starter', monthlyPrice: 499000, yearlyPrice: 399000, maxUsers: 10, maxProjects: 3, maxQRCodes: 100, features: ['Tối đa 10 người dùng', 'Tối đa 3 dự án', '100 mã QR', 'Hỗ trợ email'], isActive: true },
+                    { planKey: 'BUSINESS', displayName: 'Business', monthlyPrice: 999000, yearlyPrice: 799000, maxUsers: 50, maxProjects: 20, maxQRCodes: 500, features: ['Tối đa 50 người dùng', 'Dự án không giới hạn', '500 mã QR', 'Hỗ trợ ưu tiên 24/7'], isActive: true },
+                ]);
+            })
+            .finally(() => setPlansLoading(false));
         return () => { clearInterval(pollingRef.current); clearInterval(countdownRef.current); };
     }, []);
 
-    const getPlanPrice = () => plans[selectedPlan][cycle];
+    const getPlanPrice = () => selectedPlanObj ? (cycle === 'monthly' ? selectedPlanObj.monthlyPrice : selectedPlanObj.yearlyPrice) : 0;
     const calculateSubTotal = () => cycle === 'yearly' ? getPlanPrice() * 12 : getPlanPrice();
     const toggleCycle = () => setCycle(p => p === 'monthly' ? 'yearly' : 'monthly');
 
-    const openModal = (plan: 'starter' | 'business') => {
+    const openModal = (planKey: string) => {
         if (!isLoggedIn) { setShowLoginModal(true); return; }
-        setSelectedPlan(plan); setPaymentStep('info'); setOrderCode(''); setCheckoutUrl(''); setIsModalOpen(true);
+        setSelectedPlanKey(planKey); setPaymentStep('info'); setOrderCode(''); setCheckoutUrl(''); setIsModalOpen(true);
     };
 
     const checkDiscountCode = async () => {
@@ -97,7 +133,7 @@ const PricingPage = () => {
             const res = await fetch(`${apiUrl}/api/payment/payos/create`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plan: PLAN_KEY_MAP[selectedPlan] || 'STARTER', discountCode: discountResult?.valid ? discountCode.toUpperCase() : undefined }),
+                body: JSON.stringify({ plan: toApiPlanKey(selectedPlanKey), discountCode: discountResult?.valid ? discountCode.toUpperCase() : undefined }),
             });
             if (!res.ok) throw new Error('Lỗi');
             const data = await res.json();
@@ -120,16 +156,17 @@ const PricingPage = () => {
                         clearInterval(pollingRef.current); clearInterval(countdownRef.current);
                         const user = JSON.parse(localStorage.getItem('user') || '{}');
                         if (user.tenant) {
-                            user.tenant.subscriptionPlan = PLAN_KEY_MAP[selectedPlan];
+                            user.tenant.subscriptionPlan = toApiPlanKey(selectedPlanKey);
                             const exp = new Date(); exp.setDate(exp.getDate() + 30);
                             user.tenant.subscriptionExpiresAt = exp.toISOString();
                             localStorage.setItem('user', JSON.stringify(user));
-                            localStorage.setItem('userPlan', selectedPlan);
+                            localStorage.setItem('userPlan', toPlanKey(selectedPlanKey));
                         }
+                        localStorage.removeItem('tenantLimits');
                         setPaymentStep('success');
                     }
                 }
-            } catch {}
+            } catch { }
         }, 3000);
     };
 
@@ -153,41 +190,60 @@ const PricingPage = () => {
 
                 <section className="py-16 md:py-20 relative z-10">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-                            {planConfig.map((plan) => {
-                                const isBusiness = plan.id === 'business';
-                                const priceDisplay = plan.price ? formatMoney(cycle === 'monthly' ? plan.price.monthly : plan.price.yearly) : 'Liên hệ';
-                                return (
-                                    <div key={plan.id} className={`group relative flex flex-col p-8 bg-white rounded-3xl border transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ${isBusiness ? 'border-[#4F46E5] ring-1 ring-[#4F46E5] shadow-xl z-10 scale-105 md:scale-110' : 'border-gray-100 shadow-lg'}`}>
-                                        {plan.isPopular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#4F46E5] to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold uppercase">Khuyên dùng</div>}
-                                        <div className="mb-6">
-                                            <h3 className={`text-2xl font-bold ${isBusiness ? 'text-[#4F46E5]' : 'text-gray-900'}`}>{plan.name}</h3>
-                                            <p className="text-gray-500 text-sm mt-2 min-h-[40px]">{plan.description}</p>
+                        {plansLoading ? (
+                            <div className="flex justify-center items-center py-20">
+                                <div className="w-10 h-10 border-4 border-indigo-200 border-t-[#4F46E5] rounded-full animate-spin" />
+                            </div>
+                        ) : (
+                            <div className={`grid grid-cols-1 gap-8 items-start ${dynamicPlans.length === 1 ? 'md:grid-cols-1 max-w-sm mx-auto' :
+                                    dynamicPlans.length === 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' :
+                                        dynamicPlans.length === 3 ? 'md:grid-cols-3' :
+                                            'md:grid-cols-2 lg:grid-cols-4'
+                                }`}>
+                                {dynamicPlans.map((plan, idx) => {
+                                    const isPaid = plan.monthlyPrice > 0;
+                                    const isHighlighted = idx === Math.floor(dynamicPlans.filter(p => p.monthlyPrice > 0).length / 2) && isPaid;
+                                    const priceDisplay = isPaid ? formatMoney(cycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice) : 'Liên hệ';
+                                    const savingsPerYear = isPaid && plan.monthlyPrice > plan.yearlyPrice
+                                        ? (plan.monthlyPrice - plan.yearlyPrice) * 12
+                                        : 0;
+                                    return (
+                                        <div key={plan.planKey} className={`group relative flex flex-col p-8 bg-white rounded-3xl border transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ${isHighlighted ? 'border-[#4F46E5] ring-1 ring-[#4F46E5] shadow-xl z-10 scale-105 md:scale-110' : 'border-gray-100 shadow-lg'
+                                            }`}>
+                                            {isHighlighted && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#4F46E5] to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold uppercase">Khuyên dùng</div>}
+                                            <div className="mb-6">
+                                                <h3 className={`text-2xl font-bold ${isHighlighted ? 'text-[#4F46E5]' : 'text-gray-900'}`}>{plan.displayName}</h3>
+                                                <p className="text-gray-500 text-sm mt-2 min-h-[40px]">
+                                                    {plan.maxUsers > 0 && `Tối đa ${plan.maxUsers} người dùng · ${plan.maxProjects} dự án · ${plan.maxQRCodes} QR`}
+                                                </p>
+                                            </div>
+                                            <div className="mb-6 flex items-baseline">
+                                                <span className="text-4xl font-extrabold text-gray-900">{priceDisplay}</span>
+                                                {isPaid && <span className="ml-1 text-xl text-gray-500">/tháng</span>}
+                                            </div>
+                                            {cycle === 'yearly' && savingsPerYear > 0 && <p className="text-xs text-green-600 font-semibold mb-6 bg-green-50 w-fit px-2 py-1 rounded">Tiết kiệm {formatMoney(savingsPerYear)} /năm</p>}
+                                            <button
+                                                onClick={() => isPaid ? openModal(plan.planKey) : window.location.href = '/contact'}
+                                                className={`w-full py-3 px-4 rounded-xl font-bold transition-all ${isHighlighted ? 'bg-[#4F46E5] text-white hover:bg-[#4338ca] shadow-md' : 'bg-indigo-50 text-[#4F46E5] hover:bg-indigo-100'
+                                                    }`}>
+                                                {isPaid ? 'Đăng ký ngay' : 'Liên hệ tư vấn'}
+                                            </button>
+                                            <div className="border-t border-gray-100 my-8"></div>
+                                            <ul className="space-y-4 flex-1">
+                                                {(plan.features || []).map((f, i) => (
+                                                    <li key={i} className="flex items-start">
+                                                        <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${isHighlighted ? 'bg-indigo-100' : 'bg-green-100'}`}>
+                                                            <HiCheck className={`w-4 h-4 ${isHighlighted ? 'text-[#4F46E5]' : 'text-green-600'}`} />
+                                                        </div>
+                                                        <span className="ml-3 text-gray-600 text-sm font-medium">{f}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </div>
-                                        <div className="mb-6 flex items-baseline">
-                                            <span className="text-4xl font-extrabold text-gray-900">{priceDisplay}</span>
-                                            {plan.price && <span className="ml-1 text-xl text-gray-500">/tháng</span>}
-                                        </div>
-                                        {cycle === 'yearly' && plan.price && <p className="text-xs text-green-600 font-semibold mb-6 bg-green-50 w-fit px-2 py-1 rounded">Tiết kiệm {formatMoney((plan.price.monthly - plan.price.yearly) * 12)} /năm</p>}
-                                        <button onClick={() => plan.price ? openModal(plan.id as 'starter' | 'business') : window.location.href = '/contact'}
-                                            className={`w-full py-3 px-4 rounded-xl font-bold transition-all ${isBusiness ? 'bg-[#4F46E5] text-white hover:bg-[#4338ca] shadow-md' : 'bg-indigo-50 text-[#4F46E5] hover:bg-indigo-100'}`}>
-                                            {plan.buttonText}
-                                        </button>
-                                        <div className="border-t border-gray-100 my-8"></div>
-                                        <ul className="space-y-4 flex-1">
-                                            {plan.features.map((f, i) => (
-                                                <li key={i} className="flex items-start">
-                                                    <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${isBusiness ? 'bg-indigo-100' : 'bg-green-100'}`}>
-                                                        <HiCheck className={`w-4 h-4 ${isBusiness ? 'text-[#4F46E5]' : 'text-green-600'}`} />
-                                                    </div>
-                                                    <span className="ml-3 text-gray-600 text-sm font-medium">{f}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 </section>
 
@@ -221,7 +277,7 @@ const PricingPage = () => {
                                         <div className="flex justify-between items-start">
                                             <div>
                                                 <p className="text-xs text-gray-500 uppercase font-bold">Gói dịch vụ</p>
-                                                <h4 className={`text-xl font-bold ${colors.primary} capitalize`}>{selectedPlan}</h4>
+                                                <h4 className={`text-xl font-bold ${colors.primary}`}>{selectedPlanObj?.displayName || selectedPlanKey}</h4>
                                             </div>
                                             <span className={`px-2 py-1 bg-blue-100 ${colors.primary} text-xs font-bold rounded uppercase`}>{cycle === 'yearly' ? 'Năm' : 'Tháng'}</span>
                                         </div>
@@ -328,7 +384,7 @@ const PricingPage = () => {
                                                 <HiCheckCircle className="text-5xl text-green-500" />
                                             </div>
                                             <h3 className="text-2xl font-bold text-gray-900 mb-2">Thanh toán thành công!</h3>
-                                            <p className="text-gray-600 mb-2">Gói <span className={`font-bold ${colors.primary} capitalize`}>{selectedPlan}</span> đã được kích hoạt.</p>
+                                            <p className="text-gray-600 mb-2">Gói <span className={`font-bold ${colors.primary}`}>{selectedPlanObj?.displayName || selectedPlanKey}</span> đã được kích hoạt.</p>
                                             <p className="text-gray-500 text-sm mb-6">Gia hạn thêm <span className="font-bold text-green-600">30 ngày</span> cho tài khoản của bạn.</p>
                                             <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-left w-full max-w-sm mb-6 space-y-2">
                                                 <div className="flex justify-between text-sm"><span className="text-gray-600">Người mua</span><span className="font-semibold">{userInfo.fullName}</span></div>
@@ -395,10 +451,6 @@ const FAQItem: React.FC<FAQProps> = ({ question, answer, colors }) => {
     );
 };
 
-const planConfig = [
-    { id: 'starter', name: 'Starter', description: 'Dành cho đội nhóm nhỏ bắt đầu số hóa.', price: { monthly: 499000, yearly: 399000 }, features: ['Tối đa 05 Nhân sự', 'Chấm công QR Code & GPS', 'Giám sát lộ trình cơ bản', 'Lưu trữ dữ liệu 30 ngày', 'Hỗ trợ qua Email'], isPopular: false, buttonText: 'Dùng thử ngay' },
-    { id: 'business', name: 'Business', description: 'Giải pháp toàn diện cho doanh nghiệp.', price: { monthly: 999000, yearly: 799000 }, features: ['Tối đa 20 Nhân sự', 'Tất cả tính năng gói Starter', 'Quản lý Công việc & Task', 'Xuất báo cáo Excel/PDF', 'Hỗ trợ ưu tiên 24/7'], isPopular: true, buttonText: 'Đăng ký ngay' },
-    { id: 'enterprise', name: 'Enterprise', description: 'Hệ thống riêng biệt, bảo mật tuyệt đối.', price: null, features: ['Không giới hạn Nhân sự', 'Triển khai Server riêng (On-premise)', 'Tích hợp API hệ thống ERP', 'Tùy chỉnh tính năng theo yêu cầu', 'Chuyên viên hỗ trợ 1:1'], isPopular: false, buttonText: 'Liên hệ tư vấn' },
-];
+// planConfig removed — plans now loaded dynamically from API via /api/payment/plan-config
 
 export default PricingPage;

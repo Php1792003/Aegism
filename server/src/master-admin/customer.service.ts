@@ -2,13 +2,6 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCustomerDto, RenewPlanDto } from './dto/create-customer.dto';
 
-const PLAN_LIMITS: Record<string, { maxUsers: number; maxProjects: number; maxQRCodes: number; price: number }> = {
-  FREE:       { maxUsers: 3,   maxProjects: 1,  maxQRCodes: 20,   price: 0 },
-  STARTER:    { maxUsers: 5,   maxProjects: 1,  maxQRCodes: 100,  price: 200000 },
-  PRO:        { maxUsers: 20,  maxProjects: 5,  maxQRCodes: 500,  price: 500000 },
-  ENTERPRISE: { maxUsers: 100, maxProjects: 20, maxQRCodes: 9999, price: 1000000 },
-};
-
 @Injectable()
 export class CustomerService {
   constructor(private prisma: PrismaService) {}
@@ -49,15 +42,18 @@ export class CustomerService {
 
   async create(dto: CreateCustomerDto) {
     const plan = (dto.subscriptionPlan || 'STARTER').toUpperCase();
-    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.STARTER;
+    const planKey = plan === 'PRO' || plan === 'PROFESSIONAL' ? 'BUSINESS' : plan;
+    const planConfig = await this.prisma.planConfig.findUnique({
+      where: { planKey }
+    });
     return this.prisma.tenant.create({
       data: {
         name: dto.name,
-        subscriptionPlan: plan,
+        subscriptionPlan: planKey,
         isActive: dto.isActive ?? true,
-        maxUsers: dto.maxUsers ?? limits.maxUsers,
-        maxProjects: dto.maxProjects ?? limits.maxProjects,
-        maxQRCodes: dto.maxQRCodes ?? limits.maxQRCodes,
+        maxUsers: dto.maxUsers ?? (planConfig ? planConfig.maxUsers : 10),
+        maxProjects: dto.maxProjects ?? (planConfig ? planConfig.maxProjects : 3),
+        maxQRCodes: dto.maxQRCodes ?? (planConfig ? planConfig.maxQRCodes : 100),
         subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
@@ -87,24 +83,28 @@ export class CustomerService {
   async renewPlan(id: string, dto: RenewPlanDto) {
     const tenant = await this.findOne(id);
     const plan = dto.plan.toUpperCase();
-    const limits = PLAN_LIMITS[plan];
-    if (!limits) throw new BadRequestException(`Invalid plan: ${plan}`);
+    const planKey = plan === 'PRO' || plan === 'PROFESSIONAL' ? 'BUSINESS' : plan;
+    const planConfig = await this.prisma.planConfig.findUnique({
+      where: { planKey }
+    });
+    if (!planConfig) throw new BadRequestException(`Gói không hợp lệ: ${plan}`);
 
     const current = tenant.subscriptionExpiresAt ? new Date(tenant.subscriptionExpiresAt) : new Date();
     const base = current > new Date() ? current : new Date();
     const newExpiry = new Date(base);
     newExpiry.setMonth(newExpiry.getMonth() + dto.months);
-    const amount = limits.price * dto.months;
+    const monthlyPrice = planConfig.monthlyPrice || 0;
+    const amount = monthlyPrice * dto.months;
 
     const updated = await this.prisma.tenant.update({
       where: { id },
       data: {
-        subscriptionPlan: plan,
+        subscriptionPlan: planKey,
         subscriptionExpiresAt: newExpiry,
         isActive: true,
-        maxUsers: limits.maxUsers,
-        maxProjects: limits.maxProjects,
-        maxQRCodes: limits.maxQRCodes,
+        maxUsers: planConfig.maxUsers,
+        maxProjects: planConfig.maxProjects,
+        maxQRCodes: planConfig.maxQRCodes,
       },
     });
 

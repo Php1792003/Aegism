@@ -25,6 +25,7 @@ export class DashboardService {
             recentLogs,
             recentIncidents,
             subscription,
+            tenant,
         ] = await Promise.all([
             this.prisma.project.count({ where: { tenantId } }),
             this.prisma.qRCode.count({ where: { tenantId } }),
@@ -62,6 +63,10 @@ export class DashboardService {
             this.prisma.subscription.findFirst({
                 where: { tenantId },
                 orderBy: { createdAt: 'desc' },
+            }),
+            this.prisma.tenant.findUnique({
+                where: { id: tenantId },
+                select: { maxUsers: true, maxProjects: true, maxQRCodes: true, subscriptionPlan: true },
             }),
         ]);
 
@@ -122,6 +127,12 @@ export class DashboardService {
                 status: subscription.status,
                 expiresAt: subscription.endDate,
             } : null,
+            tenantLimits: {
+                maxUsers: tenant?.maxUsers ?? 5,
+                maxProjects: tenant?.maxProjects ?? 1,
+                maxQRCodes: tenant?.maxQRCodes ?? 100,
+                plan: tenant?.subscriptionPlan ?? 'STARTER',
+            },
         };
     }
 }	

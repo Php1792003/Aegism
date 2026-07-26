@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Swal from 'sweetalert2';
+import { getAvatar } from '../utils/helpers';
+import { useTenantLimits } from '../utils/useTenantLimits';
 import {
     FaUsers, FaUserPlus, FaMagnifyingGlass, FaShieldHalved, FaPlus,
     FaPen, FaTrash, FaPenToSquare, FaEllipsisVertical, FaCrown,
@@ -9,27 +11,39 @@ import { FaRegEnvelope, FaRegFolderOpen } from 'react-icons/fa';
 
 // ─── Permission Config ────────────────────────────────────────────────
 const PERMISSION_GROUPS = [
-    { key: 'USER',    label: 'Người dùng', icon: '👤', color: 'blue',
-      perms: ['CREATE_USER','VIEW_USERS','READ_USER','EDIT_USER','UPDATE_USER','DELETE_USER','MANAGE_USER'] },
-    { key: 'PROJECT', label: 'Dự án',      icon: '📁', color: 'indigo',
-      perms: ['CREATE_PROJECT','VIEW_PROJECTS','READ_PROJECT','EDIT_PROJECT','UPDATE_PROJECT','DELETE_PROJECT','MANAGE_PROJECT'] },
-    { key: 'QR',      label: 'Mã QR',      icon: '🔲', color: 'violet',
-      perms: ['CREATE_QR','VIEW_QR','EDIT_QR','DELETE_QR','SCAN_QR','MANAGE_QRCODE'] },
-    { key: 'TASK',    label: 'Công việc',  icon: '✅', color: 'emerald',
-      perms: ['CREATE_TASK','VIEW_TASKS','READ_TASK','EDIT_TASK','UPDATE_TASK','DELETE_TASK','ASSIGN_TASK','COMPLETE_TASK','MANAGE_TASK'] },
-    { key: 'REPORT',  label: 'Báo cáo',    icon: '📊', color: 'orange',
-      perms: ['VIEW_REPORTS','EXPORT_REPORTS','VIEW_ANALYTICS','VIEW_AUDIT_LOGS','VIEW_SCAN_LOGS','MANAGE_SCAN_LOGS'] },
-    { key: 'SYSTEM',  label: 'Hệ thống',   icon: '⚙️', color: 'rose',
-      perms: ['MANAGE_SYSTEM','MANAGE_TENANT_SETTINGS','VIEW_TENANT_SETTINGS','MANAGE_SUBSCRIPTION','CREATE_ROLE','VIEW_ROLES','MANAGE_ROLE'] },
+    {
+        key: 'USER', label: 'Người dùng', icon: '👤', color: 'blue',
+        perms: ['CREATE_USER', 'VIEW_USERS', 'READ_USER', 'EDIT_USER', 'UPDATE_USER', 'DELETE_USER', 'MANAGE_USER']
+    },
+    {
+        key: 'PROJECT', label: 'Dự án', icon: '📁', color: 'indigo',
+        perms: ['CREATE_PROJECT', 'VIEW_PROJECTS', 'READ_PROJECT', 'EDIT_PROJECT', 'UPDATE_PROJECT', 'DELETE_PROJECT', 'MANAGE_PROJECT']
+    },
+    {
+        key: 'QR', label: 'Mã QR', icon: '🔲', color: 'violet',
+        perms: ['CREATE_QR', 'VIEW_QR', 'EDIT_QR', 'DELETE_QR', 'SCAN_QR', 'MANAGE_QRCODE']
+    },
+    {
+        key: 'TASK', label: 'Công việc', icon: '✅', color: 'emerald',
+        perms: ['CREATE_TASK', 'VIEW_TASKS', 'READ_TASK', 'EDIT_TASK', 'UPDATE_TASK', 'DELETE_TASK', 'ASSIGN_TASK', 'COMPLETE_TASK', 'MANAGE_TASK']
+    },
+    {
+        key: 'REPORT', label: 'Báo cáo', icon: '📊', color: 'orange',
+        perms: ['VIEW_REPORTS', 'EXPORT_REPORTS', 'VIEW_ANALYTICS', 'VIEW_AUDIT_LOGS', 'VIEW_SCAN_LOGS', 'MANAGE_SCAN_LOGS']
+    },
+    {
+        key: 'SYSTEM', label: 'Hệ thống', icon: '⚙️', color: 'rose',
+        perms: ['MANAGE_SYSTEM', 'MANAGE_TENANT_SETTINGS', 'VIEW_TENANT_SETTINGS', 'MANAGE_SUBSCRIPTION', 'CREATE_ROLE', 'VIEW_ROLES', 'MANAGE_ROLE']
+    },
 ];
 
 const COLOR_MAP: Record<string, any> = {
-    blue:    { bg:'bg-blue-50',    border:'border-blue-200',   header:'bg-blue-100',    dot:'bg-blue-500',   tagOn:'bg-blue-600 text-white border-blue-600',   tagOff:'bg-white text-gray-500 border-gray-200 hover:border-blue-300',   btnOn:'bg-blue-600 text-white border-transparent',  btnOff:'bg-white text-gray-600 border-gray-300', chk:'#2563eb' },
-    indigo:  { bg:'bg-indigo-50',  border:'border-indigo-200', header:'bg-indigo-100',  dot:'bg-indigo-500', tagOn:'bg-indigo-600 text-white border-indigo-600', tagOff:'bg-white text-gray-500 border-gray-200 hover:border-indigo-300', btnOn:'bg-indigo-600 text-white border-transparent',btnOff:'bg-white text-gray-600 border-gray-300', chk:'#4f46e5' },
-    violet:  { bg:'bg-violet-50',  border:'border-violet-200', header:'bg-violet-100',  dot:'bg-violet-500', tagOn:'bg-violet-600 text-white border-violet-600', tagOff:'bg-white text-gray-500 border-gray-200 hover:border-violet-300', btnOn:'bg-violet-600 text-white border-transparent',btnOff:'bg-white text-gray-600 border-gray-300', chk:'#7c3aed' },
-    emerald: { bg:'bg-emerald-50', border:'border-emerald-200',header:'bg-emerald-100', dot:'bg-emerald-500',tagOn:'bg-emerald-600 text-white border-emerald-600',tagOff:'bg-white text-gray-500 border-gray-200 hover:border-emerald-300',btnOn:'bg-emerald-600 text-white border-transparent',btnOff:'bg-white text-gray-600 border-gray-300',chk:'#059669' },
-    orange:  { bg:'bg-orange-50',  border:'border-orange-200', header:'bg-orange-100',  dot:'bg-orange-500', tagOn:'bg-orange-600 text-white border-orange-600', tagOff:'bg-white text-gray-500 border-gray-200 hover:border-orange-300', btnOn:'bg-orange-600 text-white border-transparent',btnOff:'bg-white text-gray-600 border-gray-300', chk:'#ea580c' },
-    rose:    { bg:'bg-rose-50',    border:'border-rose-200',   header:'bg-rose-100',    dot:'bg-rose-500',   tagOn:'bg-rose-600 text-white border-rose-600',     tagOff:'bg-white text-gray-500 border-gray-200 hover:border-rose-300',   btnOn:'bg-rose-600 text-white border-transparent',  btnOff:'bg-white text-gray-600 border-gray-300',  chk:'#e11d48' },
+    blue: { bg: 'bg-blue-50', border: 'border-blue-200', header: 'bg-blue-100', dot: 'bg-blue-500', tagOn: 'bg-blue-600 text-white border-blue-600', tagOff: 'bg-white text-gray-500 border-gray-200 hover:border-blue-300', btnOn: 'bg-blue-600 text-white border-transparent', btnOff: 'bg-white text-gray-600 border-gray-300', chk: '#2563eb' },
+    indigo: { bg: 'bg-indigo-50', border: 'border-indigo-200', header: 'bg-indigo-100', dot: 'bg-indigo-500', tagOn: 'bg-indigo-600 text-white border-indigo-600', tagOff: 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300', btnOn: 'bg-indigo-600 text-white border-transparent', btnOff: 'bg-white text-gray-600 border-gray-300', chk: '#4f46e5' },
+    violet: { bg: 'bg-violet-50', border: 'border-violet-200', header: 'bg-violet-100', dot: 'bg-violet-500', tagOn: 'bg-violet-600 text-white border-violet-600', tagOff: 'bg-white text-gray-500 border-gray-200 hover:border-violet-300', btnOn: 'bg-violet-600 text-white border-transparent', btnOff: 'bg-white text-gray-600 border-gray-300', chk: '#7c3aed' },
+    emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', header: 'bg-emerald-100', dot: 'bg-emerald-500', tagOn: 'bg-emerald-600 text-white border-emerald-600', tagOff: 'bg-white text-gray-500 border-gray-200 hover:border-emerald-300', btnOn: 'bg-emerald-600 text-white border-transparent', btnOff: 'bg-white text-gray-600 border-gray-300', chk: '#059669' },
+    orange: { bg: 'bg-orange-50', border: 'border-orange-200', header: 'bg-orange-100', dot: 'bg-orange-500', tagOn: 'bg-orange-600 text-white border-orange-600', tagOff: 'bg-white text-gray-500 border-gray-200 hover:border-orange-300', btnOn: 'bg-orange-600 text-white border-transparent', btnOff: 'bg-white text-gray-600 border-gray-300', chk: '#ea580c' },
+    rose: { bg: 'bg-rose-50', border: 'border-rose-200', header: 'bg-rose-100', dot: 'bg-rose-500', tagOn: 'bg-rose-600 text-white border-rose-600', tagOff: 'bg-white text-gray-500 border-gray-200 hover:border-rose-300', btnOn: 'bg-rose-600 text-white border-transparent', btnOff: 'bg-white text-gray-600 border-gray-300', chk: '#e11d48' },
 };
 
 // ─── PermissionGroup accordion ─────────────────────────────────────────
@@ -45,7 +59,7 @@ const PermissionGroup = ({ group, selectedPerms, onChange }: {
 
     const toggleAll = () => {
         if (allOn) group.perms.forEach(p => { if (selectedPerms.includes(p)) onChange(p); });
-        else       group.perms.forEach(p => { if (!selectedPerms.includes(p)) onChange(p); });
+        else group.perms.forEach(p => { if (!selectedPerms.includes(p)) onChange(p); });
     };
 
     return (
@@ -84,7 +98,7 @@ const PermissionGroup = ({ group, selectedPerms, onChange }: {
                                         style={on ? { backgroundColor: c.chk, borderColor: c.chk } : { borderColor: '#d1d5db', background: '#fff' }}>
                                         {on && <FaCheck className="text-white" style={{ fontSize: 7 }} />}
                                     </span>
-                                    {perm.replace(/_/g,' ')}
+                                    {perm.replace(/_/g, ' ')}
                                 </button>
                             );
                         })}
@@ -97,9 +111,11 @@ const PermissionGroup = ({ group, selectedPerms, onChange }: {
 
 // ─── Staff component ──────────────────────────────────────────────────
 const Staff = () => {
-    const apiUrl = 'https://api.aegism.online';
+    const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:3000' : 'https://api.aegism.online';
     const [activeTab, setActiveTab] = useState('staff');
-    const [currentPlan, setCurrentPlan] = useState('starter');
+    // ── Lấy giới hạn thực tế từ DB ──────────────────────────────────
+    const { limits: tenantLimits } = useTenantLimits();
     const [user, setUser] = useState<any>({ name: 'Loading...', permissions: [] });
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string>('');
@@ -120,7 +136,35 @@ const Staff = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
 
-    const plans: any = { starter: { limits: { users: 5 } }, professional: { limits: { users: 50 } }, enterprise: { limits: { users: 'unlimited' } } };
+    // States and refs for searchable project select in staff modal
+    const [modalRoles, setModalRoles] = useState<any[]>([]);
+    const [projectSearchQuery, setProjectSearchQuery] = useState('');
+    const [showProjectDropdown, setShowProjectDropdown] = useState(false);
+    const projectDropdownRef = useRef<HTMLDivElement>(null);
+
+    const fetchModalRoles = async (projId: string) => {
+        if (!projId) {
+            setModalRoles([]);
+            return;
+        }
+        try {
+            const res = await fetch(`${apiUrl}/api/roles?projectId=${projId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } });
+            if (res.ok) setModalRoles(await res.json());
+        } catch (e) { console.error(e); }
+    };
+
+    useEffect(() => {
+        const handleOutsideClick = (e: MouseEvent) => {
+            if (projectDropdownRef.current && !projectDropdownRef.current.contains(e.target as Node)) {
+                setShowProjectDropdown(false);
+                const currentProj = projects.find(p => p.id === staffForm.projectId);
+                setProjectSearchQuery(currentProj ? currentProj.name : '');
+            }
+        };
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, [staffForm.projectId, projects]);
+
 
     useEffect(() => {
         const init = async () => {
@@ -147,7 +191,7 @@ const Staff = () => {
             catch { permissions = []; }
         }
         setUser({ ...u, permissions });
-        if (u.tenant) setCurrentPlan(u.tenant.subscriptionPlan?.toLowerCase() || 'starter');
+        // plan hiển thị chỉ, giới hạn đến từ tenantLimits hook
     };
 
     const hasPermission = (perm: string) => {
@@ -162,9 +206,7 @@ const Staff = () => {
     };
 
     const getAvatarUrl = (staff: any) => {
-        if (staff.avatar && (staff.avatar.startsWith('data:') || staff.avatar.startsWith('http'))) return staff.avatar;
-        if (staff.avatar && staff.avatar.startsWith('/uploads')) return apiUrl + staff.avatar;
-        return `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.fullName || 'User')}&background=random&size=128`;
+        return getAvatar(staff);
     };
 
     const parsePermissions = (permStr: any) => {
@@ -175,11 +217,10 @@ const Staff = () => {
 
     const getRoleName = (role: any) => role ? role.name : 'Chưa gán';
 
+    // Sử dụng giới hạn thực từ DB thay vì giá trị cố định
     const canAddUser = useMemo(() => {
-        const limit = plans[currentPlan]?.limits?.users;
-        if (limit === 'unlimited') return true;
-        return allStaff.length < limit;
-    }, [allStaff, currentPlan]);
+        return allStaff.length < tenantLimits.maxUsers;
+    }, [allStaff, tenantLimits.maxUsers]);
 
     const filteredStaff = useMemo(() => {
         if (!searchQuery) return allStaff;
@@ -200,6 +241,7 @@ const Staff = () => {
         const ne = validateInput(staffForm.fullName, 'name'); if (ne) e.fullName = ne;
         const ee = validateInput(staffForm.email, 'email'); if (ee) e.email = ee;
         if (!isEditingStaff) { const pe = validateInput(staffForm.password, 'password'); if (pe) e.password = pe; }
+        if (!staffForm.projectId) e.projectId = 'Vui lòng chọn dự án.';
         if (!staffForm.roleId) e.roleId = 'Vui lòng chọn vai trò.';
         setErrors(e); return Object.keys(e).length === 0;
     };
@@ -247,6 +289,11 @@ const Staff = () => {
         if (!selectedProjectId) { Swal.fire('Thông báo', 'Vui lòng chọn dự án trước', 'info'); return; }
         setIsEditingStaff(false); setTempPassword(null);
         setStaffForm({ fullName: '', email: '', password: '', roleId: '', isTenantAdmin: false, status: 'active', projectId: selectedProjectId, avatar: '' });
+
+        const initialProject = projects.find(p => p.id === selectedProjectId);
+        setProjectSearchQuery(initialProject ? initialProject.name : '');
+        fetchModalRoles(selectedProjectId);
+
         setErrors({}); setShowStaffModal(true);
     };
 
@@ -254,7 +301,14 @@ const Staff = () => {
         if (!hasPermission('EDIT_USER') && !hasPermission('UPDATE_USER') && !hasPermission('MANAGE_USER'))
             return Swal.fire({ icon: 'error', title: 'Từ chối', text: 'Bạn không có quyền sửa nhân sự.' });
         setIsEditingStaff(true); setTempPassword(null);
-        setStaffForm({ ...staff, password: '', roleId: staff.role ? staff.role.id : '', projectId: selectedProjectId, avatar: getAvatarUrl(staff) });
+
+        const projId = selectedProjectId;
+        setStaffForm({ ...staff, password: '', roleId: staff.role ? staff.role.id : '', projectId: projId, avatar: getAvatarUrl(staff) });
+
+        const initialProject = projects.find(p => p.id === projId);
+        setProjectSearchQuery(initialProject ? initialProject.name : '');
+        fetchModalRoles(projId);
+
         setErrors({}); setShowStaffModal(true);
     };
 
@@ -355,7 +409,7 @@ const Staff = () => {
             <div className="mb-6 border-b border-gray-200 px-6">
                 <nav className="-mb-px flex space-x-8">
                     {[{ key: 'staff', icon: <FaUsers className="mr-2" />, label: 'Danh sách Nhân sự' },
-                      { key: 'roles', icon: <FaShieldHalved className="mr-2" />, label: 'Quản lý Vai trò & Quyền hạn' }].map(tab => (
+                    { key: 'roles', icon: <FaShieldHalved className="mr-2" />, label: 'Quản lý Vai trò & Quyền hạn' }].map(tab => (
                         <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                             className={`whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm flex items-center transition-colors ${activeTab === tab.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                             {tab.icon}{tab.label}
@@ -375,7 +429,14 @@ const Staff = () => {
                             <p className="text-sm text-gray-500">Quản lý thành viên và phân quyền truy cập.</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="text-sm bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium">{filteredStaff.length} Thành viên</div>
+                            <div className={`text-sm px-3 py-1.5 rounded-full font-medium ${allStaff.length >= tenantLimits.maxUsers
+                                ? 'bg-red-100 text-red-600'
+                                : allStaff.length >= tenantLimits.maxUsers * 0.8
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-blue-50 text-blue-600'
+                                }`}>
+                                👥 {allStaff.length} / {tenantLimits.maxUsers} Thành viên
+                            </div>
                             {(hasPermission('CREATE_USER') || hasPermission('MANAGE_USER')) && (
                                 <button onClick={openAddStaffModal} disabled={!canAddUser}
                                     className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${canAddUser ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
@@ -491,7 +552,7 @@ const Staff = () => {
                                                     <span className="text-xs mt-0.5 flex-shrink-0">{group.icon}</span>
                                                     <div className="flex flex-wrap gap-1">
                                                         {matched.map(p => (
-                                                            <span key={p} className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${c.tagOn}`}>{p.replace(/_/g,' ')}</span>
+                                                            <span key={p} className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${c.tagOn}`}>{p.replace(/_/g, ' ')}</span>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -624,7 +685,7 @@ const Staff = () => {
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Ảnh đại diện</label>
                                 <div className="flex items-center gap-4">
                                     <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                        <img src={staffForm.avatar ? (staffForm.avatar.startsWith('data:') ? staffForm.avatar : apiUrl + staffForm.avatar) : `https://ui-avatars.com/api/?name=${encodeURIComponent(staffForm.fullName || 'User')}&background=random&size=128`}
+                                        <img src={getAvatar(staffForm)}
                                             className="h-14 w-14 rounded-full border-2 border-gray-200 object-cover group-hover:border-blue-500 transition-colors" alt="" />
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 rounded-full flex items-center justify-center transition-all"><FaCamera className="text-white opacity-0 group-hover:opacity-100" /></div>
                                     </div>
@@ -643,13 +704,54 @@ const Staff = () => {
                                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                                 </div>
                             )}
+
+                            {/* Searchable Project Selector */}
+                            <div className="relative" ref={projectDropdownRef}>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Dự án <span className="text-red-500">*</span></label>
+                                <div className="relative">
+                                    <input type="text" value={projectSearchQuery}
+                                        onChange={(e) => { setProjectSearchQuery(e.target.value); setShowProjectDropdown(true); }}
+                                        onFocus={() => setShowProjectDropdown(true)}
+                                        className={`w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 pr-10 ${errors.projectId ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'}`}
+                                        placeholder="Tìm kiếm và chọn dự án..." />
+                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                                        <FaChevronDown style={{ fontSize: 10 }} />
+                                    </div>
+                                </div>
+                                {errors.projectId && <p className="text-red-500 text-xs mt-1">{errors.projectId}</p>}
+                                {showProjectDropdown && (
+                                    <div className="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1">
+                                        {projects.filter((p: any) => p.name.toLowerCase().includes(projectSearchQuery.toLowerCase())).map((p: any) => {
+                                            const isSelected = p.id === staffForm.projectId;
+                                            return (
+                                                <button key={p.id} type="button"
+                                                    onClick={() => {
+                                                        setStaffForm((prev: any) => ({ ...prev, projectId: p.id, roleId: '' }));
+                                                        setProjectSearchQuery(p.name);
+                                                        setShowProjectDropdown(false);
+                                                        setErrors((prev: any) => ({ ...prev, projectId: null }));
+                                                        fetchModalRoles(p.id);
+                                                    }}
+                                                    className={`w-full text-left px-4 py-2 text-sm hover:bg-blue-50 transition-colors flex items-center justify-between ${isSelected ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-700'}`}>
+                                                    <span>{p.name}</span>
+                                                    {isSelected && <FaCheck className="text-blue-600 text-xs" />}
+                                                </button>
+                                            );
+                                        })}
+                                        {projects.filter((p: any) => p.name.toLowerCase().includes(projectSearchQuery.toLowerCase())).length === 0 && (
+                                            <div className="px-4 py-2.5 text-sm text-gray-500 italic text-center">Không tìm thấy dự án phù hợp.</div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Vai trò <span className="text-red-500">*</span></label>
                                     <select value={staffForm.roleId} onChange={(e) => { setStaffForm({ ...staffForm, roleId: e.target.value }); setErrors({ ...errors, roleId: null }); }}
                                         className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-white ${errors.roleId ? 'border-red-400' : 'border-gray-300 focus:ring-blue-300'}`}>
                                         <option value="" disabled>-- Chọn vai trò --</option>
-                                        {roles.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                                        {modalRoles.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}
                                     </select>
                                     {errors.roleId && <p className="text-red-500 text-xs mt-1">{errors.roleId}</p>}
                                 </div>

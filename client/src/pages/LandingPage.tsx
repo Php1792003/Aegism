@@ -14,6 +14,13 @@ import {
 
 const LandingPage = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly');
+    const [dynamicPlans, setDynamicPlans] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:3000'
+        : 'https://api.aegism.online';
 
     // --- CONFIG ---
     const colors = {
@@ -26,54 +33,27 @@ const LandingPage = () => {
         borderPrimary: 'border-[#4F46E5]'
     };
 
-    // Dữ liệu Bảng giá (Đồng bộ với trang Pricing)
-    const pricingPlans = [
-        {
-            name: "Starter",
-            price: "475.000",
-            period: "/tháng",
-            desc: "Dành cho đội nhóm nhỏ mới bắt đầu số hóa.",
-            features: [
-                "Tối đa 05 Người dùng",
-                "Chấm công QR Code & GPS",
-                "Giám sát vị trí cơ bản",
-                "Lưu trữ dữ liệu 30 ngày"
-            ],
-            cta: "Dùng thử ngay",
-            link: "/register?plan=starter",
-            highlight: false
-        },
-        {
-            name: "Business",
-            price: "1.225.000",
-            period: "/tháng",
-            desc: "Giải pháp tiêu chuẩn cho doanh nghiệp SMEs.",
-            features: [
-                "Tối đa 20 Người dùng",
-                "Quản lý Task & Sự cố",
-                "Phân quyền chuyên sâu",
-                "Hỗ trợ ưu tiên 24/7"
-            ],
-            cta: "Đăng ký ngay",
-            link: "/register?plan=business",
-            highlight: true // Gói nổi bật
-        },
-        {
-            name: "Enterprise",
-            price: "Liên hệ",
-            period: "",
-            desc: "Hệ thống riêng biệt, bảo mật tuyệt đối.",
-            features: [
-                "Không giới hạn User",
-                "Server riêng (On-premise)",
-                "Tùy chỉnh tính năng",
-                "Tích hợp API hệ thống"
-            ],
-            cta: "Liên hệ tư vấn",
-            link: "/contact",
-            highlight: false
-        }
-    ];
+    React.useEffect(() => {
+        setLoading(true);
+        fetch(`${apiUrl}/api/payment/plan-config`)
+            .then(r => r.json())
+            .then((configs: any[]) => {
+                const active = configs.filter(c => c.isActive && c.planKey !== 'NONE');
+                setDynamicPlans(active);
+            })
+            .catch(() => {
+                setDynamicPlans([
+                    { planKey: 'STARTER', displayName: 'Starter', monthlyPrice: 499000, yearlyPrice: 399000, maxUsers: 10, maxProjects: 3, maxQRCodes: 100, features: ['Tối đa 10 người dùng', 'Tối đa 3 dự án', '100 mã QR', 'Hỗ trợ email'], isActive: true },
+                    { planKey: 'BUSINESS', displayName: 'Business', monthlyPrice: 999000, yearlyPrice: 799000, maxUsers: 50, maxProjects: 20, maxQRCodes: 500, features: ['Tối đa 50 người dùng', 'Dự án không giới hạn', '500 mã QR', 'Hỗ trợ ưu tiên 24/7'], isActive: true },
+                    { planKey: 'ENTERPRISE', displayName: 'Enterprise', monthlyPrice: 0, yearlyPrice: 0, maxUsers: 999, maxProjects: 999, maxQRCodes: 9999, features: ['Không giới hạn User', 'Server riêng (On-premise)', 'Tùy chỉnh tính năng', 'Tích hợp API hệ thống'], isActive: true },
+                ]);
+            })
+            .finally(() => setLoading(false));
+    }, []);
+
+    const formatMoney = (n: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
+    };
 
     return (
         <div className="bg-white text-gray-800 font-sans">
@@ -173,7 +153,7 @@ const LandingPage = () => {
                 {/* --- PRICING SECTION (ĐÃ CẬP NHẬT) --- */}
                 <section className={`${colors.lightBg} py-16 md:py-24`}>
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="text-center max-w-3xl mx-auto mb-16">
+                        <div className="text-center max-w-3xl mx-auto mb-8">
                             <h2 className={`text-3xl font-extrabold ${colors.dark}`}>
                                 Bảng giá linh hoạt & minh bạch
                             </h2>
@@ -182,59 +162,118 @@ const LandingPage = () => {
                             </p>
                         </div>
 
-                        {/* Pricing Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-                            {pricingPlans.map((plan, index) => (
-                                <div
-                                    key={index}
-                                    className={`
-                                        relative flex flex-col p-8 bg-white rounded-2xl transition-all duration-300
-                                        ${plan.highlight
-                                            ? 'border-2 border-indigo-500 shadow-2xl scale-105 z-10'
-                                            : 'border border-gray-200 shadow-lg hover:-translate-y-2'
-                                        }
-                                    `}
-                                >
-                                    {plan.highlight && (
-                                        <div className="absolute top-0 right-0 -mt-4 mr-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wide">
-                                            Phổ biến nhất
-                                        </div>
-                                    )}
-
-                                    <div className="mb-4">
-                                        <h3 className={`text-xl font-bold ${plan.highlight ? 'text-indigo-600' : 'text-gray-900'}`}>{plan.name}</h3>
-                                        <p className="text-sm text-gray-500 mt-2 min-h-[40px]">{plan.desc}</p>
-                                    </div>
-
-                                    <div className="mb-6 flex items-baseline">
-                                        <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
-                                        {plan.price !== 'Liên hệ' && <span className="text-gray-500 font-medium ml-1">đ{plan.period}</span>}
-                                    </div>
-
-                                    <ul className="mb-8 space-y-4 flex-1">
-                                        {plan.features.map((feature, idx) => (
-                                            <li key={idx} className="flex items-start">
-                                                <HiCheck className={`flex-shrink-0 h-5 w-5 ${plan.highlight ? 'text-indigo-600' : 'text-green-500'}`} />
-                                                <span className="ml-3 text-gray-600 text-sm">{feature}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-
-                                    <Link
-                                        to={plan.link}
-                                        className={`
-                                            w-full block text-center py-3 rounded-xl font-bold transition-all
-                                            ${plan.highlight
-                                                ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/30'
-                                                : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                            }
-                                        `}
-                                    >
-                                        {plan.cta}
-                                    </Link>
-                                </div>
-                            ))}
+                        {/* Toggle Cycle */}
+                        <div className="flex justify-center items-center gap-4 mb-12">
+                            <span className={`text-sm font-medium ${cycle === 'monthly' ? 'text-gray-900 font-bold' : 'text-gray-500'}`}>Thanh toán hàng tháng</span>
+                            <button onClick={() => setCycle(c => c === 'monthly' ? 'yearly' : 'monthly')}
+                                className="w-12 h-6 bg-indigo-600 rounded-full p-1 transition-colors duration-300 focus:outline-none relative flex items-center">
+                                <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-300 transform ${cycle === 'yearly' ? 'translate-x-6' : ''}`} />
+                            </button>
+                            <span className={`text-sm font-medium flex items-center gap-1.5 ${cycle === 'yearly' ? 'text-indigo-600 font-bold' : 'text-gray-500'}`}>
+                                Thanh toán hàng năm
+                                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tiết kiệm ~20%</span>
+                            </span>
                         </div>
+
+                        {/* Pricing Grid */}
+                        {loading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} className="flex flex-col p-8 bg-white border border-gray-100 rounded-2xl shadow-lg h-[460px] animate-pulse">
+                                        <div className="h-6 bg-gray-200 rounded w-1/3 mb-4" />
+                                        <div className="h-4 bg-gray-200 rounded w-2/3 mb-6" />
+                                        <div className="h-10 bg-gray-200 rounded w-1/2 mb-8" />
+                                        <div className="space-y-4 flex-1">
+                                            {Array.from({ length: 4 }).map((_, j) => (
+                                                <div key={j} className="h-4 bg-gray-200 rounded w-5/6" />
+                                            ))}
+                                        </div>
+                                        <div className="h-12 bg-gray-200 rounded w-full mt-6" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                                {dynamicPlans.map((plan, index) => {
+                                    const isEnterprise = plan.planKey === 'ENTERPRISE' || (plan.monthlyPrice === 0 && plan.yearlyPrice === 0);
+                                    const priceStr = isEnterprise
+                                        ? 'Liên hệ'
+                                        : cycle === 'monthly'
+                                            ? formatMoney(plan.monthlyPrice)
+                                            : formatMoney(plan.yearlyPrice);
+                                    const isHighlight = plan.planKey === 'BUSINESS';
+                                    const ctaText = isEnterprise ? 'Liên hệ tư vấn' : 'Đăng ký ngay';
+                                    const ctaLink = isEnterprise ? '/contact' : `/register?plan=${plan.planKey.toLowerCase()}`;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`
+                                                relative flex flex-col p-8 bg-white rounded-2xl transition-all duration-300
+                                                ${isHighlight
+                                                    ? 'border-2 border-indigo-500 shadow-2xl scale-105 z-10'
+                                                    : 'border border-gray-200 shadow-lg hover:-translate-y-2'
+                                                }
+                                            `}
+                                        >
+                                            {isHighlight && (
+                                                <div className="absolute top-0 right-0 -mt-4 mr-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wide">
+                                                    Phổ biến nhất
+                                                </div>
+                                            )}
+
+                                            <div className="mb-4">
+                                                <h3 className={`text-xl font-bold ${isHighlight ? 'text-indigo-600' : 'text-gray-900'}`}>{plan.displayName}</h3>
+                                                <p className="text-sm text-gray-500 mt-2 min-h-[40px]">
+                                                    {plan.planKey === 'STARTER' && 'Dành cho đội nhóm nhỏ mới bắt đầu số hóa.'}
+                                                    {plan.planKey === 'BUSINESS' && 'Giải pháp tiêu chuẩn cho doanh nghiệp SMEs.'}
+                                                    {plan.planKey === 'ENTERPRISE' && 'Hệ thống riêng biệt, bảo mật tuyệt đối.'}
+                                                </p>
+                                            </div>
+
+                                            <div className="mb-6 flex items-baseline">
+                                                <span className="text-3xl font-extrabold text-gray-900">{priceStr}</span>
+                                                {!isEnterprise && <span className="text-gray-500 font-medium ml-1">/tháng</span>}
+                                            </div>
+
+                                            <ul className="mb-8 space-y-4 flex-1">
+                                                <li className="flex items-start">
+                                                    <HiCheck className={`flex-shrink-0 h-5 w-5 ${isHighlight ? 'text-indigo-600' : 'text-green-500'}`} />
+                                                    <span className="ml-3 text-gray-600 text-sm font-semibold">Tối đa {plan.maxUsers} người dùng</span>
+                                                </li>
+                                                <li className="flex items-start">
+                                                    <HiCheck className={`flex-shrink-0 h-5 w-5 ${isHighlight ? 'text-indigo-600' : 'text-green-500'}`} />
+                                                    <span className="ml-3 text-gray-600 text-sm font-semibold">Tối đa {plan.maxProjects} dự án</span>
+                                                </li>
+                                                <li className="flex items-start">
+                                                    <HiCheck className={`flex-shrink-0 h-5 w-5 ${isHighlight ? 'text-indigo-600' : 'text-green-500'}`} />
+                                                    <span className="ml-3 text-gray-600 text-sm font-semibold">Tối đa {plan.maxQRCodes} mã QR</span>
+                                                </li>
+                                                {(Array.isArray(plan.features) ? plan.features : []).slice(0, 4).map((feature: string, idx: number) => (
+                                                    <li key={idx} className="flex items-start">
+                                                        <HiCheck className={`flex-shrink-0 h-5 w-5 ${isHighlight ? 'text-indigo-600' : 'text-green-500'}`} />
+                                                        <span className="ml-3 text-gray-600 text-sm">{feature}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <Link
+                                                to={ctaLink}
+                                                className={`
+                                                    w-full block text-center py-3 rounded-xl font-bold transition-all
+                                                    ${isHighlight
+                                                        ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/30'
+                                                        : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                                    }
+                                                `}
+                                            >
+                                                {ctaText}
+                                            </Link>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 </section>
 

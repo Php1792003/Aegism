@@ -219,7 +219,7 @@ const ContactPage = () => {
                                                 )}
                                             </button>
                                             <p className="text-center text-xs text-gray-400 mt-4">
-                                                Thông tin của bạn được bảo mật theo <Link to="#" className="underline hover:text-blue-500">Chính sách riêng tư</Link> của chúng tôi.
+                                                Thông tin của bạn được bảo mật theo <Link to="/policy" className="underline hover:text-blue-500">Chính sách riêng tư</Link> của chúng tôi.
                                             </p>
                                         </div>
                                     </form>

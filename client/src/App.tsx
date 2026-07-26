@@ -1,6 +1,8 @@
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import SuperAdminLayout from './layouts/SuperAdminLayout';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ScanRedirect from './pages/Scanredirect';
+import NotFoundPage from './pages/NotFoundPage';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -23,7 +25,13 @@ import RegisterPage from './pages/RegisterPage';
 import Branding from './pages/Branding';
 import ApiIntegration from './pages/ApiIntegration';
 import ProfilePage from './pages/ProfilePage';
+import PolicyPage from './pages/PolicyPage';
+import TermsPage from './pages/TermsPage';
 import SuperAdminCustomers from './pages/SuperAdminCustomers';
+import SuperAdminUsers from './pages/SuperAdminUsers';
+import SuperAdminRevenue from './pages/SuperAdminRevenue';
+import SuperAdminPlans from './pages/SuperAdminPlans';
+import SuperAdminSecurity from './pages/SuperAdminSecurity';
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('accessToken');
   return token ? children : <Navigate to="/login" />;
@@ -48,6 +56,8 @@ function App() {
           <Route path='/features' element={<FeaturesPage />} />
           <Route path='/contact' element={<ContactPage />} />
           <Route path='/request-demo' element={<RequestDemoPage />} />
+          <Route path="/policy" element={<PolicyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -71,7 +81,15 @@ function App() {
         <Route element={<SuperAdminRoute><SuperAdminLayout /></SuperAdminRoute>}>
           <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
 	  <Route path="/super-admin/customers" element={<SuperAdminCustomers />} />
+          <Route path="/super-admin/users" element={<SuperAdminUsers />} />
+          <Route path="/super-admin/revenue" element={<SuperAdminRevenue />} />
+          <Route path="/super-admin/plans" element={<SuperAdminPlans />} />
+          <Route path="/super-admin/security" element={<SuperAdminSecurity />} />
         </Route>
+
+        {/* Scan redirect & 404 */}
+        <Route path="/scan" element={<ScanRedirect />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

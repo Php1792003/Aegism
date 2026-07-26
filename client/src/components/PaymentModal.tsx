@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000' : 'https://api.aegism.online';
 
-const PLANS = [
+const STATIC_PLANS = [
     { key: 'STARTER', name: 'Starter', price: 499000, badge: 'bg-blue-100 text-blue-700', border: 'border-blue-500', bg: 'bg-blue-50', features: ['5 người dùng', '1 dự án', '100 mã QR'] },
-    { key: 'PROFESSIONAL', name: 'Professional', price: 999000, badge: 'bg-orange-100 text-orange-700', border: 'border-orange-500', bg: 'bg-orange-50', features: ['20 người dùng', '5 dự án', '500 mã QR', 'Báo cáo'] },
+    { key: 'BUSINESS', name: 'Business', price: 999000, badge: 'bg-orange-100 text-orange-700', border: 'border-orange-500', bg: 'bg-orange-50', features: ['20 người dùng', '5 dự án', '500 mã QR', 'Báo cáo'] },
     { key: 'ENTERPRISE', name: 'Enterprise', price: 1499000, badge: 'bg-purple-100 text-purple-700', border: 'border-purple-500', bg: 'bg-purple-50', features: ['Không giới hạn', 'Tích hợp API', 'Thương hiệu', 'Hỗ trợ ưu tiên'] },
 ];
 
@@ -27,10 +27,56 @@ export default function PaymentModal({ isOpen, onClose, isExpired = true }: Paym
     const [checkoutUrl, setCheckoutUrl] = useState('');
     const [orderCode, setOrderCode] = useState('');
     const [countdown, setCountdown] = useState(300);
+    const [plans, setPlans] = useState<any[]>([]);
+    const [plansLoading, setPlansLoading] = useState(true);
     const pollingRef = useRef<any>(null);
     const countdownRef = useRef<any>(null);
 
-    const plan = PLANS.find(p => p.key === selectedPlan)!;
+    const plan = plans.find(p => p.key === selectedPlan) || plans[0] || STATIC_PLANS[0];
+
+    useEffect(() => {
+        if (!isOpen) return;
+        setPlansLoading(true);
+        fetch(`${apiUrl}/api/payment/plan-config`)
+            .then(r => r.json())
+            .then((configs: any[]) => {
+                const active = configs.filter(c => c.isActive && c.planKey !== 'NONE');
+                const mapped = active.map(c => {
+                    let badge = 'bg-blue-100 text-blue-700';
+                    let border = 'border-blue-500';
+                    let bg = 'bg-blue-50';
+                    if (c.planKey === 'BUSINESS') {
+                        badge = 'bg-orange-100 text-orange-700';
+                        border = 'border-orange-500';
+                        bg = 'bg-orange-50';
+                    } else if (c.planKey === 'ENTERPRISE') {
+                        badge = 'bg-purple-100 text-purple-700';
+                        border = 'border-purple-500';
+                        bg = 'bg-purple-50';
+                    }
+                    return {
+                        key: c.planKey,
+                        name: c.displayName,
+                        price: c.monthlyPrice || c.yearlyPrice || 0,
+                        badge,
+                        border,
+                        bg,
+                        features: c.features || []
+                    };
+                });
+                if (mapped.length > 0) {
+                    setPlans(mapped);
+                    // Select first dynamic plan
+                    setSelectedPlan(mapped[0].key);
+                } else {
+                    setPlans(STATIC_PLANS);
+                }
+            })
+            .catch(() => {
+                setPlans(STATIC_PLANS);
+            })
+            .finally(() => setPlansLoading(false));
+    }, [isOpen]);
 
     useEffect(() => {
         if (step === 'qr' && orderCode) {
@@ -56,6 +102,7 @@ export default function PaymentModal({ isOpen, onClose, isExpired = true }: Paym
                                 localStorage.setItem('user', JSON.stringify(user));
                                 localStorage.setItem('userPlan', selectedPlan.toLowerCase());
                             }
+                            localStorage.removeItem('tenantLimits');
                             setStep('success');
                         }
                     }
@@ -63,7 +110,7 @@ export default function PaymentModal({ isOpen, onClose, isExpired = true }: Paym
             }, 3000);
             return () => { clearInterval(pollingRef.current); clearInterval(countdownRef.current); };
         }
-    }, [step, orderCode]);
+    }, [step, orderCode, selectedPlan]);
 
     const handleCreatePayment = async () => {
         setLoading(true);
@@ -131,49 +178,55 @@ export default function PaymentModal({ isOpen, onClose, isExpired = true }: Paym
                 <div className="p-6">
                     {/* STEP 1: Chọn gói */}
                     {step === 'select' && (
-                        <div className="space-y-4">
-                            <div className="grid gap-3">
-                                {PLANS.map(p => (
-                                    <div key={p.key} onClick={() => setSelectedPlan(p.key)}
-                                        className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${selectedPlan === p.key ? `${p.border} ${p.bg}` : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedPlan === p.key ? 'border-blue-600' : 'border-gray-300'}`}>
-                                                    {selectedPlan === p.key && <div className="w-2 h-2 rounded-full bg-blue-600" />}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <span className="font-bold text-gray-900">{p.name}</span>
-                                                        <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.badge}`}>{p.key}</span>
+                        plansLoading ? (
+                            <div className="flex justify-center items-center py-10">
+                                <div className="w-10 h-10 border-4 border-indigo-200 border-t-blue-600 rounded-full animate-spin" />
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="grid gap-3">
+                                    {plans.map(p => (
+                                        <div key={p.key} onClick={() => setSelectedPlan(p.key)}
+                                            className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${selectedPlan === p.key ? `${p.border} ${p.bg}` : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedPlan === p.key ? 'border-blue-600' : 'border-gray-300'}`}>
+                                                        {selectedPlan === p.key && <div className="w-2 h-2 rounded-full bg-blue-600" />}
                                                     </div>
-                                                    <div className="flex gap-2 mt-1 flex-wrap">
-                                                        {p.features.map(f => <span key={f} className="text-xs text-gray-500">✓ {f}</span>)}
+                                                    <div>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className="font-bold text-gray-900">{p.name}</span>
+                                                            <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.badge}`}>{p.key}</span>
+                                                        </div>
+                                                        <div className="flex gap-2 mt-1 flex-wrap">
+                                                            {p.features.map((f: string) => <span key={f} className="text-xs text-gray-500">✓ {f}</span>)}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div className="text-right ml-3 flex-shrink-0">
-                                                <div className="font-bold text-gray-900 text-sm">{fmt(p.price)}</div>
-                                                <div className="text-xs text-gray-400">/tháng</div>
+                                                <div className="text-right ml-3 flex-shrink-0">
+                                                    <div className="font-bold text-gray-900 text-sm">{fmt(p.price)}</div>
+                                                    <div className="text-xs text-gray-400">/tháng</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="bg-gray-50 rounded-xl p-4">
-                                <div className="flex justify-between text-sm"><span className="text-gray-500">Gói</span><span className="font-semibold">{plan.name}</span></div>
-                                <div className="flex justify-between text-sm mt-1"><span className="text-gray-500">Thời hạn</span><span className="font-semibold">30 ngày</span></div>
-                                <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between">
-                                    <span className="font-bold text-gray-700">Tổng</span>
-                                    <span className="font-bold text-blue-600 text-lg">{fmt(plan.price)}</span>
+                                    ))}
                                 </div>
-                            </div>
 
-                            <button onClick={handleCreatePayment} disabled={loading}
-                                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                                {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Đang tạo...</> : 'Tiếp tục thanh toán →'}
-                            </button>
-                        </div>
+                                <div className="bg-gray-50 rounded-xl p-4">
+                                    <div className="flex justify-between text-sm"><span className="text-gray-500">Gói</span><span className="font-semibold">{plan.name}</span></div>
+                                    <div className="flex justify-between text-sm mt-1"><span className="text-gray-500">Thời hạn</span><span className="font-semibold">30 ngày</span></div>
+                                    <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between">
+                                        <span className="font-bold text-gray-700">Tổng</span>
+                                        <span className="font-bold text-blue-600 text-lg">{fmt(plan.price)}</span>
+                                    </div>
+                                </div>
+
+                                <button onClick={handleCreatePayment} disabled={loading}
+                                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                                    {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Đang tạo...</> : 'Tiếp tục thanh toán →'}
+                                </button>
+                            </div>
+                        )
                     )}
 
                     {/* STEP 2: VietQR */}

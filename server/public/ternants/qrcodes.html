@@ -550,7 +550,13 @@
                 user: { name: 'Loading...', email: '', avatar: '', roleName: 'User', isSuperAdmin: false, isTenantAdmin: false, permissions: [] },
                 
                 currentPlan: 'starter',
-                plans: { starter: { limits: { qr: 100 } }, professional: { limits: { qr: 500 } }, enterprise: { limits: { qr: 2000 } } },
+                plans: {
+                    starter: { limits: { qr: 100 } },
+                    pro: { limits: { qr: 500 } },
+                    professional: { limits: { qr: 500 } },
+                    business: { limits: { qr: 500 } },
+                    enterprise: { limits: { qr: 2000 } }
+                },
 
                 scannerActive: false, html5QrCode: null, pendingScanData: null, scanResult: null, isProcessing: false, isLoading: false,
                 

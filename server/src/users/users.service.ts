@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,7 +20,14 @@ export class UsersService {
                     }
                 },
                 tenant: {
-                    select: { name: true, subscriptionPlan: true }
+                    select: { 
+                        name: true, 
+                        subscriptionPlan: true, 
+                        subscriptionExpiresAt: true,
+                        maxUsers: true,
+                        maxProjects: true,
+                        maxQRCodes: true
+                    }
                 }
             },
         });
@@ -36,6 +43,18 @@ export class UsersService {
             where: { email: dto.email },
         });
         if (existing) throw new ConflictException('Email đã tồn tại');
+
+        // Check Limit User
+        const tenant = await this.prisma.tenant.findUnique({
+            where: { id: tenantId },
+            select: { maxUsers: true },
+        });
+        const currentCount = await this.prisma.user.count({
+            where: { tenantId, status: { not: 'DELETED' } },
+        });
+        if (tenant && currentCount >= tenant.maxUsers) {
+            throw new ForbiddenException('User limit reached.');
+        }
 
         const hashedPassword = await bcrypt.hash(dto.password, 10);
 

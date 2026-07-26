@@ -689,7 +689,13 @@
                 showDetailModal: false,
                 selectedStaff: {},
                 tempPassword: null,
-                plans: { starter: { limits: { users: 5 } }, professional: { limits: { users: 50 } }, enterprise: { limits: { users: 'unlimited' } } },
+                plans: {
+                    starter: { limits: { users: 5 } },
+                    pro: { limits: { users: 50 } },
+                    professional: { limits: { users: 50 } },
+                    business: { limits: { users: 50 } },
+                    enterprise: { limits: { users: 'unlimited' } }
+                },
 
                 errors: { fullName: null, email: null, password: null, roleId: null, roleName: null },
 

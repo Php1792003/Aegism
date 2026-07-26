@@ -18,6 +18,11 @@ const Footer = () => {
                         <p className="mt-4 text-sm text-gray-500">
                             &copy; 2025 AEGISM. All rights reserved.
                         </p>
+                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                            <Link to="/terms" className="text-xs text-gray-400 hover:text-[#4F46E5] transition-colors font-semibold">Điều khoản</Link>
+                            <span className="text-xs text-gray-300">|</span>
+                            <Link to="/policy" className="text-xs text-gray-400 hover:text-[#4F46E5] transition-colors font-semibold">Bảo mật</Link>
+                        </div>
                     </div>
                     {/* Column 2: Platform */}
                     <div>

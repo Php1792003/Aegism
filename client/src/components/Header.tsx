@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HiBars3, HiXMark } from 'react-icons/hi2';
 import Swal from 'sweetalert2';
+import { getAvatar } from '../utils/helpers';
+
+const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000' : 'https://api.aegism.online';
 
 const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -12,15 +16,29 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    const syncUser = () => {
         const token = localStorage.getItem('accessToken');
         const u = JSON.parse(localStorage.getItem('user') || '{}');
         if (token && u.id) {
             setIsLoggedIn(true);
-            const avatarUrl = u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || u.fullName || 'User')}&background=4F46E5&color=fff`;
-            setUser({ name: u.name || u.fullName || 'Người dùng', avatar: avatarUrl, isSuperAdmin: u.isSuperAdmin });
+            const avatarUrl = getAvatar(u);
+            setUser({ name: u.fullName || u.name || 'Người dùng', avatar: avatarUrl, isSuperAdmin: u.isSuperAdmin });
+        } else {
+            setIsLoggedIn(false);
+            setUser({ name: '', avatar: '' });
         }
+    };
+
+    useEffect(() => {
+        syncUser();
+        window.addEventListener('user-profile-updated', syncUser);
+        window.addEventListener('storage', syncUser);
+        return () => {
+            window.removeEventListener('user-profile-updated', syncUser);
+            window.removeEventListener('storage', syncUser);
+        };
     }, [location]);
+
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Html5Qrcode } from 'html5-qrcode';
 import { QRCodeCanvas } from 'qrcode.react';
+import { useTenantLimits } from '../utils/useTenantLimits';
 import {
     FaPlus, FaTrashCan, FaCamera, FaSatelliteDish, FaTriangleExclamation,
     FaRotate, FaLocationDot, FaCheck, FaLocationCrosshairs, FaCircleNotch,
@@ -118,6 +119,9 @@ const QrCodes = () => {
     });
 
     // ─── State ─────────────────────────────────────────────────────────────────
+    // ── Lấy giới hạn thực tế từ DB ──────────────────────────────────
+    const { limits: tenantLimits } = useTenantLimits();
+
     const [currentView, setCurrentView] = useState('list');
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState('');
@@ -683,6 +687,16 @@ const QrCodes = () => {
     // ─── QR CRUD ─────────────────────────────────────────────────────────────────
     const openCreateModal = () => {
         if (!checkPermissionAction('CREATE_QR') && !checkPermissionAction('MANAGE_QRCODE')) return;
+        // Kiểm tra giới hạn thực tế từ DB
+        if (currentProjectQrPoints.length >= tenantLimits.maxQRCodes) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Đã đạt giới hạn gói',
+                text: `Gói ${tenantLimits.plan} của bạn chỉ cho phép tối đa ${tenantLimits.maxQRCodes} mã QR. Vui lòng nâng cấp gói để tạo thêm.`,
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
         setIsEdit(false); setFormData({ id: null, name: '', location: '' }); setErrors({}); setShowModal(true);
     };
 
@@ -947,10 +961,27 @@ const QrCodes = () => {
                         ))}
                     </div>
                     {currentView === 'list' && (hasPermission('CREATE_QR') || hasPermission('MANAGE_QRCODE')) && (
-                        <button onClick={openCreateModal}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-blue-700 flex items-center gap-2 text-sm transition">
-                            <FaPlus /> Thêm QR
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                                currentProjectQrPoints.length >= tenantLimits.maxQRCodes
+                                    ? 'bg-red-100 text-red-600'
+                                    : currentProjectQrPoints.length >= tenantLimits.maxQRCodes * 0.8
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-green-100 text-green-700'
+                            }`}>
+                                🔲 {currentProjectQrPoints.length}/{tenantLimits.maxQRCodes}
+                            </span>
+                            <button
+                                onClick={openCreateModal}
+                                disabled={currentProjectQrPoints.length >= tenantLimits.maxQRCodes}
+                                className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm transition shadow-sm ${
+                                    currentProjectQrPoints.length >= tenantLimits.maxQRCodes
+                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                }`}>
+                                <FaPlus /> Thêm QR
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>

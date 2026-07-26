@@ -14,33 +14,17 @@ import {
     RiPhoneLine, RiVideoLine
 } from 'react-icons/ri';
 
-const API_URL = 'https://api.aegism.online';
+const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000' : 'https://api.aegism.online';
 
-// TURN server - Metered.ca (global.relay.metered.ca)
+// Sử dụng Google STUN servers (Public & Reliable)
 const ICE_SERVERS = {
     iceServers: [
-        { urls: 'stun:stun.relay.metered.ca:80' },
         { urls: 'stun:stun.l.google.com:19302' },
-        {
-            urls: 'turn:global.relay.metered.ca:80',
-            username: 'b78169ee2cdf707a7814fd06',
-            credential: 'WOKWqiWViSRfXziL'
-        },
-        {
-            urls: 'turn:global.relay.metered.ca:80?transport=tcp',
-            username: 'b78169ee2cdf707a7814fd06',
-            credential: 'WOKWqiWViSRfXziL'
-        },
-        {
-            urls: 'turn:global.relay.metered.ca:443',
-            username: 'b78169ee2cdf707a7814fd06',
-            credential: 'WOKWqiWViSRfXziL'
-        },
-        {
-            urls: 'turns:global.relay.metered.ca:443?transport=tcp',
-            username: 'b78169ee2cdf707a7814fd06',
-            credential: 'WOKWqiWViSRfXziL'
-        }
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' }
     ],
     iceCandidatePoolSize: 10,
     iceTransportPolicy: 'all' as RTCIceTransportPolicy
@@ -244,13 +228,13 @@ const Chat: React.FC = () => {
     // ─── SOUND ─────────────────────────────────────────────────────────────
 
     const playRingtone = () => {
-        try { ringtoneRef.current?.play().catch(() => {}); } catch { }
+        try { ringtoneRef.current?.play().catch(() => { }); } catch { }
     };
     const playWaiting = () => {
-        try { waitingRef.current?.play().catch(() => {}); } catch { }
+        try { waitingRef.current?.play().catch(() => { }); } catch { }
     };
     const playNotification = () => {
-        try { notificationRef.current?.play().catch(() => {}); } catch { }
+        try { notificationRef.current?.play().catch(() => { }); } catch { }
     };
     const stopRingtone = () => {
         try { if (ringtoneRef.current) { ringtoneRef.current.pause(); ringtoneRef.current.currentTime = 0; } } catch { }
@@ -384,7 +368,7 @@ const Chat: React.FC = () => {
 
         socket.on('ice-candidate', async (data) => {
             const candidate = new RTCIceCandidate(data.candidate);
-            if (peerConnection.current?.remoteDescription?.type) {
+            if (peerConnection.current?.remoteDescription) {
                 await peerConnection.current.addIceCandidate(candidate);
             } else {
                 remoteCandidatesQueue.current.push(candidate);
