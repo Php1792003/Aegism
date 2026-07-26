@@ -196,9 +196,9 @@ const PricingPage = () => {
                             </div>
                         ) : (
                             <div className={`grid grid-cols-1 gap-8 items-start ${dynamicPlans.length === 1 ? 'md:grid-cols-1 max-w-sm mx-auto' :
-                                    dynamicPlans.length === 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' :
-                                        dynamicPlans.length === 3 ? 'md:grid-cols-3' :
-                                            'md:grid-cols-2 lg:grid-cols-4'
+                                dynamicPlans.length === 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' :
+                                    dynamicPlans.length === 3 ? 'md:grid-cols-3' :
+                                        'md:grid-cols-2 lg:grid-cols-4'
                                 }`}>
                                 {dynamicPlans.map((plan, idx) => {
                                     const isPaid = plan.monthlyPrice > 0;
@@ -364,7 +364,7 @@ const PricingPage = () => {
                                             <h3 className="text-lg font-bold mb-2">Quét mã VietQR để thanh toán</h3>
                                             <p className="text-sm text-gray-500 mb-4">Dùng app ngân hàng quét mã hoặc mở trang PayOS</p>
                                             <div className="border-4 border-[#4F46E5] rounded-2xl p-3 bg-white shadow-lg inline-block mb-4">
-                                                <img src={`https://img.vietqr.io/image/MB-12345678-compact2.png?amount=${calculateSubTotal()}&addInfo=AEGISM${selectedPlan.toUpperCase()}${orderCode}&accountName=AEGISM`} alt="VietQR" className="w-48 h-48 object-contain" />
+                                                <img src={`https://img.vietqr.io/image/MB-12345678-compact2.png?amount=${calculateSubTotal()}&addInfo=AEGISM${selectedPlanKey.toUpperCase()}${orderCode}&accountName=AEGISM`} alt="VietQR" className="w-48 h-48 object-contain" />
                                             </div>
                                             {checkoutUrl && (
                                                 <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 bg-[#4F46E5] text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors mb-4">
