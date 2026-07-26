@@ -262,12 +262,12 @@ const PricingPage = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 overflow-y-auto">
                     <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                        <div className="fixed inset-0 transition-opacity" onClick={paymentStep === 'info' ? closeModal : undefined}>
+                        <div className="fixed inset-0 transition-opacity" onClick={['info', 'waiting', 'error'].includes(paymentStep) ? closeModal : undefined}>
                             <div className="absolute inset-0 bg-gray-900 opacity-75"></div>
                         </div>
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
                         <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full relative">
-                            {(paymentStep === 'info' || paymentStep === 'error') && (
+                            {['info', 'waiting', 'error'].includes(paymentStep) && (
                                 <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"><HiXMark className="text-2xl" /></button>
                             )}
                             <div className="grid grid-cols-1 lg:grid-cols-12 h-full lg:min-h-[600px]">
