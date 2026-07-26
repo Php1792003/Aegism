@@ -16,4 +16,16 @@ export class MailerService {
             },
         });
     }
+
+    async sendResetPasswordOtp(userEmail: string, userName: string, otp: string) {
+        await this.mailerService.sendMail({
+            to: userEmail,
+            subject: 'AEGISM - Mã xác nhận đặt lại mật khẩu',
+            template: 'reset-password',
+            context: {
+                name: userName,
+                otp,
+            },
+        });
+    }
 }

@@ -59,6 +59,8 @@ model User {
   roleId                    String?
   status                    String               @default("active")
   avatar                    String?
+  resetPasswordOtp          String?
+  resetPasswordOtpExpiry    DateTime?
   activityLogs              ActivityLog[]
   adminOfGroups             Conversation[]       @relation("GroupAdmin")
   conversations             ConversationMember[]

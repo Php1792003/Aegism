@@ -4,6 +4,8 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
   ForbiddenException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
@@ -162,5 +164,70 @@ export class AuthService {
         role: role ? { id: role.id, name: role.name, permissions: role.permissions } : null,
       },
     };
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('Vui lòng kiểm tra lại email.');
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Set expiry to 15 minutes from now
+    const expiry = new Date();
+    expiry.setMinutes(expiry.getMinutes() + 15);
+
+    // Save to DB
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetPasswordOtp: otp,
+        resetPasswordOtpExpiry: expiry,
+      },
+    });
+
+    // Send Email
+    try {
+      await this.mailerService.sendResetPasswordOtp(user.email, user.fullName, otp);
+    } catch (error) {
+      console.error('Failed to send reset password email:', error);
+      throw new InternalServerErrorException('Lỗi gửi email. Vui lòng thử lại sau.');
+    }
+
+    return { message: 'Mã OTP đã được gửi đến email của bạn.' };
+  }
+
+  async resetPassword(email: string, otp: string, newPassword: string): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      throw new BadRequestException('Email hoặc mã OTP không hợp lệ.');
+    }
+
+    // Check if OTP matches and is not expired
+    if (!user.resetPasswordOtp || user.resetPasswordOtp !== otp) {
+      throw new BadRequestException('Mã OTP không chính xác.');
+    }
+
+    if (!user.resetPasswordOtpExpiry || user.resetPasswordOtpExpiry < new Date()) {
+      throw new BadRequestException('Mã OTP đã hết hạn.');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear OTP fields
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordOtp: null,
+        resetPasswordOtpExpiry: null,
+      },
+    });
+
+    return { message: 'Đặt lại mật khẩu thành công.' };
   }
 }

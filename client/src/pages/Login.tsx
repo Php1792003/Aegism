@@ -52,8 +52,8 @@ const Login = () => {
             console.error(err);
             if (err.response && err.response.status === 401) {
                 setError('Email hoặc mật khẩu không chính xác.');
-            } else if (err.response && err.response.status === 403 && 
-                      (err.response.data?.message === 'USER_SUSPENDED' || err.response.data?.message === 'TENANT_SUSPENDED')) {
+            } else if (err.response && err.response.status === 403 &&
+                (err.response.data?.message === 'USER_SUSPENDED' || err.response.data?.message === 'TENANT_SUSPENDED')) {
                 setError('Vi phạm chính sách bảo mật của hệ thống nên đã tạm khoá tài khoản vui lòng liên hệ admin để được hỗ trợ.');
                 setShowSuspendedToast(true);
             } else {
@@ -169,6 +169,11 @@ const Login = () => {
                                         )}
                                     </button>
                                 </div>
+                                <div className="flex justify-end mt-2">
+                                    <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                                        Quên mật khẩu?
+                                    </Link>
+                                </div>
                             </div>
 
                             {/* Submit Button */}
@@ -218,8 +223,8 @@ const Login = () => {
                             Vi phạm chính sách bảo mật của hệ thống nên đã tạm khoá tài khoản vui lòng liên hệ admin để được hỗ trợ.
                         </p>
                     </div>
-                    <button 
-                        onClick={() => setShowSuspendedToast(false)} 
+                    <button
+                        onClick={() => setShowSuspendedToast(false)}
                         className="p-1 rounded-lg text-red-400 hover:text-white hover:bg-red-900/30 transition-colors self-start"
                     >
                         <HiOutlineX className="w-4 h-4" />

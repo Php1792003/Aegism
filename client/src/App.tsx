@@ -5,6 +5,7 @@ import ScanRedirect from './pages/Scanredirect';
 import NotFoundPage from './pages/NotFoundPage';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import type { JSX } from 'react';
 import Project from './pages/Project';
@@ -60,6 +61,7 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
         </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<RegisterPage />} />
 
         {/* User routes */}
