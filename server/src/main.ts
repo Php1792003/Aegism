@@ -14,11 +14,15 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  // Cấu hình CORS đã được sửa đổi
   app.enableCors({
-    origin: true,
+    origin: [
+      'https://aegism.online',
+      'https://www.aegism.online',
+      'http://localhost:3001'
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization',
   });
 
   app.use(json({ limit: '50mb' }));
@@ -36,7 +40,7 @@ async function bootstrap() {
   console.log(`
   🚀 Server đang chạy tại: ${url}
   🏢 API Prefix: ${url}/api
-  📂 Static Assets: ${url}/uploads
+  📁 Static Assets: ${url}/uploads
   `);
 }
 bootstrap();
