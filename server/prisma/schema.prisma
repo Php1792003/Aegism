@@ -699,3 +699,45 @@ model BlacklistedIP {
     updatedAt      DateTime @updatedAt
 }
 
+model PromoCampaign {
+    id              String   @id @default(cuid())
+    title           String
+    description     String
+    type            String   @default("BANNER_TOP") // BANNER_TOP | MODAL | TOAST | BANNER_BOTTOM
+    benefits        String?  // JSON array string
+    targetPlanKey   String?
+    discountPercent Int?
+    voucherCode     String?
+    ctaLabel        String   @default("Nâng cấp ngay")
+    ctaUrl          String   @default("/pricing")
+    targetAudience  String   @default("{}") // JSON: {"plans":["NONE","STARTER"]}
+    triggerEvent    String   @default("APP_OPEN") // LOGIN | APP_OPEN | LIMIT_REACHED | PREMIUM_FEATURE | SCHEDULED | NEW_FEATURE
+    isActive        Boolean  @default(true)
+    isAiGenerated   Boolean  @default(false)
+    status          String   @default("ACTIVE") // PENDING_APPROVAL | ACTIVE | REJECTED
+    aiReasoning     String?  @db.Text
+    startDate       DateTime
+    endDate         DateTime
+    priority        Int      @default(0)
+    impressions     Int      @default(0)
+    clicks          Int      @default(0)
+    conversions     Int      @default(0)
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    dismissals      PromoDismissal[]
+
+    @@index([isActive])
+    @@index([startDate, endDate])
+}
+
+model PromoDismissal {
+    id          String   @id @default(cuid())
+    campaignId  String
+    userId      String
+    dismissType String   // CLOSED | NEVER_SHOW
+    dismissedAt DateTime @default(now())
+    campaign    PromoCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+    @@unique([campaignId, userId])
+    @@index([userId])
+}

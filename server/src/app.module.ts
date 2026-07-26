@@ -28,12 +28,16 @@ import { ChatModule } from './chat/chat.module';
 import { UsersModule } from './users/users.module';
 import { PaymentModule } from './payment/payment.module';
 import { SecurityModule } from './security/security.module';
+import { PromotionModule } from './promotion/promotion.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './security/audit.interceptor';
+
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     PrismaModule,
 
     ServeStaticModule.forRoot(
@@ -66,6 +70,7 @@ import { AuditInterceptor } from './security/audit.interceptor';
     UsersModule,
     PaymentModule,
     SecurityModule,
+    PromotionModule,
   ],
   controllers: [AppController],
   providers: [

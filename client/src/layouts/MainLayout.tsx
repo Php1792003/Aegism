@@ -31,7 +31,7 @@ const getNotifIcon = (type: string) => {
 
 const MainLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [user, setUser] = useState<any>({ name: 'Loading...', email: '', avatar: '', roleName: 'User', tenantName: '...', isSuperAdmin: false, isTenantAdmin: false, permissions: [] });
+    const [user, setUser] = useState<any>({ name: 'Loading...', email: '', avatar: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDBwJSIgaGVpZ2h0PSIxMDBwJSI+PGNpcmNsZSBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiIGZpbGw9IiNlNWU3ZWIiLz48L3N2Zz4=', roleName: 'User', tenantName: '...', isSuperAdmin: false, isTenantAdmin: false, permissions: [] });
     const [currentPlan, setCurrentPlan] = useState('starter');
     const [notifications, setNotifications] = useState<any[]>([]);
     const [notifOpen, setNotifOpen] = useState(false);
@@ -70,7 +70,7 @@ const MainLayout = () => {
         return 'Trung tâm Điều hành';
     };
 
-    const playSound = () => { notifSound.currentTime = 0; notifSound.play().catch(() => {}); };
+    const playSound = () => { notifSound.currentTime = 0; notifSound.play().catch(() => { }); };
 
     const fetchNotifications = async () => {
         const token = localStorage.getItem('accessToken');
@@ -82,7 +82,7 @@ const MainLayout = () => {
                 setNotifications(data);
                 setUnreadCount(data.filter((n: any) => !n.isRead).length);
             }
-        } catch {}
+        } catch { }
     };
 
     const markAsRead = async (id: string) => {
@@ -92,7 +92,7 @@ const MainLayout = () => {
             await fetch(`${apiUrl}/api/notifications/${id}/read`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` } });
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch {}
+        } catch { }
     };
 
     const markAllAsRead = () => notifications.filter(n => !n.isRead).forEach(n => markAsRead(n.id));
@@ -123,7 +123,7 @@ const MainLayout = () => {
                 setNotifications(prev => [notif, ...prev]);
                 setUnreadCount(prev => prev + 1);
                 playSound();
-            } catch {}
+            } catch { }
         };
         return () => es.close();
     }, []);
@@ -131,13 +131,13 @@ const MainLayout = () => {
     useEffect(() => {
         const userStr = localStorage.getItem('user');
         const planStr = localStorage.getItem('userPlan');
-        if (userStr) { try { updateUserUI(JSON.parse(userStr)); } catch {} }
+        if (userStr) { try { updateUserUI(JSON.parse(userStr)); } catch { } }
         if (planStr) setCurrentPlan(planStr);
         fetchUserProfile();
 
         const handleSync = () => {
             const currentStr = localStorage.getItem('user');
-            if (currentStr) { try { updateUserUI(JSON.parse(currentStr)); } catch {} }
+            if (currentStr) { try { updateUserUI(JSON.parse(currentStr)); } catch { } }
         };
         window.addEventListener('user-profile-updated', handleSync);
         window.addEventListener('storage', handleSync);
@@ -318,7 +318,9 @@ const MainLayout = () => {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6 pb-24 lg:pb-6"><Outlet /></main>
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6 pb-24 lg:pb-6">
+                    <Outlet />
+                </main>
 
                 {/* Mobile Bottom Navigation Bar */}
                 <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">

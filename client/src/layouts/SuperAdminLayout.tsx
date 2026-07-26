@@ -6,7 +6,7 @@ import {
     HiOutlineChartBar, HiOutlineOfficeBuilding, HiOutlineUsers,
     HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX,
     HiOutlineShieldCheck, HiOutlineCurrencyDollar, HiOutlineDocumentReport,
-    HiOutlineChevronLeft, HiOutlineChevronRight
+    HiOutlineChevronLeft, HiOutlineChevronRight, HiOutlineSpeakerphone
 } from 'react-icons/hi';
 
 const SuperAdminLayout = () => {
@@ -61,6 +61,7 @@ const SuperAdminLayout = () => {
         { path: '/super-admin/users', icon: <HiOutlineUsers className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý người dùng', shortLabel: 'Người dùng' },
         { path: '/super-admin/revenue', icon: <HiOutlineCurrencyDollar className="w-5 h-5 flex-shrink-0" />, label: 'Doanh thu', shortLabel: 'Doanh thu' },
         { path: '/super-admin/plans', icon: <HiOutlineDocumentReport className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý Gói', shortLabel: 'Gói dịch vụ' },
+        { path: '/super-admin/promotions', icon: <HiOutlineSpeakerphone className="w-5 h-5 flex-shrink-0" />, label: 'Chiến dịch Quảng bá', shortLabel: 'Quảng bá' },
         { path: '/super-admin/security', icon: <HiOutlineShieldCheck className="w-5 h-5 flex-shrink-0" />, label: 'Bảo mật & Nhật ký', shortLabel: 'Bảo mật' },
     ];
 
