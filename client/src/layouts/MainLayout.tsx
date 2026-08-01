@@ -217,7 +217,7 @@ const MainLayout = () => {
                         <button onClick={() => setSidebarOpen(false)} className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition-colors"><HiOutlineX className="w-5 h-5" /></button>
                     </div>
                     <nav className="mt-6 px-4 space-y-1 overflow-y-auto max-h-[calc(100vh-160px)] custom-scrollbar">
-                        <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className={getLinkClass('/')}><HiOutlineHome className="w-5 h-5 mr-3" />Tổng quan</Link>
+                        <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className={getLinkClass('/dashboard')}><HiOutlineHome className="w-5 h-5 mr-3" />Tổng quan</Link>
                         {hasPermission('VIEW_PROJECTS') && <Link to="/projects" onClick={() => setSidebarOpen(false)} className={getLinkClass('/projects')}><HiOutlineBriefcase className="w-5 h-5 mr-3" />Quản lý Dự án</Link>}
                         <Link to="/qrcodes" onClick={() => setSidebarOpen(false)} className={getLinkClass('/qrcodes')}><HiOutlineQrcode className="w-5 h-5 mr-3" />Mã QR & Điểm quét</Link>
                         <Link to="/staff" onClick={() => setSidebarOpen(false)} className={getLinkClass('/staff')}><HiOutlineUsers className="w-5 h-5 mr-3" />Nhân sự & Phân quyền</Link>
