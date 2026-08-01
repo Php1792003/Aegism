@@ -3,7 +3,8 @@ import SuperAdminLayout from './layouts/SuperAdminLayout';
 import { PromoProvider } from './components/PromoSystem';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ScanRedirect from './pages/Scanredirect';
-import NotFoundPage from './pages/NotFoundPage';
+import NotFound from './components/NotFound';
+import ServerError from './components/ServerError';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
@@ -93,9 +94,10 @@ function App() {
             <Route path="/super-admin/security" element={<SuperAdminSecurity />} />
           </Route>
 
-          {/* Scan redirect & 404 */}
+          {/* Scan redirect & Errors */}
           <Route path="/scan" element={<ScanRedirect />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="/500" element={<ServerError />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </PromoProvider>
     </BrowserRouter>
