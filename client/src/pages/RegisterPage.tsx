@@ -112,8 +112,8 @@ const RegisterPage = () => {
             <div className="flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
                 <div className="mx-auto w-full max-w-md">
                     <div className="flex items-center mb-10">
-                        <Link to="/">
-                            <img src="/img/aegism_logo_mini.png" alt="Logo AEGISM" className="h-[30px] w-auto" />
+                        <Link to="/" className="w-full flex justify-center">
+                            <img src="/img/aegism_logo_mini.png" alt="Logo AEGISM" className="w-full h-[56px] object-contain" />
                         </Link>
                     </div>
 

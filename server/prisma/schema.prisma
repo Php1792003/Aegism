@@ -16,6 +16,11 @@ model Tenant {
   maxQRCodes            Int                @default(100)
   maxUsers              Int                @default(5)
   maxProjects           Int                @default(1)
+  appName               String?
+  primaryColor          String?
+  logoUrl               String?
+  logoHeight            Int                @default(40)
+  customDomain          String?
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
   activityLogs          ActivityLog[]
@@ -41,6 +46,8 @@ model Tenant {
   workflows             Workflow[]
   workflowApprovals     WorkflowApproval[]
   workflowInstances     WorkflowInstance[]
+  apiKeys               TenantApiKey[]
+  webhooks              TenantWebhook[]
 
   @@index([subscriptionPlan])
   @@index([isActive])
@@ -88,6 +95,8 @@ model User {
   approvedWorkflowApprovals WorkflowApproval[]   @relation("ApprovedBy")
   assignedWorkflowApprovals WorkflowApproval[]   @relation("AssignedTo")
   startedWorkflowInstances  WorkflowInstance[]
+  createdApiKeys            TenantApiKey[]
+  createdWebhooks           TenantWebhook[]
 
   @@index([tenantId])
   @@index([roleId])
@@ -740,4 +749,64 @@ model PromoDismissal {
 
     @@unique([campaignId, userId])
     @@index([userId])
+}
+
+model TenantApiKey {
+    id              String   @id @default(cuid())
+    name            String
+    keyHash         String   @unique
+    prefix          String
+    suffix          String
+    isActive        Boolean  @default(true)
+    policyAccepted  Boolean  @default(false)
+    lastUsedAt      DateTime?
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    tenantId        String
+    createdById     String
+    revokedAt       DateTime?
+    revokedBy       String?
+    revokeReason    String?
+    tenant          Tenant   @relation(fields: [tenantId], references: [id])
+    createdBy       User     @relation(fields: [createdById], references: [id])
+
+    @@index([tenantId])
+    @@index([keyHash])
+    @@index([createdById])
+}
+
+model TenantWebhook {
+    id              String         @id @default(cuid())
+    event           String
+    url             String
+    secret          String?
+    isActive        Boolean        @default(true)
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @updatedAt
+    tenantId        String
+    createdById     String
+    tenant          Tenant         @relation(fields: [tenantId], references: [id])
+    createdBy       User           @relation(fields: [createdById], references: [id])
+    logs            WebhookLog[]
+
+    @@index([tenantId])
+    @@index([event])
+}
+
+model WebhookLog {
+    id              String        @id @default(cuid())
+    webhookId       String
+    event           String
+    payload         String?       @db.Text
+    statusCode      Int?
+    response        String?       @db.Text
+    success         Boolean       @default(false)
+    duration        Int?
+    error           String?
+    attempt         Int           @default(1)
+    createdAt       DateTime      @default(now())
+    webhook         TenantWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+    @@index([webhookId])
+    @@index([createdAt])
 }

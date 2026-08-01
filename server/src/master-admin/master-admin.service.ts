@@ -270,6 +270,7 @@ export class MasterAdminService {
       const { execSync } = require('child_process');
       const dfOutput = execSync(
         "df / --output=size,used --block-size=1 | tail -1",
+        { stdio: 'pipe' }
       )
         .toString()
         .trim();

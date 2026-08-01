@@ -37,6 +37,7 @@ const MainLayout = () => {
     const [notifOpen, setNotifOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const [showExpiredModal, setShowExpiredModal] = useState(false);
+    const [branding, setBranding] = useState<{ logo: string | null; appName: string; primaryColor: string; logoHeight: number }>({ logo: null, appName: 'OPSERA', primaryColor: '#2563EB', logoHeight: 40 });
     const notifRef = useRef<HTMLDivElement>(null);
     const isFirstLoad = useRef(true);
 
@@ -147,6 +148,47 @@ const MainLayout = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const fetchBranding = async () => {
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+                try {
+                    const res = await fetch(`${apiUrl}/api/branding`, { headers: { Authorization: `Bearer ${token}` } });
+                    if (res.ok) {
+                        const data = await res.json();
+                        setBranding(prev => ({
+                            ...prev,
+                            appName: data.appName || 'OPSERA',
+                            primaryColor: data.primaryColor || '#2563EB',
+                            logo: data.logo || null,
+                            logoHeight: data.logoHeight || 40
+                        }));
+                    }
+                } catch (err) { }
+            }
+        };
+
+        const handlePreview = (e: CustomEvent) => {
+            if (e.detail) {
+                setBranding(prev => ({
+                    ...prev,
+                    appName: e.detail.appName !== undefined ? e.detail.appName : prev.appName,
+                    primaryColor: e.detail.primaryColor !== undefined ? e.detail.primaryColor : prev.primaryColor,
+                    logo: e.detail.logo !== undefined ? e.detail.logo : prev.logo,
+                    logoHeight: e.detail.logoHeight !== undefined ? e.detail.logoHeight : prev.logoHeight
+                }));
+            }
+        };
+
+        fetchBranding();
+        window.addEventListener('brandingUpdated', fetchBranding);
+        window.addEventListener('brandingPreview', handlePreview as EventListener);
+        return () => {
+            window.removeEventListener('brandingUpdated', fetchBranding);
+            window.removeEventListener('brandingPreview', handlePreview as EventListener);
+        };
+    }, []);
+
     const fetchUserProfile = async () => {
         try {
             const token = localStorage.getItem('accessToken');
@@ -195,8 +237,22 @@ const MainLayout = () => {
 
     const getLinkClass = (path: string, colorType: 'blue' | 'purple' = 'blue') => {
         const isActive = location.pathname === path;
+
+        if (isActive) {
+            // Nếu có custom color và là 'blue' (màu chính) thì override inline style, còn không thì dùng tailwind classes.
+            // Để đơn giản, ta chỉ đổi màu style nếu người dùng không dùng mặc định.
+        }
+
         const activeClasses = colorType === 'purple' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600';
         return `flex items-center px-4 py-3 rounded-lg transition-colors font-medium mb-1 ${isActive ? activeClasses : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'}`;
+    };
+
+    const activeLinkStyle = (path: string, colorType: 'blue' | 'purple' = 'blue') => {
+        const isActive = location.pathname === path;
+        if (isActive && colorType === 'blue' && branding.primaryColor !== '#2563EB') {
+            return { backgroundColor: `${branding.primaryColor}15`, color: branding.primaryColor };
+        }
+        return {};
     };
 
     const hasPermission = (perm: string) => {
@@ -212,17 +268,28 @@ const MainLayout = () => {
 
             <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-lg lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div>
-                    <div className="relative flex items-center justify-center h-20 border-b border-gray-100 px-4">
-                        <Link to="/"><img src="/img/aegism_logo_mini.png" alt="Logo" className="h-[30px] w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} /></Link>
+                    <div className="relative flex items-center justify-center min-h-[80px] py-4 border-b border-gray-100 px-4">
+                        <Link to="/" className="w-full flex items-center justify-center">
+                            {branding.logo ? (
+                                <img src={branding.logo.startsWith('http') ? branding.logo : `${apiUrl}${branding.logo}`} alt="Logo" className="w-full object-contain" style={{ height: `${branding.logoHeight}px` }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                            ) : (
+                                <div className="flex items-center justify-center space-x-2">
+                                    <img src="/img/aegism_logo_mini.png" alt="Logo" className="w-full object-contain" style={{ height: `${branding.logoHeight}px` }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                                    {branding.appName && branding.appName !== 'AEGISM' && branding.appName !== 'OPSERA' && (
+                                        <span className="font-bold text-lg hidden md:block" style={{ color: branding.primaryColor }}>{branding.appName}</span>
+                                    )}
+                                </div>
+                            )}
+                        </Link>
                         <button onClick={() => setSidebarOpen(false)} className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition-colors"><HiOutlineX className="w-5 h-5" /></button>
                     </div>
                     <nav className="mt-6 px-4 space-y-1 overflow-y-auto max-h-[calc(100vh-160px)] custom-scrollbar">
-                        <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className={getLinkClass('/dashboard')}><HiOutlineHome className="w-5 h-5 mr-3" />Tổng quan</Link>
-                        {hasPermission('VIEW_PROJECTS') && <Link to="/projects" onClick={() => setSidebarOpen(false)} className={getLinkClass('/projects')}><HiOutlineBriefcase className="w-5 h-5 mr-3" />Quản lý Dự án</Link>}
-                        <Link to="/qrcodes" onClick={() => setSidebarOpen(false)} className={getLinkClass('/qrcodes')}><HiOutlineQrcode className="w-5 h-5 mr-3" />Mã QR & Điểm quét</Link>
-                        <Link to="/staff" onClick={() => setSidebarOpen(false)} className={getLinkClass('/staff')}><HiOutlineUsers className="w-5 h-5 mr-3" />Nhân sự & Phân quyền</Link>
-                        <Link to="/tasks" onClick={() => setSidebarOpen(false)} className={getLinkClass('/tasks')}><HiOutlineClipboardList className="w-5 h-5 mr-3" />Công việc & Task</Link>
-                        <Link to="/chat" onClick={() => setSidebarOpen(false)} className={getLinkClass('/chat')}><HiOutlineChatAlt2 className="w-5 h-5 mr-3" />Trò chuyện</Link>
+                        <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className={getLinkClass('/dashboard')} style={activeLinkStyle('/dashboard')}><HiOutlineHome className="w-5 h-5 mr-3" />Tổng quan</Link>
+                        {hasPermission('VIEW_PROJECTS') && <Link to="/projects" onClick={() => setSidebarOpen(false)} className={getLinkClass('/projects')} style={activeLinkStyle('/projects')}><HiOutlineBriefcase className="w-5 h-5 mr-3" />Quản lý Dự án</Link>}
+                        <Link to="/qrcodes" onClick={() => setSidebarOpen(false)} className={getLinkClass('/qrcodes')} style={activeLinkStyle('/qrcodes')}><HiOutlineQrcode className="w-5 h-5 mr-3" />Mã QR & Điểm quét</Link>
+                        <Link to="/staff" onClick={() => setSidebarOpen(false)} className={getLinkClass('/staff')} style={activeLinkStyle('/staff')}><HiOutlineUsers className="w-5 h-5 mr-3" />Nhân sự & Phân quyền</Link>
+                        <Link to="/tasks" onClick={() => setSidebarOpen(false)} className={getLinkClass('/tasks')} style={activeLinkStyle('/tasks')}><HiOutlineClipboardList className="w-5 h-5 mr-3" />Công việc & Task</Link>
+                        <Link to="/chat" onClick={() => setSidebarOpen(false)} className={getLinkClass('/chat')} style={activeLinkStyle('/chat')}><HiOutlineChatAlt2 className="w-5 h-5 mr-3" />Trò chuyện</Link>
                         {['business', 'professional', 'enterprise'].includes(currentPlan) && (
                             <div className="pt-2 mt-2 border-t border-gray-100">
                                 <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nâng cao</p>
@@ -233,8 +300,8 @@ const MainLayout = () => {
                         {currentPlan === 'enterprise' && (
                             <div className="pt-2 mt-2 border-t border-gray-100">
                                 <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Doanh nghiệp</p>
-                                <Link to="/api-integration" onClick={() => setSidebarOpen(false)} className={getLinkClass('/api-integration')}><HiOutlineCubeTransparent className="w-5 h-5 mr-3" />Tích hợp API</Link>
-                                <Link to="/branding" onClick={() => setSidebarOpen(false)} className={getLinkClass('/branding')}><HiOutlineColorSwatch className="w-5 h-5 mr-3" />Tùy chỉnh Thương hiệu</Link>
+                                <Link to="/api-integration" onClick={() => setSidebarOpen(false)} className={getLinkClass('/api-integration')} style={activeLinkStyle('/api-integration')}><HiOutlineCubeTransparent className="w-5 h-5 mr-3" />Tích hợp API</Link>
+                                <Link to="/branding" onClick={() => setSidebarOpen(false)} className={getLinkClass('/branding')} style={activeLinkStyle('/branding')}><HiOutlineColorSwatch className="w-5 h-5 mr-3" />Tùy chỉnh Thương hiệu</Link>
                             </div>
                         )}
                     </nav>

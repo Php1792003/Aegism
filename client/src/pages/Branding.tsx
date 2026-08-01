@@ -6,6 +6,7 @@ const Branding: React.FC = () => {
     const [appName, setAppName] = useState('OPSERA');
     const [primaryColor, setPrimaryColor] = useState('#2563EB');
     const [logo, setLogo] = useState<string | null>(null);
+    const [logoHeight, setLogoHeight] = useState<number>(40);
     const [domain, setDomain] = useState('');
     const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
     const [saving, setSaving] = useState(false);
@@ -15,17 +16,35 @@ const Branding: React.FC = () => {
     const isEnterprise = currentPlan === 'enterprise';
 
     useEffect(() => {
-        const saved = localStorage.getItem('brandingConfig');
-        if (saved) {
+        const fetchBranding = async () => {
             try {
-                const cfg = JSON.parse(saved);
-                if (cfg.appName) setAppName(cfg.appName);
-                if (cfg.primaryColor) setPrimaryColor(cfg.primaryColor);
-                if (cfg.logo) setLogo(cfg.logo);
-                if (cfg.domain) setDomain(cfg.domain);
-            } catch { }
-        }
+                const token = localStorage.getItem('accessToken');
+                const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                    ? 'http://localhost:3000/api'
+                    : 'https://api.aegism.online/api';
+                const res = await fetch(`${apiUrl}/branding`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.appName) setAppName(data.appName);
+                    if (data.primaryColor) setPrimaryColor(data.primaryColor);
+                    if (data.logo) setLogo(data.logo);
+                    if (data.domain) setDomain(data.domain);
+                    if (data.logoHeight) setLogoHeight(data.logoHeight);
+                }
+            } catch (err) {
+                console.error('Failed to fetch branding:', err);
+            }
+        };
+        fetchBranding();
     }, []);
+
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent('brandingPreview', {
+            detail: { appName, primaryColor, logo, logoHeight }
+        }));
+    }, [appName, primaryColor, logo, logoHeight]);
 
     const showToast = (msg: string, type: 'success' | 'error') => {
         setToast({ msg, type });
@@ -44,9 +63,33 @@ const Branding: React.FC = () => {
     const handleSave = async () => {
         setSaving(true);
         try {
-            localStorage.setItem('brandingConfig', JSON.stringify({ appName, primaryColor, logo, domain }));
-            await new Promise(r => setTimeout(r, 600));
-            showToast('Đã lưu thay đổi thành công!', 'success');
+            const token = localStorage.getItem('accessToken');
+            const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                ? 'http://localhost:3000/api'
+                : 'https://api.aegism.online/api';
+            const res = await fetch(`${apiUrl}/branding`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    appName,
+                    primaryColor,
+                    logo,
+                    logoHeight,
+                    domain
+                })
+            });
+
+            if (res.ok) {
+                // Dispatch event so that MainLayout can update immediately
+                window.dispatchEvent(new Event('brandingUpdated'));
+                showToast('Đã lưu thay đổi thành công!', 'success');
+            } else {
+                const errData = await res.json();
+                showToast(errData.message || 'Lưu thất bại', 'error');
+            }
         } catch { showToast('Lưu thất bại', 'error'); }
         finally { setSaving(false); }
     };
@@ -161,35 +204,27 @@ const Branding: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Custom Domain */}
+                        {/* Kích thước Logo */}
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <h3 className="text-base font-bold text-gray-800 mb-5">Tên miền riêng (Custom Domain)</h3>
+                            <h3 className="text-base font-bold text-gray-800 mb-5">Kích thước Logo</h3>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Domain của bạn</label>
-                                <div className="flex rounded-lg overflow-hidden border border-gray-300">
-                                    <span className="inline-flex items-center px-3 bg-gray-50 text-gray-500 text-sm border-r border-gray-300">
-                                        https://
-                                    </span>
-                                    <input type="text" value={domain} onChange={e => setDomain(e.target.value)}
-                                        placeholder="portal.yourcompany.com"
-                                        className="flex-1 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" />
-                                </div>
+                                <label className="flex justify-between text-sm font-medium text-gray-700 mb-4">
+                                    <span>Độ thu phóng</span>
+                                    <span className="text-blue-600 font-bold">{logoHeight}px</span>
+                                </label>
+                                <input type="range" min="20" max="200" value={logoHeight} onChange={e => setLogoHeight(Number(e.target.value))}
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                             </div>
-                            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4 rounded-r-lg">
-                                <p className="text-xs text-blue-700">
-                                    Vui lòng tạo bản ghi <strong>CNAME</strong> trỏ về <code className="bg-blue-100 px-1 rounded">custom.opsera.vn</code> tại nhà cung cấp tên miền của bạn.
-                                </p>
-                            </div>
-                            <button className="w-full px-4 py-2 bg-gray-800 text-white text-sm font-bold rounded-lg hover:bg-gray-900 transition-colors">
-                                Xác thực Tên miền
-                            </button>
+                            <p className="text-xs text-gray-500 mt-3">
+                                Kéo thanh trượt để điều chỉnh chiều cao của logo (từ 20px đến 200px) sao cho vừa vặn với không gian menu.
+                            </p>
                         </div>
 
                         {/* Save button */}
                         <div className="flex justify-end">
                             <button onClick={handleSave} disabled={saving}
                                 className="px-8 py-3 bg-pink-600 text-white text-sm font-bold rounded-xl hover:bg-pink-700 shadow-lg transition-all hover:scale-105 disabled:opacity-60 disabled:scale-100 flex items-center gap-2">
-                                {saving && <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>}
+                                {saving && <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>}
                                 {saving ? 'Đang lưu...' : 'Lưu Thay đổi'}
                             </button>
                         </div>
@@ -223,10 +258,10 @@ const Branding: React.FC = () => {
                                 <div className="flex flex-1 overflow-hidden">
                                     {/* Sidebar preview */}
                                     <div className="w-44 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
-                                        <div className="h-14 border-b border-gray-100 flex items-center justify-center px-3">
+                                        <div className="min-h-[56px] py-2 border-b border-gray-100 flex items-center justify-center px-3 w-full">
                                             {logo
-                                                ? <img src={logo} className="h-7 object-contain" alt="logo" />
-                                                : <span className="text-base font-black tracking-wider" style={{ color: primaryColor }}>{appName || 'OPSERA'}</span>
+                                                ? <img src={logo} className="w-full object-contain" style={{ height: `${logoHeight}px` }} alt="logo" />
+                                                : <span className="text-base font-black tracking-wider text-center line-clamp-2 leading-tight" style={{ color: primaryColor }}>{appName || 'OPSERA'}</span>
                                             }
                                         </div>
                                         <div className="p-2 space-y-1">

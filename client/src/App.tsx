@@ -36,6 +36,8 @@ import SuperAdminRevenue from './pages/SuperAdminRevenue';
 import SuperAdminPlans from './pages/SuperAdminPlans';
 import SuperAdminSecurity from './pages/SuperAdminSecurity';
 import SuperAdminPromo from './pages/SuperAdminPromo';
+import SuperAdminApiKeys from './pages/SuperAdminApiKeys';
+
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('accessToken');
   return token ? children : <Navigate to="/login" />;
@@ -92,6 +94,7 @@ function App() {
             <Route path="/super-admin/plans" element={<SuperAdminPlans />} />
             <Route path="/super-admin/promotions" element={<SuperAdminPromo />} />
             <Route path="/super-admin/security" element={<SuperAdminSecurity />} />
+            <Route path="/super-admin/api-keys" element={<SuperAdminApiKeys />} />
           </Route>
 
           {/* Scan redirect & Errors */}

@@ -8,8 +8,8 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Column 1: Logo & Info */}
                     <div>
-                        <Link to="/">
-                            <img src="/img/aegism_logo_mini.png" alt="Logo AEGISM" className="h-[30px] w-auto" onError={(e) => e.currentTarget.style.display = 'none'} />
+                        <Link to="/" className="w-full flex items-center">
+                            <img src="/img/aegism_logo_mini.png" alt="Logo AEGISM" className="w-full h-[56px] object-contain object-left" onError={(e) => e.currentTarget.style.display = 'none'} />
                             <span className="text-xl font-bold text-gray-800 ml-2 md:hidden">AEGISM</span>
                         </Link>
                         <p className="mt-2 text-sm text-gray-500">
