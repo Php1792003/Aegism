@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
+import { BreadcrumbSchema } from '../components/StructuredData';
 import {
     HiBars3,
     HiXMark,
@@ -93,6 +95,13 @@ const AboutPage = () => {
     return (
         <div className="bg-white text-gray-800 font-sans">
             <main>
+                <SEO
+                    title="Về AEGISM - Đội ngũ & Sứ mệnh chuyển đổi số an ninh"
+                    description="Tìm hiểu về AEGISM - công ty công nghệ tiên phong tại Đà Nẵng chuyên cung cấp giải pháp số hóa quản lý an ninh và vận hành tòa nhà."
+                    url="/about"
+                    keywords="về AEGISM, đội ngũ AEGISM, sứ mệnh AEGISM, công ty công nghệ an ninh Đà Nẵng"
+                />
+                <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Giới thiệu', url: '/about' }]} />
                 <section className="relative py-20 lg:py-28 bg-white overflow-hidden">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="text-center max-w-4xl mx-auto">

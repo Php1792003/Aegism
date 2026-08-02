@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
+import { BreadcrumbSchema } from '../components/StructuredData';
 import {
     HiBars3,
     HiXMark,
@@ -40,6 +42,13 @@ const RequestDemoPage = () => {
     return (
         <div className="bg-white text-gray-800 font-sans min-h-screen flex flex-col">
             <main className="py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white flex-grow">
+                <SEO
+                    title="Đăng ký Demo AEGISM miễn phí - Trải nghiệm ngay"
+                    description="Đăng ký demo miễn phí phần mềm quản lý an ninh AEGISM. Đội ngũ chuyên gia sẽ hướng dẫn bạn trải nghiệm toàn bộ tính năng trong 30 phút."
+                    url="/request-demo"
+                    keywords="demo AEGISM, dùng thử phần mềm an ninh, đăng ký demo miễn phí, trải nghiệm AEGISM"
+                />
+                <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Yêu cầu Demo', url: '/request-demo' }]} />
                 <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">

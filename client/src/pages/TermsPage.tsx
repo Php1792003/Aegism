@@ -1,10 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiDocumentText, HiCheckCircle, HiExclamationTriangle, HiChevronRight } from 'react-icons/hi2';
+import SEO from '../components/SEO';
+import { BreadcrumbSchema } from '../components/StructuredData';
 
 const TermsPage = () => {
     return (
         <div className="bg-gradient-to-b from-gray-50 to-white font-sans text-gray-800 py-16 px-4 sm:px-6 lg:px-8">
+            <SEO
+                title="Điều khoản sử dụng - AEGISM"
+                description="Điều khoản và điều kiện sử dụng dịch vụ AEGISM. Quy định về quyền và nghĩa vụ của người dùng khi sử dụng nền tảng."
+                url="/terms"
+                keywords="điều khoản sử dụng AEGISM, điều kiện dịch vụ, quy định sử dụng"
+            />
+            <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Điều khoản sử dụng', url: '/terms' }]} />
             <div className="max-w-4xl mx-auto">
                 {/* Header Section */}
                 <div className="text-center mb-12">

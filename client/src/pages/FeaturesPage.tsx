@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
+import { BreadcrumbSchema } from '../components/StructuredData';
 import {
     HiBars3,
     HiXMark,
@@ -104,6 +106,13 @@ const FeaturesPage = () => {
     return (
         <div className="bg-white text-gray-800 font-sans">
             <main>
+                <SEO
+                    title="Tính năng AEGISM - Tuần tra QR, GPS & Báo cáo KPI"
+                    description="Khám phá bộ công cụ mạnh mẽ: tuần tra QR Code chống gian lận, bản đồ GPS thời gian thực, dashboard phân tích và báo cáo KPI nhân viên."
+                    url="/features"
+                    keywords="tính năng AEGISM, tuần tra QR Code, giám sát GPS, báo cáo KPI bảo vệ, phần mềm quản lý an ninh"
+                />
+                <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Tính năng', url: '/features' }]} />
                 <section className="relative bg-gray-50 pt-24 pb-20 overflow-hidden">
                     <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full z-0 pointer-events-none">
                         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>

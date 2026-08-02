@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
+import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema, FAQSchema, BreadcrumbSchema } from '../components/StructuredData';
 import {
     HiBars3,
     HiXMark,
@@ -58,6 +60,16 @@ const LandingPage = () => {
     return (
         <div className="bg-white text-gray-800 font-sans">
             <main>
+                <SEO
+                    title="AEGISM - Phần mềm quản lý an ninh & vận hành #1 Việt Nam"
+                    description="Nền tảng AEGISM giúp số hóa tuần tra QR Code, giám sát GPS thời gian thực & báo cáo sự cố tức thì cho lực lượng bảo vệ và quản lý tòa nhà."
+                    url="/"
+                    keywords="phần mềm quản lý bảo vệ, phần mềm giám sát an ninh, tuần tra QR Code, quản lý tòa nhà, giám sát GPS bảo vệ"
+                />
+                <OrganizationSchema />
+                <SoftwareApplicationSchema />
+                <WebSiteSchema />
+                <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }]} />
                 {/* --- HERO SECTION --- */}
                 <section className="bg-white py-16 md:py-24 relative overflow-hidden">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -83,7 +95,7 @@ const LandingPage = () => {
                                 <div className="absolute inset-0 bg-gradient-to-tr from-indigo-300 to-purple-300 rounded-full blur-3xl opacity-30 animate-pulse"></div>
                                 <img
                                     src="/img/aegism_dashboard.png"
-                                    alt="AEGISM Dashboard"
+                                    alt="Giao diện Dashboard AEGISM - Phần mềm quản lý tuần tra và giám sát an ninh thời gian thực"
                                     className="relative w-full h-auto rounded-2xl shadow-2xl border border-gray-100 transform hover:scale-[1.02] transition duration-500"
                                 />
                             </div>

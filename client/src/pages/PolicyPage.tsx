@@ -1,10 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiShieldCheck, HiLockClosed, HiEye, HiChevronRight } from 'react-icons/hi2';
+import SEO from '../components/SEO';
+import { BreadcrumbSchema } from '../components/StructuredData';
 
 const PolicyPage = () => {
     return (
         <div className="bg-gradient-to-b from-gray-50 to-white font-sans text-gray-800 py-16 px-4 sm:px-6 lg:px-8">
+            <SEO
+                title="Chính sách bảo mật - AEGISM"
+                description="Chính sách bảo mật và quyền riêng tư của AEGISM. Cam kết bảo vệ dữ liệu người dùng theo tiêu chuẩn bảo mật quốc tế."
+                url="/policy"
+                keywords="chính sách bảo mật AEGISM, quyền riêng tư, bảo vệ dữ liệu"
+            />
+            <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Chính sách bảo mật', url: '/policy' }]} />
             <div className="max-w-4xl mx-auto">
                 {/* Header Section */}
                 <div className="text-center mb-12">

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
+import { BreadcrumbSchema, LocalBusinessSchema, FAQSchema } from '../components/StructuredData';
 import {
     HiBars3,
     HiXMark,
@@ -43,6 +45,20 @@ const ContactPage = () => {
     return (
         <div className="bg-white text-gray-800 font-sans min-h-screen flex flex-col">
             <main className="flex-grow">
+                <SEO
+                    title="Liên hệ AEGISM - Tư vấn & Hỗ trợ kỹ thuật 24/7"
+                    description="Liên hệ đội ngũ AEGISM để được tư vấn giải pháp, yêu cầu demo hoặc hỗ trợ kỹ thuật. Hotline: 0905 441 263, Email: support@aegism.com."
+                    url="/contact"
+                    keywords="liên hệ AEGISM, hỗ trợ AEGISM, tư vấn phần mềm an ninh, hỗ trợ kỹ thuật 24/7"
+                />
+                <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Liên hệ', url: '/contact' }]} />
+                <LocalBusinessSchema />
+                <FAQSchema items={[
+                    { question: 'AEGISM có bản dùng thử không?', answer: 'Có. Chúng tôi cung cấp gói Starter miễn phí trọn đời cho các đội nhóm nhỏ dưới 5 người.' },
+                    { question: 'Thời gian triển khai bao lâu?', answer: 'Với hệ thống Cloud, bạn có thể bắt đầu ngay lập tức sau khi đăng ký tài khoản.' },
+                    { question: 'Tôi có thể yêu cầu tính năng riêng?', answer: 'Được. Gói Enterprise cho phép tùy chỉnh tính năng và triển khai Server riêng theo nhu cầu.' },
+                    { question: 'Hỗ trợ kỹ thuật như thế nào?', answer: 'Chúng tôi hỗ trợ qua Email, Zalo, và Hotline 24/7 đối với gói Business trở lên.' },
+                ]} />
                 <section className="bg-gray-50 py-16 md:py-24">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center max-w-3xl mx-auto mb-16">

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { HiCheck, HiXMark, HiChevronDown, HiCheckCircle } from 'react-icons/hi2';
+import SEO from '../components/SEO';
+import { BreadcrumbSchema, FAQSchema } from '../components/StructuredData';
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000' : 'https://api.aegism.online';
@@ -173,6 +175,18 @@ const PricingPage = () => {
     return (
         <div className="bg-white text-gray-800 font-sans">
             <main className={colors.lightBg}>
+                <SEO
+                    title="Bảng giá AEGISM 2026 - Gói dịch vụ linh hoạt từ 499K"
+                    description="So sánh các gói Starter, Business, Enterprise. Không phí ẩn, thanh toán linh hoạt, dùng thử miễn phí 14 ngày. Tiết kiệm 20% khi trả năm."
+                    url="/pricing"
+                    keywords="bảng giá AEGISM, giá phần mềm quản lý bảo vệ, gói dịch vụ an ninh, phần mềm tuần tra giá rẻ"
+                />
+                <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Bảng giá', url: '/pricing' }]} />
+                <FAQSchema items={[
+                    { question: 'Làm thế nào để nâng cấp gói dịch vụ?', answer: 'Bạn có thể nâng cấp bất cứ lúc nào, hệ thống sẽ tự động tính phí chênh lệch.' },
+                    { question: 'Chính sách hoàn tiền?', answer: 'Chúng tôi hoàn tiền trong 14 ngày đầu nếu bạn không hài lòng.' },
+                    { question: 'AEGISM có bản dùng thử không?', answer: 'Có. Chúng tôi cung cấp dùng thử miễn phí 14 ngày cho tất cả các gói trả phí.' },
+                ]} />
                 <section className="bg-white pt-16 pb-12">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
                         <h1 className={`text-4xl md:text-5xl font-extrabold ${colors.dark} tracking-tight`}>Gói dịch vụ phù hợp cho mọi quy mô</h1>

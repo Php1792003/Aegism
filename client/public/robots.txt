@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /super-admin/
+Disallow: /scan/
+Disallow: /api-integration/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /profile
+Disallow: /branding
+Disallow: /projects
+Disallow: /qrcodes
+Disallow: /staff
+Disallow: /tasks
+Disallow: /chat
+Disallow: /reports
+Disallow: /audit-log
+Disallow: /500
+
+# Crawl-delay
+Crawl-delay: 1
+
+Sitemap: https://aegism.online/sitemap.xml
