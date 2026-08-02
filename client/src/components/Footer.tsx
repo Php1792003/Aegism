@@ -48,9 +48,9 @@ const Footer = () => {
                     <div>
                         <h4 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Liên hệ</h4>
                         <ul className="mt-4 space-y-2">
-                            <li><Link to="/support" className="text-base text-gray-500 hover:text-gray-900">Hỗ trợ</Link></li>
-                            <li><Link to="/sales" className="text-base text-gray-500 hover:text-gray-900">Bán hàng</Link></li>
-                            <li><Link to="/press" className="text-base text-gray-500 hover:text-gray-900">Liên hệ báo chí</Link></li>
+                            <li><Link to="/contact" className="text-base text-gray-500 hover:text-gray-900">Hỗ trợ</Link></li>
+                            <li><Link to="/contact" className="text-base text-gray-500 hover:text-gray-900">Bán hàng</Link></li>
+                            <li><Link to="/contact" className="text-base text-gray-500 hover:text-gray-900">Liên hệ báo chí</Link></li>
                         </ul>
                     </div>
                 </div>

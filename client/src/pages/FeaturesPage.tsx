@@ -146,7 +146,7 @@ const FeaturesPage = () => {
                     <section
                         key={feature.id}
                         id={feature.id}
-                        className={`py-16 md:py-24 ${feature.bgGray ? 'bg-gray-50' : 'bg-white'}`}
+                        className={`pt-4 pb-16 md:pt-8 md:pb-24 ${feature.bgGray ? 'bg-gray-50' : 'bg-white'}`}
                     >
                         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center`}>

@@ -71,7 +71,7 @@ const LandingPage = () => {
                 <WebSiteSchema />
                 <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }]} />
                 {/* --- HERO SECTION --- */}
-                <section className="bg-white py-16 md:py-24 relative overflow-hidden">
+                <section className="bg-white pt-4 pb-16 md:pt-8 md:pb-24 relative overflow-hidden">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                             <div className="text-center md:text-left z-10">
@@ -107,16 +107,20 @@ const LandingPage = () => {
                 <section className="bg-gray-50 py-10 border-y border-gray-100">
                     <div className="container mx-auto max-w-7xl px-4 text-center">
                         <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-6">Tin dùng bởi các doanh nghiệp hàng đầu</p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                            {['VinGroup', 'SunGroup', 'Novaland', 'DatXanh', 'HungThinh'].map((brand, i) => (
-                                <span key={i} className="text-xl font-bold text-gray-400 hover:text-indigo-600 transition">{brand}</span>
+                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-80 transition-all duration-500">
+                            {[{ name: 'Đại Sơn Long Security', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ-vXV2-71JW8jf4GePELj0IxnsTzJ1OAflKXoAhQtgA&s=10' }].map((partner, i) => (
+                                partner.logo ? (
+                                    <img key={i} src={partner.logo} alt={partner.name} className="h-24 md:h-28 object-contain drop-shadow-sm" />
+                                ) : (
+                                    <span key={i} className="text-xl font-bold text-gray-400">{partner.name}</span>
+                                )
                             ))}
                         </div>
                     </div>
                 </section>
 
                 {/* --- FEATURES SECTION (Bám sát hệ thống) --- */}
-                <section className="bg-white py-16 md:py-24">
+                <section className="bg-white pt-4 pb-16 md:pt-8 md:pb-24">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center max-w-3xl mx-auto">
                             <h2 className={`text-3xl font-extrabold ${colors.dark}`}>
@@ -163,7 +167,7 @@ const LandingPage = () => {
                 </section>
 
                 {/* --- PRICING SECTION (ĐÃ CẬP NHẬT) --- */}
-                <section className={`${colors.lightBg} py-16 md:py-24`}>
+                <section className={`${colors.lightBg} pt-4 pb-16 md:pt-8 md:pb-24`}>
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center max-w-3xl mx-auto mb-8">
                             <h2 className={`text-3xl font-extrabold ${colors.dark}`}>
@@ -290,7 +294,7 @@ const LandingPage = () => {
                 </section>
 
                 {/* --- TESTIMONIALS --- */}
-                <section className="bg-white py-16 md:py-24">
+                <section className={`${colors.lightBg} pt-4 pb-16 md:pt-8 md:pb-24`}>
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-12">Khách hàng nói gì về AEGISM?</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

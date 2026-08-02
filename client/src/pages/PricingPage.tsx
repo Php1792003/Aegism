@@ -261,7 +261,7 @@ const PricingPage = () => {
                     </div>
                 </section>
 
-                <section className="bg-white py-16 md:py-24 border-t border-gray-100">
+                <section className="bg-white pt-4 pb-16 md:pt-8 md:pb-24 border-t border-gray-100">
                     <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12"><h2 className={`text-3xl font-extrabold ${colors.dark}`}>Câu hỏi thường gặp</h2></div>
                         <div className="space-y-4">

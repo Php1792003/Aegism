@@ -59,7 +59,7 @@ const ContactPage = () => {
                     { question: 'Tôi có thể yêu cầu tính năng riêng?', answer: 'Được. Gói Enterprise cho phép tùy chỉnh tính năng và triển khai Server riêng theo nhu cầu.' },
                     { question: 'Hỗ trợ kỹ thuật như thế nào?', answer: 'Chúng tôi hỗ trợ qua Email, Zalo, và Hotline 24/7 đối với gói Business trở lên.' },
                 ]} />
-                <section className="bg-gray-50 py-16 md:py-24">
+                <section className="bg-gray-50 pt-4 pb-16 md:pt-8 md:pb-24">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center max-w-3xl mx-auto mb-16">
                             <span className="text-blue-600 font-semibold tracking-wider uppercase text-sm">Hỗ trợ 24/7</span>

@@ -195,14 +195,14 @@ const AboutPage = () => {
                                 </div>
                             </div>
 
-                            <div className="lg:w-1/2 w-full">
-                                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-700 group">
-                                    <div className="absolute inset-0 bg-blue-600/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                            <div className="lg:w-1/2 w-full flex justify-center items-center">
+                                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-700 group w-full max-w-[400px] aspect-square">
+                                    <div className="absolute inset-0 bg-blue-600/10 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none"></div>
                                     <img
                                         src="/img/argism_contract.png"
                                         alt="Lễ ký kết hợp tác chiến lược"
-                                        className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                        onError={(e) => e.currentTarget.src = 'https://placehold.co/600x400/1e3a8a/FFFFFF?text=Strategic+Partnership'}
+                                        className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                        onError={(e) => e.currentTarget.src = 'https://placehold.co/800x800/1e3a8a/FFFFFF?text=Strategic+Partnership'}
                                     />
                                 </div>
                             </div>
