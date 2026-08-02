@@ -104,7 +104,7 @@ const ApiIntegration: React.FC = () => {
                 setNewKeyName('');
                 setAcceptedPolicy(false);
                 setShowNewKeyModal(false);
-                setStats(s => ({ ...s, activeKeys: s.activeKeys + 1, totalKeys: s.totalKeys + 1 }));
+                setStats((s: any) => ({ ...s, activeKeys: s.activeKeys + 1, totalKeys: s.totalKeys + 1 }));
                 showToast('Tạo API Key thành công!', 'success');
             } else {
                 showToast(data.message || 'Lỗi khi tạo API Key', 'error');
@@ -138,7 +138,7 @@ const ApiIntegration: React.FC = () => {
 
             if (res.ok) {
                 setApiKeys(prev => prev.map(k => k.id === id ? { ...k, isActive: false } : k));
-                setStats(s => ({ ...s, activeKeys: Math.max(0, s.activeKeys - 1) }));
+                setStats((s: any) => ({ ...s, activeKeys: Math.max(0, s.activeKeys - 1) }));
                 showToast('Đã thu hồi API Key', 'info');
             } else {
                 const data = await res.json();
@@ -165,7 +165,7 @@ const ApiIntegration: React.FC = () => {
                 setWebhooks(prev => [data, ...prev]);
                 setNewWebhookUrl('');
                 setShowWebhookModal(false);
-                setStats(s => ({ ...s, activeWebhooks: s.activeWebhooks + 1, totalWebhooks: s.totalWebhooks + 1 }));
+                setStats((s: any) => ({ ...s, activeWebhooks: s.activeWebhooks + 1, totalWebhooks: s.totalWebhooks + 1 }));
                 showToast('Đã thêm Webhook!', 'success');
             } else {
                 showToast(data.message || 'Lỗi khi thêm webhook', 'error');
@@ -185,7 +185,7 @@ const ApiIntegration: React.FC = () => {
 
             if (res.ok) {
                 setWebhooks(prev => prev.filter(w => w.id !== id));
-                setStats(s => ({ ...s, activeWebhooks: Math.max(0, s.activeWebhooks - 1) }));
+                setStats((s: any) => ({ ...s, activeWebhooks: Math.max(0, s.activeWebhooks - 1) }));
                 showToast('Đã xóa Webhook', 'info');
             }
         } catch (error) {
