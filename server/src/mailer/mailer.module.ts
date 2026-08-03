@@ -12,17 +12,20 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             useFactory: async (config: ConfigService) => ({
                 transport: {
                     host: config.get('MAIL_HOST'),
-                    port: 465,
-                    secure: true,
+                    port: Number(config.get('MAIL_PORT', 587)),
+                    secure: false, // STARTTLS on port 587 (Mailcow)
                     auth: {
                         user: config.get('MAIL_USER'),
                         pass: config.get('MAIL_PASS'),
+                    },
+                    tls: {
+                        rejectUnauthorized: false, // Chấp nhận self-signed cert trên LAN
                     },
                     debug: true,
                     logger: true,
                 },
                 defaults: {
-                    from: '"AEGISM Support" <psaigon179@gmail.com>',
+                    from: config.get('MAIL_FROM', '"AEGISM System" <noreply@aegism.online>'),
                 },
                 template: {
                     dir: join(process.cwd(), 'src/mailer/templates'),

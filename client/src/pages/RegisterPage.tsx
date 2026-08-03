@@ -228,7 +228,7 @@ const RegisterPage = () => {
                 <div className="absolute inset-0 w-full h-full">
                     <img
                         src="/img/signup_bg.png"
-                        alt="Background"
+                        alt="Đăng ký tài khoản nền tảng quản lý an ninh AEGISM"
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gray-900 bg-opacity-60"></div>
