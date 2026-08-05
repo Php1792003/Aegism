@@ -31,6 +31,29 @@ export class HelpdeskService {
    */
   async handleInboundWebhook(payload: ResendWebhookPayload) {
     const { data } = payload;
+    return this.handleInboundEmail({
+      from: data.from,
+      to: data.to[0] || 'contact@aegism.online',
+      subject: data.subject || 'Không có tiêu đề',
+      html: data.html || null,
+      text: data.text || null,
+      emailId: data.email_id || null,
+      headers: data.headers || null,
+    });
+  }
+
+  /**
+   * Xử lý email đến chung (từ Webhook hoặc IMAP)
+   */
+  async handleInboundEmail(data: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string | null;
+    text: string | null;
+    emailId: string | null;
+    headers: any | null;
+  }) {
     const { email: fromEmail, name: fromName } = this.parseFromField(data.from);
 
     this.logger.log(`Inbound email from: ${fromEmail} | Subject: ${data.subject}`);
@@ -84,11 +107,11 @@ export class HelpdeskService {
         direction: 'INBOUND',
         fromEmail: fromEmail,
         fromName: fromName,
-        toEmail: data.to[0] || 'contact@aegism.online',
+        toEmail: data.to,
         subject: data.subject,
-        bodyHtml: data.html || null,
-        bodyText: data.text || null,
-        resendEmailId: data.email_id || null,
+        bodyHtml: data.html,
+        bodyText: data.text,
+        resendEmailId: data.emailId,
         headers: data.headers ? JSON.stringify(data.headers) : null,
       },
     });
