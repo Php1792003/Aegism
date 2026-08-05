@@ -72,6 +72,11 @@ export enum Permission {
   MANAGE_TENANT_SETTINGS = 'MANAGE_TENANT_SETTINGS',
   VIEW_TENANT_SETTINGS = 'VIEW_TENANT_SETTINGS',
   MANAGE_SUBSCRIPTION = 'MANAGE_SUBSCRIPTION',
+
+  // Helpdesk / Ticket
+  TICKET_VIEW = 'TICKET_VIEW',
+  TICKET_REPLY = 'TICKET_REPLY',
+  TICKET_MANAGE = 'TICKET_MANAGE',
 }
 
 export const DEFAULT_ROLE_PERMISSIONS = {
@@ -99,6 +104,8 @@ export const DEFAULT_ROLE_PERMISSIONS = {
     Permission.VIEW_AUDIT_LOGS,
     Permission.VIEW_SCAN_LOGS,
     Permission.MANAGE_SCAN_LOGS,
+    Permission.TICKET_VIEW,
+    Permission.TICKET_REPLY,
   ],
 
   SCANNER: [
@@ -119,6 +126,8 @@ export const DEFAULT_ROLE_PERMISSIONS = {
     Permission.EDIT_TASK,
     Permission.COMPLETE_TASK,
     Permission.VIEW_REPORTS,
+    Permission.TICKET_VIEW,
+    Permission.TICKET_REPLY,
   ],
 
   VIEWER: [

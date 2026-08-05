@@ -6,7 +6,7 @@ import {
     HiOutlineHome, HiOutlineBriefcase, HiOutlineQrcode, HiOutlineUsers,
     HiOutlineClipboardList, HiOutlineChatAlt2, HiOutlineChartBar,
     HiOutlineClipboardCheck, HiOutlineCubeTransparent, HiOutlineColorSwatch,
-    HiOutlineBell, HiOutlineMenu, HiOutlineLogout, HiOutlineX
+    HiOutlineBell, HiOutlineMenu, HiOutlineLogout, HiOutlineX, HiOutlineMail
 } from 'react-icons/hi';
 
 const notifSound = new Audio('/sound/notification.mp3');
@@ -68,6 +68,7 @@ const MainLayout = () => {
         if (pathname.startsWith('/api-integration')) return 'Tích hợp API';
         if (pathname.startsWith('/branding')) return 'Cấu hình Thương hiệu';
         if (pathname.startsWith('/profile')) return 'Cài đặt Tài khoản';
+        if (pathname.startsWith('/helpdesk')) return 'Hỗ trợ Khách hàng';
         return 'Trung tâm Điều hành';
     };
 
@@ -290,6 +291,7 @@ const MainLayout = () => {
                         <Link to="/staff" onClick={() => setSidebarOpen(false)} className={getLinkClass('/staff')} style={activeLinkStyle('/staff')}><HiOutlineUsers className="w-5 h-5 mr-3" />Nhân sự & Phân quyền</Link>
                         <Link to="/tasks" onClick={() => setSidebarOpen(false)} className={getLinkClass('/tasks')} style={activeLinkStyle('/tasks')}><HiOutlineClipboardList className="w-5 h-5 mr-3" />Công việc & Task</Link>
                         <Link to="/chat" onClick={() => setSidebarOpen(false)} className={getLinkClass('/chat')} style={activeLinkStyle('/chat')}><HiOutlineChatAlt2 className="w-5 h-5 mr-3" />Trò chuyện</Link>
+                        {hasPermission('TICKET_VIEW') && <Link to="/helpdesk" onClick={() => setSidebarOpen(false)} className={getLinkClass('/helpdesk')} style={activeLinkStyle('/helpdesk')}><HiOutlineMail className="w-5 h-5 mr-3" />Hỗ trợ Khách hàng</Link>}
                         {['business', 'professional', 'enterprise'].includes(currentPlan) && (
                             <div className="pt-2 mt-2 border-t border-gray-100">
                                 <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nâng cao</p>

@@ -48,6 +48,7 @@ model Tenant {
   workflowInstances     WorkflowInstance[]
   apiKeys               TenantApiKey[]
   webhooks              TenantWebhook[]
+  emailTickets          EmailTicket[]
 
   @@index([subscriptionPlan])
   @@index([isActive])
@@ -97,6 +98,7 @@ model User {
   startedWorkflowInstances  WorkflowInstance[]
   createdApiKeys            TenantApiKey[]
   createdWebhooks           TenantWebhook[]
+  assignedTickets           EmailTicket[]    @relation("TicketAssignee")
 
   @@index([tenantId])
   @@index([roleId])
@@ -809,4 +811,47 @@ model WebhookLog {
 
     @@index([webhookId])
     @@index([createdAt])
+}
+
+model EmailTicket {
+  id              String         @id @default(uuid())
+  subject         String
+  customerEmail   String
+  customerName    String?
+  status          String         @default("OPEN")
+  priority        String         @default("NORMAL")
+  tags            String?
+  assignedToId    String?
+  tenantId        String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  assignedTo      User?          @relation("TicketAssignee", fields: [assignedToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant          Tenant         @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  messages        EmailMessage[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([customerEmail])
+  @@index([assignedToId])
+}
+
+model EmailMessage {
+  id              String       @id @default(uuid())
+  ticketId        String
+  direction       String
+  fromEmail       String
+  fromName        String?
+  toEmail         String
+  subject         String?
+  bodyHtml        String?      @db.Text
+  bodyText        String?      @db.Text
+  resendEmailId   String?
+  headers         String?      @db.Text
+  createdAt       DateTime     @default(now())
+
+  ticket          EmailTicket  @relation(fields: [ticketId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([ticketId])
+  @@index([createdAt])
 }

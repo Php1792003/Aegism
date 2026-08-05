@@ -7,7 +7,7 @@ import {
     HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX,
     HiOutlineShieldCheck, HiOutlineCurrencyDollar, HiOutlineDocumentReport,
     HiOutlineChevronLeft, HiOutlineChevronRight, HiOutlineSpeakerphone,
-    HiOutlineKey
+    HiOutlineKey, HiOutlineMail
 } from 'react-icons/hi';
 
 const SuperAdminLayout = () => {
@@ -64,6 +64,7 @@ const SuperAdminLayout = () => {
         { path: '/super-admin/plans', icon: <HiOutlineDocumentReport className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý Gói', shortLabel: 'Gói dịch vụ' },
         { path: '/super-admin/promotions', icon: <HiOutlineSpeakerphone className="w-5 h-5 flex-shrink-0" />, label: 'Chiến dịch Quảng bá', shortLabel: 'Quảng bá' },
         { path: '/super-admin/api-keys', icon: <HiOutlineKey className="w-5 h-5 flex-shrink-0" />, label: 'Quản lý API Keys', shortLabel: 'API Keys' },
+        { path: '/super-admin/helpdesk', icon: <HiOutlineMail className="w-5 h-5 flex-shrink-0" />, label: 'Hỗ trợ Khách hàng', shortLabel: 'Helpdesk' },
         { path: '/super-admin/security', icon: <HiOutlineShieldCheck className="w-5 h-5 flex-shrink-0" />, label: 'Bảo mật & Nhật ký', shortLabel: 'Bảo mật' },
     ];
 
@@ -137,7 +138,7 @@ const SuperAdminLayout = () => {
                     {sidebarOpen ? (
                         <>
                             <div className="flex items-center gap-3 mb-3 px-1">
-                                <img src={user.avatar} className="w-9 h-9 rounded-full border-2 border-purple-500 flex-shrink-0" alt="avatar" />
+                                <img src={user.avatar || 'https://ui-avatars.com/api/?name=Admin&background=random'} className="w-9 h-9 rounded-full border-2 border-purple-500 flex-shrink-0" alt="avatar" />
                                 <div>
                                     <div className="text-white text-sm font-semibold truncate">{user.name}</div>
                                     <div className="text-purple-400 text-xs">Super Administrator</div>
@@ -150,7 +151,7 @@ const SuperAdminLayout = () => {
                         </>
                     ) : (
                         <>
-                            <img src={user.avatar} className="w-8 h-8 rounded-full border-2 border-purple-500" alt="avatar" title={user.name} />
+                            <img src={user.avatar || 'https://ui-avatars.com/api/?name=Admin&background=random'} className="w-8 h-8 rounded-full border-2 border-purple-500" alt="avatar" title={user.name} />
                             <button onClick={handleLogout} className="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors" title="Đăng xuất">
                                 <HiOutlineLogout className="w-4 h-4" />
                             </button>

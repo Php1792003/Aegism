@@ -37,6 +37,7 @@ import SuperAdminPlans from './pages/SuperAdminPlans';
 import SuperAdminSecurity from './pages/SuperAdminSecurity';
 import SuperAdminPromo from './pages/SuperAdminPromo';
 import SuperAdminApiKeys from './pages/SuperAdminApiKeys';
+import Helpdesk from './pages/Helpdesk';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('accessToken');
@@ -83,6 +84,7 @@ function App() {
             <Route path="/branding" element={<Branding />} />
             <Route path="/api-integration" element={<ApiIntegration />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="helpdesk" element={<Helpdesk />} />
           </Route>
 
           {/* Super Admin routes */}
@@ -93,6 +95,7 @@ function App() {
             <Route path="/super-admin/revenue" element={<SuperAdminRevenue />} />
             <Route path="/super-admin/plans" element={<SuperAdminPlans />} />
             <Route path="/super-admin/promotions" element={<SuperAdminPromo />} />
+            <Route path="/super-admin/helpdesk" element={<Helpdesk />} />
             <Route path="/super-admin/security" element={<SuperAdminSecurity />} />
             <Route path="/super-admin/api-keys" element={<SuperAdminApiKeys />} />
           </Route>
