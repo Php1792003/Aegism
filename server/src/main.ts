@@ -25,8 +25,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.use(json({ limit: '50mb' }));
-  app.use(urlencoded({ extended: true, limit: '50mb' }));
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ extended: true, limit: '10mb' }));
 
   app.useGlobalPipes(new ValidationPipe({
     transform: true,

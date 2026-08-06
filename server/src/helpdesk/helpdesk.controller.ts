@@ -19,12 +19,13 @@ import { HelpdeskService } from './helpdesk.service';
 import { SendReplyDto } from './dto/send-reply.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { ResendWebhookPayload } from './interfaces/resend-webhook.interface';
+import { simpleParser } from 'mailparser';
 
 @Controller()
 export class HelpdeskController {
   private readonly logger = new Logger(HelpdeskController.name);
 
-  constructor(private readonly helpdeskService: HelpdeskService) {}
+  constructor(private readonly helpdeskService: HelpdeskService) { }
 
   /**
    * Webhook endpoint — Resend gọi khi có email mới
@@ -32,14 +33,35 @@ export class HelpdeskController {
    */
   @Post('emails/webhook')
   @HttpCode(200)
-  async handleWebhook(@Body() payload: ResendWebhookPayload) {
-    this.logger.log(`Received webhook: ${payload.type}`);
+  async handleWebhook(@Body() body: any) {
+    this.logger.log(`[HelpdeskController] Received webhook from Cloudflare: ${JSON.stringify(body)}`);
 
-    if (payload.type === 'email.received') {
-      return this.helpdeskService.handleInboundWebhook(payload);
+    const { from, to, subject, raw } = body;
+
+    let parsedText = raw;
+    let parsedHtml: any = null;
+
+    if (raw) {
+      try {
+        const parsed = await simpleParser(raw);
+        parsedText = parsed.text || raw;
+        parsedHtml = parsed.html || null;
+      } catch (e) {
+        this.logger.error('Failed to parse raw email MIME', e);
+      }
     }
 
-    return { success: true, message: 'Event type ignored' };
+    await this.helpdeskService.handleInboundEmail({
+      from: from || 'unknown@example.com',
+      to: to || 'contact@aegism.online',
+      subject: subject || 'No Subject',
+      html: parsedHtml,
+      text: parsedText,
+      emailId: null,
+      headers: null,
+    });
+
+    return { status: 'success' };
   }
 
   /**
