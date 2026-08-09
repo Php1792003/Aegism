@@ -81,8 +81,8 @@ const EditPlanModal = ({ plan, isNew = false, onClose, onSave }: { plan: any; is
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
                     <div>
                         <h2 className="text-white font-bold text-lg">{isNew ? 'Thêm gói mới' : 'Chỉnh sửa gói'}</h2>
@@ -173,8 +173,8 @@ const TenantHistoryModal = ({ tenantId, tenantName, onClose }: { tenantId: strin
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-gray-800 gap-4">
                     <div>
                         <h2 className="text-white font-bold">Lịch sử thanh toán</h2>
@@ -190,7 +190,7 @@ const TenantHistoryModal = ({ tenantId, tenantName, onClose }: { tenantId: strin
                         : !data?.payments?.length ? <p className="text-center py-16 text-gray-600">Chưa có giao dịch nào</p>
                             : (
                                 <table className="w-full text-sm">
-                                    <thead><tr className="border-b border-gray-800 text-gray-500 text-xs uppercase">
+                                    <thead><tr className="border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] text-gray-400 text-[11px] uppercase tracking-wider">
                                         <th className="text-left px-5 py-3 whitespace-nowrap">Mã GD</th>
                                         <th className="text-left px-4 py-3 whitespace-nowrap">Gói</th>
                                         <th className="text-right px-4 py-3 whitespace-nowrap">Số tiền</th>
@@ -199,7 +199,7 @@ const TenantHistoryModal = ({ tenantId, tenantName, onClose }: { tenantId: strin
                                     </tr></thead>
                                     <tbody>
                                         {data.payments.map((p: any) => (
-                                            <tr key={p.id} className="border-b border-gray-800/50 hover:bg-gray-800/20">
+                                            <tr key={p.id} className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                                                 <td className="px-5 py-3 font-mono text-xs text-gray-400 whitespace-nowrap">{p.orderCode}</td>
                                                 <td className="px-4 py-3 whitespace-nowrap"><span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: (PLAN_COLORS[p.plan] || '#6b7280') + '20', color: PLAN_COLORS[p.plan] || '#6b7280' }}>{p.plan}</span></td>
                                                 <td className="px-4 py-3 text-right font-bold text-white whitespace-nowrap">{fmt(p.amount)}</td>
@@ -322,9 +322,9 @@ const SuperAdminPlans = () => {
             {/* Stats overview */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {loading ? Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-5 h-24 animate-pulse" />
+                    <div key={i} style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5 h-24 animate-pulse" />
                 )) : plans.map(p => (
-                    <div key={p.planKey} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                    <div key={p.planKey} style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5">
                         <div className="flex items-center gap-2 mb-2">
                             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: PLAN_COLORS[p.planKey] || '#6b7280' }} />
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{p.planKey}</span>
@@ -339,7 +339,7 @@ const SuperAdminPlans = () => {
             {/* Charts + Plan cards */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Pie */}
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5">
                     <h3 className="text-sm font-semibold text-white mb-4">Phân bổ tenant theo gói</h3>
                     {!loading && pieData.some(p => p.value > 0) ? (
                         <>
@@ -368,9 +368,9 @@ const SuperAdminPlans = () => {
 
                 {/* Plan cards */}
                 <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {loading ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-5 h-48 animate-pulse" />) :
+                    {loading ? Array.from({ length: 4 }).map((_, i) => <div key={i} style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5 h-48 animate-pulse" />) :
                         plans.map(p => (
-                            <div key={p.planKey} className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col gap-3 relative group hover:border-gray-700 transition-colors">
+                            <div key={p.planKey} style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5 flex flex-col gap-3 relative group hover:border-[rgba(255,255,255,0.15)] transition-colors">
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
@@ -420,7 +420,7 @@ const SuperAdminPlans = () => {
             </div>
 
             {/* Tenant payment history lookup */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="overflow-hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 border-b border-gray-800 gap-4">
                     <h3 className="text-sm font-semibold text-white">Lịch sử thanh toán theo khách hàng</h3>
                     <div className="relative w-full sm:w-auto">
@@ -430,7 +430,7 @@ const SuperAdminPlans = () => {
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead><tr className="border-b border-gray-800 text-gray-500 text-xs uppercase">
+                        <thead><tr className="border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] text-gray-400 text-[11px] uppercase tracking-wider">
                             <th className="text-left px-5 py-3 whitespace-nowrap">Tenant</th>
                             <th className="text-left px-4 py-3 whitespace-nowrap">Gói hiện tại</th>
                             <th className="text-left px-4 py-3 whitespace-nowrap">Users</th>
@@ -443,7 +443,7 @@ const SuperAdminPlans = () => {
                                     {Array.from({ length: 5 }).map((_, j) => <td key={j} className="px-4 py-3"><div className="h-4 bg-gray-800 rounded animate-pulse" /></td>)}
                                 </tr>
                             )) : filteredTenants.slice(0, 15).map((t: any) => (
-                                <tr key={t.id} className="border-b border-gray-800/50 hover:bg-gray-800/20 transition-colors group">
+                                <tr key={t.id} className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors group">
                                     <td className="px-5 py-3 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-purple-800/60 flex items-center justify-center text-purple-300 font-semibold text-sm flex-shrink-0">{t.name?.charAt(0)}</div>

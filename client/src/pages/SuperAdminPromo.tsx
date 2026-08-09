@@ -70,9 +70,9 @@ const CampaignModal = ({ campaign, onClose, onSave }: {
     const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 sticky top-0 bg-gray-900 z-10">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                <div style={{ background: 'rgba(17,17,27,0.95)', borderBottom: '1px solid rgba(255,255,255,0.1)' }} className="flex items-center justify-between px-6 py-4 sticky top-0 z-10">
                     <h2 className="text-white font-bold text-lg">{isNew ? '🚀 Tạo chiến dịch mới' : '✏️ Chỉnh sửa chiến dịch'}</h2>
                     <button onClick={onClose} className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800"><HiOutlineX className="w-5 h-5" /></button>
                 </div>
@@ -351,7 +351,7 @@ const SuperAdminPromo = () => {
                     { label: 'Lượt hiển thị', value: fmtNum(totalImpressions), icon: <HiOutlineEye className="w-5 h-5" />, color: 'blue' },
                     { label: 'CTR trung bình', value: `${avgCtr}%`, icon: <HiOutlineCursorClick className="w-5 h-5" />, color: 'orange' },
                 ].map((s, i) => (
-                    <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+                    <div key={i} style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-4">
                         <div className="flex items-center gap-2 text-gray-400 text-xs mb-2">
                             {s.icon} {s.label}
                         </div>
@@ -361,11 +361,11 @@ const SuperAdminPromo = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-gray-800">
+                            <tr className="border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)]">
                                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Chiến dịch</th>
                                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Kiểu</th>
                                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Thời gian</th>
@@ -391,7 +391,7 @@ const SuperAdminPromo = () => {
                                 const isRunning = c.isActive && new Date(c.startDate) <= now && new Date(c.endDate) >= now;
                                 const isExpired = new Date(c.endDate) < now;
                                 return (
-                                    <tr key={c.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors group">
+                                    <tr key={c.id} className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors group">
                                         <td className="px-5 py-4 whitespace-nowrap">
                                             <div className="text-white font-semibold text-sm">{c.title}</div>
                                             <div className="text-gray-500 text-xs mt-0.5 line-clamp-1 max-w-[200px]">{c.description}</div>

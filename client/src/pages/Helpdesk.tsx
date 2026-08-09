@@ -180,21 +180,16 @@ const Helpdesk = () => {
             {/* Stats Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 {[
-                    { label: 'Tổng Ticket', value: stats.total, color: 'from-blue-500 to-blue-600', icon: '📬' },
-                    { label: 'Đang mở', value: stats.open, color: 'from-amber-500 to-amber-600', icon: '📨' },
-                    { label: 'Đã giải quyết', value: stats.resolved, color: 'from-emerald-500 to-emerald-600', icon: '✅' },
-                    { label: 'Hôm nay', value: stats.todayCount, color: 'from-purple-500 to-purple-600', icon: '📅' },
+                    { label: 'Tổng Ticket', value: stats.total, color: 'from-blue-500 to-blue-600', accent: '#3b82f6', icon: <HiOutlineInboxIn className="w-5 h-5" /> },
+                    { label: 'Đang mở', value: stats.open, color: 'from-amber-500 to-amber-600', accent: '#f59e0b', icon: <HiOutlineMail className="w-5 h-5" /> },
+                    { label: 'Đã giải quyết', value: stats.resolved, color: 'from-emerald-500 to-emerald-600', accent: '#10b981', icon: <HiOutlineCheckCircle className="w-5 h-5" /> },
+                    { label: 'Hôm nay', value: stats.todayCount, color: 'from-purple-500 to-purple-600', accent: '#8b5cf6', icon: <HiOutlineClock className="w-5 h-5" /> },
                 ].map((s, i) => (
-                    <div key={i} className="bg-gray-900 rounded-xl border border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs text-gray-400 font-medium">{s.label}</p>
-                                <p className="text-2xl font-bold text-gray-200 mt-1">{s.value}</p>
-                            </div>
-                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${s.color} flex items-center justify-center text-lg`}>
-                                {s.icon}
-                            </div>
-                        </div>
+                    <div key={i} style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '18px 20px', backdropFilter: 'blur(12px)', position: 'relative', overflow: 'hidden' }} className="flex flex-col h-full shadow-sm">
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent, ${s.accent}, transparent)` }} />
+                        <div style={{ width: '44px', height: '44px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: `${s.accent}18`, color: s.accent, border: `1px solid ${s.accent}30`, marginBottom: '12px' }}>{s.icon}</div>
+                        <div style={{ fontSize: '22px', fontWeight: '700', color: '#fff', lineHeight: 1.1, fontFamily: 'JetBrains Mono, monospace' }} className="truncate mb-1">{s.value}</div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }} className="truncate">{s.label}</div>
                     </div>
                 ))}
             </div>
@@ -202,9 +197,9 @@ const Helpdesk = () => {
             {/* Main Content */}
             <div className="flex-1 flex gap-4 min-h-0">
                 {/* Ticket List (Left Panel) */}
-                <div className="w-full md:w-96 flex flex-col bg-gray-900 rounded-xl border border-gray-800 shadow-sm overflow-hidden">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="w-full md:w-96 flex flex-col shadow-sm overflow-hidden">
                     {/* Search & Filters */}
-                    <div className="p-3 border-b border-gray-800 space-y-2">
+                    <div className="p-3 border-b border-[rgba(255,255,255,0.05)] space-y-2">
                         <div className="flex gap-2">
                             <div className="flex-1 relative">
                                 <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -259,7 +254,7 @@ const Helpdesk = () => {
                                     <div
                                         key={t.id}
                                         onClick={() => fetchTicketDetail(t.id)}
-                                        className={`px-4 py-3 border-b border-gray-800 cursor-pointer transition-all hover:bg-gray-800/50 ${isActive ? 'bg-gray-800 border-l-4 border-l-purple-500' : ''}`}
+                                        className={`px-4 py-3 border-b border-[rgba(255,255,255,0.05)] cursor-pointer transition-all hover:bg-[rgba(255,255,255,0.02)] ${isActive ? 'bg-[rgba(255,255,255,0.03)] border-l-4 border-l-purple-500' : ''}`}
                                     >
                                         <div className="flex items-start gap-3">
                                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
@@ -287,7 +282,7 @@ const Helpdesk = () => {
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div className="flex items-center justify-between px-3 py-2 border-t border-gray-800 text-xs text-gray-400">
+                        <div className="flex items-center justify-between px-3 py-2 border-t border-[rgba(255,255,255,0.05)] text-xs text-gray-400">
                             <button disabled={page <= 1} onClick={() => { setPage(p => p - 1); fetchTickets(page - 1); }} className="px-2 py-1 rounded hover:bg-gray-800 disabled:opacity-40">← Trước</button>
                             <span>{page}/{totalPages}</span>
                             <button disabled={page >= totalPages} onClick={() => { setPage(p => p + 1); fetchTickets(page + 1); }} className="px-2 py-1 rounded hover:bg-gray-800 disabled:opacity-40">Sau →</button>
@@ -296,7 +291,7 @@ const Helpdesk = () => {
                 </div>
 
                 {/* Ticket Detail (Right Panel) */}
-                <div className="hidden md:flex flex-1 flex-col bg-gray-900 rounded-xl border border-gray-800 shadow-sm overflow-hidden">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="hidden md:flex flex-1 flex-col shadow-sm overflow-hidden">
                     {!selectedTicket ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
                             <HiOutlineMail className="w-16 h-16 mb-4 text-gray-700" />
@@ -310,7 +305,7 @@ const Helpdesk = () => {
                     ) : (
                         <>
                             {/* Ticket Header */}
-                            <div className="px-5 py-4 border-b border-gray-800">
+                            <div className="px-5 py-4 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)]">
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1 min-w-0">
                                         <h3 className="text-lg font-bold text-gray-200 truncate">{selectedTicket.subject}</h3>
@@ -351,7 +346,7 @@ const Helpdesk = () => {
                             </div>
 
                             {/* Messages Timeline */}
-                            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 bg-gray-950/50">
+                            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
                                 {selectedTicket.messages.map(msg => {
                                     const isInbound = msg.direction === 'INBOUND';
                                     return (
@@ -384,7 +379,7 @@ const Helpdesk = () => {
 
                             {/* Reply Editor */}
                             {selectedTicket.status !== 'CLOSED' && (
-                                <div className="px-5 py-3 border-t border-gray-800 bg-gray-900">
+                                <div className="px-5 py-3 border-t border-[rgba(255,255,255,0.05)] bg-[rgba(17,17,27,0.95)]">
                                     <div className="flex gap-3">
                                         <textarea
                                             value={replyContent}

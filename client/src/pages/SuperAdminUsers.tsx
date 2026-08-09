@@ -84,13 +84,14 @@ const getStatusBadge = (status: string) =>
 
 // ─── STAT CARD ───────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, icon: Icon, accent }: any) => (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex items-center gap-4">
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${accent}`}>
-            <Icon className="w-5 h-5" />
+    <div style={{ background: 'rgba(17,17,27,0.8)', border: `1px solid rgba(255,255,255,0.07)`, borderRadius: '14px', padding: '20px', backdropFilter: 'blur(12px)', position: 'relative', overflow: 'hidden' }} className="flex items-center gap-4">
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, transparent, ' + accent + ', transparent)' }} />
+        <div style={{ width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${accent}18`, color: accent, border: `1px solid ${accent}30`, flexShrink: 0 }}>
+            <Icon className="w-6 h-6" />
         </div>
         <div>
-            <div className="text-2xl font-bold text-white">{value}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{label}</div>
+            <div style={{ fontSize: '24px', fontWeight: '700', color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>{value}</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{label}</div>
         </div>
     </div>
 );
@@ -146,7 +147,7 @@ const EditModal = ({ user, onClose, onSave }: { user: any; onClose: () => void; 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative bg-gray-900 border border-gray-700/50 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="relative w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 flex-shrink-0">
                     <div>
                         <h3 className="text-base font-semibold text-white">Chỉnh sửa tài khoản</h3>
@@ -244,7 +245,7 @@ const AddModal = ({ tenants, onClose, onSave }: { tenants: any[]; onClose: () =>
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative bg-gray-900 border border-gray-700/50 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="relative w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 flex-shrink-0">
                     <div>
                         <h3 className="text-base font-semibold text-white">Thêm tài khoản người dùng</h3>
@@ -484,14 +485,14 @@ const SuperAdminUsers = () => {
 
             {/* Stat Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Tổng tài khoản" value={stats.total} icon={HiOutlineUsers} accent="bg-purple-500/10 text-purple-400" />
-                <StatCard label="Đang hoạt động" value={stats.active} icon={HiOutlineCheckCircle} accent="bg-emerald-500/10 text-emerald-400" />
-                <StatCard label="Đã bị khóa" value={stats.locked} icon={HiOutlineBan} accent="bg-red-500/10 text-red-400" />
-                <StatCard label="Quản trị viên" value={stats.admins} icon={HiOutlineShieldCheck} accent="bg-blue-500/10 text-blue-400" />
+                <StatCard label="Tổng tài khoản" value={stats.total} icon={HiOutlineUsers} accent="#8b5cf6" />
+                <StatCard label="Đang hoạt động" value={stats.active} icon={HiOutlineCheckCircle} accent="#34c759" />
+                <StatCard label="Đã bị khóa" value={stats.locked} icon={HiOutlineBan} accent="#ff2d55" />
+                <StatCard label="Quản trị viên" value={stats.admins} icon={HiOutlineShieldCheck} accent="#3b82f6" />
             </div>
 
             {/* Table Card */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="overflow-hidden">
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row gap-3 px-5 py-4 border-b border-gray-800">
                     <div className="relative flex-1">
@@ -523,7 +524,7 @@ const SuperAdminUsers = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
+                            <tr className="border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] text-gray-400 text-[11px] uppercase tracking-wider">
                                 <th className="text-left px-5 py-3.5 font-semibold whitespace-nowrap">Người dùng</th>
                                 <th className="text-left px-4 py-3.5 font-semibold whitespace-nowrap">Tenant</th>
                                 <th className="text-left px-4 py-3.5 font-semibold whitespace-nowrap">Vai trò</th>

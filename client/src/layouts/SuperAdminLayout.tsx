@@ -71,26 +71,33 @@ const SuperAdminLayout = () => {
 
     const getLinkClass = (path: string) => {
         const isActive = location.pathname === path;
-        return `flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200 mb-1 ${isActive
-            ? 'bg-purple-600 text-white shadow-lg'
-            : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`;
+        return `flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200 mb-1 border ${isActive
+            ? 'bg-[#8b5cf6]/10 text-[#8b5cf6] border-[#8b5cf6]/30 shadow-[0_0_15px_rgba(139,92,246,0.1)]'
+            : 'text-gray-400 hover:bg-white/5 hover:text-[#e5e7eb] border-transparent'}`;
     };
 
     return (
-        <div className="flex h-screen bg-gray-950 overflow-hidden font-sans">
+        <div style={{ minHeight: '100vh', background: '#080810', color: '#e5e7eb', fontFamily: "'Inter', 'SF Pro Display', sans-serif" }} className="flex h-screen overflow-hidden">
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+                * { box-sizing: border-box; }
+                ::-webkit-scrollbar { width: 4px; height: 4px; }
+                ::-webkit-scrollbar-track { background: transparent; }
+                ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 4px; }
+            `}</style>
             {mobileSidebarOpen && (
                 <div className="fixed inset-0 z-40 bg-black bg-opacity-60 lg:hidden" onClick={() => setMobileSidebarOpen(false)} />
             )}
 
             {/* SIDEBAR */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 bg-gray-900 border-r border-gray-800 flex flex-col justify-between transition-all duration-300 pb-16 lg:pb-0
+                fixed inset-y-0 left-0 z-50 border-r border-[rgba(255,255,255,0.05)] flex flex-col justify-between transition-all duration-300 pb-16 lg:pb-0
                 lg:static
                 ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 ${sidebarOpen ? 'w-64' : 'w-16'}
-            `}>
+            `} style={{ background: 'rgba(17,17,27,0.8)', backdropFilter: 'blur(12px)' }}>
                 <div className="overflow-hidden">
-                    <div className={`flex items-center h-16 px-3 border-b border-gray-800 ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
+                    <div className={`flex items-center h-16 px-3 border-b border-[rgba(255,255,255,0.05)] ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
                         {sidebarOpen && (
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -134,7 +141,7 @@ const SuperAdminLayout = () => {
                     </nav>
                 </div>
 
-                <div className={`p-3 border-t border-gray-800 ${!sidebarOpen ? 'flex flex-col items-center gap-2' : ''}`}>
+                <div className={`p-3 border-t border-[rgba(255,255,255,0.05)] ${!sidebarOpen ? 'flex flex-col items-center gap-2' : ''}`}>
                     {sidebarOpen ? (
                         <>
                             <div className="flex items-center gap-3 mb-3 px-1">
@@ -162,7 +169,7 @@ const SuperAdminLayout = () => {
 
             {/* MAIN */}
             <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-                <header className="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 flex-shrink-0">
+                <header className="h-16 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between px-4 flex-shrink-0 relative z-40" style={{ background: 'rgba(17,17,27,0.8)', backdropFilter: 'blur(12px)' }}>
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
@@ -182,12 +189,12 @@ const SuperAdminLayout = () => {
                         </Link>
                     </div>
                 </header>
-                <main className="flex-1 overflow-y-auto bg-gray-950 p-4 md:p-6 pb-24 lg:pb-6">
+                <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 lg:pb-6 relative z-10">
                     <Outlet />
                 </main>
 
                 {/* Mobile Bottom Navigation */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900 border-t border-gray-800 shadow-lg">
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[rgba(255,255,255,0.05)] shadow-lg" style={{ background: 'rgba(17,17,27,0.85)', backdropFilter: 'blur(12px)' }}>
                     <div className="flex items-center justify-around h-16 px-1">
                         {navItems.slice(0, 4).map(item => (
                             <Link

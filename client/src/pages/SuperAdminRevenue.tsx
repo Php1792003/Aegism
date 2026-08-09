@@ -41,14 +41,15 @@ const DATE_PRESETS = [
 ];
 
 const StatCard = ({ label, value, sub, icon: Icon, accent, trend }: any) => (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex items-start gap-4">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${accent}`}>
+    <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '20px', backdropFilter: 'blur(12px)', position: 'relative', overflow: 'hidden' }} className="flex items-center gap-4">
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, transparent, ' + accent + ', transparent)' }} />
+        <div style={{ width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: accent + '18', color: accent, border: '1px solid ' + accent + '30', flexShrink: 0 }}>
             <Icon className="w-6 h-6" />
         </div>
-        <div className="flex-1 min-w-0">
-            <div className="text-2xl font-bold text-white truncate">{value}</div>
-            <div className="text-xs text-gray-400 mt-0.5">{label}</div>
-            {sub && <div className={`text-xs mt-1 font-medium ${trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{sub}</div>}
+        <div>
+            <div style={{ fontSize: '24px', fontWeight: '700', color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>{value}</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{label}</div>
+            {sub && <div style={{ fontSize: '10px', color: trend >= 0 ? '#34c759' : '#ff2d55' }} className="mt-1 font-medium">{sub}</div>}
         </div>
     </div>
 );
@@ -147,8 +148,8 @@ const VoucherManagerModal = ({ onClose }: { onClose: () => void }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
                     <h2 className="text-lg font-bold text-white flex items-center gap-2"><HiOutlineTicket className="w-5 h-5 text-purple-400" /> Quản lý Voucher</h2>
                     <button onClick={onClose} className="p-2 text-gray-400 hover:text-white"><HiOutlineX className="w-5 h-5" /></button>
@@ -159,21 +160,21 @@ const VoucherManagerModal = ({ onClose }: { onClose: () => void }) => {
                             <h3 className="text-sm font-semibold text-white mb-3">{editingVoucher ? 'Cập nhật Voucher' : 'Thêm Voucher Mới'}</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
                                 <div className="sm:col-span-2"><label className="text-xs text-gray-400 block mb-1">Mã (VD: GIAM50)</label>
-                                    <input disabled={!!editingVoucher} value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed" /></div>
+                                    <input disabled={!!editingVoucher} value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} className="w-full bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white text-sm rounded-lg px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:border-purple-500" /></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Loại</label>
-                                    <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2">
+                                    <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500">
                                         <option value="percent">% (Phần trăm)</option><option value="fixed">VND (Cố định)</option>
                                     </select></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Giá trị</label>
-                                    <input type="number" value={form.value} onChange={e => setForm(p => ({ ...p, value: Number(e.target.value) }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
+                                    <input type="number" value={form.value} onChange={e => setForm(p => ({ ...p, value: Number(e.target.value) }))} className="w-full bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500" /></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Giới hạn (lần)</label>
-                                    <input type="number" placeholder="Vô hạn" value={form.maxUses} onChange={e => setForm(p => ({ ...p, maxUses: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
+                                    <input type="number" placeholder="Vô hạn" value={form.maxUses} onChange={e => setForm(p => ({ ...p, maxUses: e.target.value }))} className="w-full bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500" /></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Hạn sử dụng</label>
-                                    <input type="date" value={form.expiresAt} onChange={e => setForm(p => ({ ...p, expiresAt: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
+                                    <input type="date" value={form.expiresAt} onChange={e => setForm(p => ({ ...p, expiresAt: e.target.value }))} className="w-full bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500" /></div>
                             </div>
                             <div className="mt-3 flex items-center justify-between">
                                 <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={form.isActive} onChange={e => setForm(p => ({ ...p, isActive: e.target.checked }))} className="w-4 h-4 rounded bg-gray-900 border-gray-700 accent-purple-600" />
+                                    <input type="checkbox" checked={form.isActive} onChange={e => setForm(p => ({ ...p, isActive: e.target.checked }))} className="w-4 h-4 rounded bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.1)] accent-purple-600" />
                                     <span className="text-sm text-gray-300">Kích hoạt Voucher</span>
                                 </label>
                                 <div className="flex gap-2">
@@ -340,7 +341,7 @@ const SuperAdminRevenue = () => {
 
             {/* Filter Panel */}
             {showFilters && (
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5 space-y-4">
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-semibold text-white">Bộ lọc nâng cao</h3>
                         <button onClick={() => setShowFilters(false)} className="text-gray-500 hover:text-white">
@@ -412,16 +413,16 @@ const SuperAdminRevenue = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Tổng doanh thu" value={loading ? '...' : fmtShort(summary.totalRevenue || 0) + ' ₫'} icon={HiOutlineCurrencyDollar} accent="bg-purple-500/10 text-purple-400" />
-                <StatCard label="Tháng này" value={loading ? '...' : fmtShort(summary.thisMonthRevenue || 0) + ' ₫'} sub={`${summary.growth >= 0 ? '▲' : '▼'} ${Math.abs(summary.growth || 0)}% so với tháng trước`} trend={summary.growth} icon={HiOutlineTrendingUp} accent="bg-emerald-500/10 text-emerald-400" />
-                <StatCard label="Tổng giao dịch" value={loading ? '...' : summary.totalTransactions || 0} icon={HiOutlineChartBar} accent="bg-blue-500/10 text-blue-400" />
-                <StatCard label="GD tháng này" value={loading ? '...' : summary.thisMonthCount || 0} icon={HiOutlineChartBar} accent="bg-orange-500/10 text-orange-400" />
+                <StatCard label="Tổng doanh thu" value={loading ? '...' : fmtShort(summary.totalRevenue || 0) + ' ₫'} icon={HiOutlineCurrencyDollar} accent="#8b5cf6" />
+                <StatCard label="Tháng này" value={loading ? '...' : fmtShort(summary.thisMonthRevenue || 0) + ' ₫'} sub={`${summary.growth >= 0 ? '▲' : '▼'} ${Math.abs(summary.growth || 0)}% so với tháng trước`} trend={summary.growth} icon={HiOutlineTrendingUp} accent="#34c759" />
+                <StatCard label="Tổng giao dịch" value={loading ? '...' : summary.totalTransactions || 0} icon={HiOutlineChartBar} accent="#3b82f6" />
+                <StatCard label="GD tháng này" value={loading ? '...' : summary.thisMonthCount || 0} icon={HiOutlineChartBar} accent="#ff9500" />
             </div>
 
             {/* Charts row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Area chart */}
-                <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="lg:col-span-2 p-5">
                     <h3 className="text-sm font-semibold text-white mb-4">Xu hướng doanh thu</h3>
                     {loading ? (
                         <div className="h-56 flex items-center justify-center">
@@ -449,7 +450,7 @@ const SuperAdminRevenue = () => {
                 </div>
 
                 {/* Pie chart */}
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5">
                     <h3 className="text-sm font-semibold text-white mb-4">Doanh thu theo gói</h3>
                     {loading || byPlanData.length === 0 ? (
                         <div className="h-56 flex items-center justify-center text-gray-600 text-sm">
@@ -482,7 +483,7 @@ const SuperAdminRevenue = () => {
             </div>
 
             {/* Transactions table */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="overflow-hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 border-b border-gray-800 gap-4">
                     <h3 className="text-sm font-semibold text-white">Lịch sử giao dịch</h3>
                     <div className="relative w-full sm:w-auto">
@@ -495,7 +496,7 @@ const SuperAdminRevenue = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
+                            <tr className="border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] text-gray-400 text-[11px] uppercase tracking-wider">
                                 <th className="text-left px-5 py-3.5 whitespace-nowrap">Mã GD</th>
                                 <th className="text-left px-4 py-3.5 whitespace-nowrap">Khách hàng</th>
                                 <th className="text-left px-4 py-3.5 whitespace-nowrap">Gói</th>
@@ -518,7 +519,7 @@ const SuperAdminRevenue = () => {
                                 const st = STATUS_MAP[t.status] || STATUS_MAP['PENDING'];
                                 const planColor = PLAN_COLORS[t.plan] || '#6b7280';
                                 return (
-                                    <tr key={t.id} className="border-b border-gray-800/50 hover:bg-gray-800/20 transition-colors">
+                                    <tr key={t.id} className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                                         <td className="px-5 py-3.5 font-mono text-xs text-gray-400 whitespace-nowrap">{t.orderCode}</td>
                                         <td className="px-4 py-3.5 text-white text-sm whitespace-nowrap">{t.tenant?.name || '—'}</td>
                                         <td className="px-4 py-3.5 whitespace-nowrap">
@@ -544,7 +545,7 @@ const SuperAdminRevenue = () => {
                 </div>
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
-                    <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-800">
+                    <div className="flex items-center justify-between px-5 py-3.5 border-t border-[rgba(255,255,255,0.05)]">
                         <span className="text-xs text-gray-500">
                             Trang {pagination.page} / {pagination.totalPages} ({pagination.total} giao dịch)
                         </span>

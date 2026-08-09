@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HiOutlineOfficeBuilding, HiOutlineUserGroup, HiOutlineExclamation, HiOutlineClock } from 'react-icons/hi';
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000' : 'https://api.aegism.online';
@@ -11,17 +12,18 @@ const fmt = (bytes: number) => {
 };
 
 const GaugeBar = ({ percent, color }: { percent: number, color: string }) => (
-    <div className="w-full bg-gray-800 rounded-full h-2 mt-3">
-        <div className={`h-2 rounded-full transition-all duration-700 ${color}`} style={{ width: `${Math.min(percent, 100)}%` }} />
+    <div className="w-full rounded-full h-2 mt-3" style={{ background: 'rgba(255,255,255,0.05)' }}>
+        <div className={`h-2 rounded-full transition-all duration-700`} style={{ width: `${Math.min(percent, 100)}%`, background: color }} />
     </div>
 );
 
-const StatCard = ({ icon, label, value, sub, color }: any) => (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5 flex flex-col h-full">
-        <div className={`text-2xl mb-2`}>{icon}</div>
-        <div className={`text-2xl sm:text-3xl font-bold ${color} mb-1 truncate`}>{value}</div>
-        <div className="text-gray-400 text-xs sm:text-sm truncate">{label}</div>
-        {sub && <div className="text-gray-600 text-[10px] sm:text-xs mt-auto pt-2 truncate">{sub}</div>}
+const StatCard = ({ icon, label, value, sub, accent }: any) => (
+    <div style={{ background: 'rgba(17,17,27,0.8)', border: `1px solid rgba(255,255,255,0.07)`, borderRadius: '14px', padding: '18px 20px', backdropFilter: 'blur(12px)', position: 'relative', overflow: 'hidden' }} className="flex flex-col h-full">
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+        <div style={{ width: '44px', height: '44px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: `${accent}18`, color: accent, border: `1px solid ${accent}30`, marginBottom: '12px' }}>{icon}</div>
+        <div style={{ fontSize: '22px', fontWeight: '700', color: '#fff', lineHeight: 1.1, fontFamily: 'JetBrains Mono, monospace' }} className="truncate mb-1">{value}</div>
+        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }} className="truncate">{label}</div>
+        {sub && <div className="text-[10px] sm:text-xs mt-auto pt-2 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{sub}</div>}
     </div>
 );
 
@@ -35,9 +37,11 @@ export default function SuperAdminDashboard() {
     const [stats, setStats] = useState<any>(null);
     const [tenants, setTenants] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-    const fetchAll = async () => {
+    const fetchAll = async (manual = false) => {
+        if (manual) setIsRefreshing(true);
         const token = localStorage.getItem('accessToken');
         const headers = { Authorization: `Bearer ${token}` };
         try {
@@ -45,16 +49,34 @@ export default function SuperAdminDashboard() {
                 fetch(`${apiUrl}/api/master-admin/system-stats`, { headers }),
                 fetch(`${apiUrl}/api/master-admin/tenants`, { headers }),
             ]);
-            if (sRes.ok) setStats(await sRes.json());
-            if (tRes.ok) setTenants(await tRes.json());
-            setLastUpdate(new Date());
+
+            if (sRes.status === 429 || tRes.status === 429) {
+                if (manual) {
+                    import('sweetalert2').then(({ default: Swal }) => {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            title: 'Thao tác quá nhanh, vui lòng thử lại sau',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    });
+                }
+            } else {
+                if (sRes.ok) setStats(await sRes.json());
+                if (tRes.ok) setTenants(await tRes.json());
+                setLastUpdate(new Date());
+            }
         } catch (e) { console.error(e); }
         setLoading(false);
+        if (manual) setIsRefreshing(false);
     };
 
     useEffect(() => {
         fetchAll();
-        const interval = setInterval(fetchAll, 10000);
+        // Tăng thời gian polling lên 60 giây để tránh hit rate limit (Throttler: 60 req/min)
+        const interval = setInterval(() => fetchAll(), 60000);
         return () => clearInterval(interval);
     }, []);
 
@@ -67,9 +89,9 @@ export default function SuperAdminDashboard() {
         </div>
     );
 
-    const cpuColor = (stats?.cpu?.usage || 0) > 80 ? 'bg-red-500' : (stats?.cpu?.usage || 0) > 50 ? 'bg-yellow-500' : 'bg-green-500';
-    const memColor = (stats?.memory?.percent || 0) > 80 ? 'bg-red-500' : (stats?.memory?.percent || 0) > 60 ? 'bg-yellow-500' : 'bg-purple-500';
-    const diskColor = (stats?.disk?.percent || 0) > 80 ? 'bg-red-500' : (stats?.disk?.percent || 0) > 60 ? 'bg-yellow-500' : 'bg-blue-500';
+    const cpuColor = (stats?.cpu?.usage || 0) > 80 ? '#ff2d55' : (stats?.cpu?.usage || 0) > 50 ? '#ff9500' : '#34c759';
+    const memColor = (stats?.memory?.percent || 0) > 80 ? '#ff2d55' : (stats?.memory?.percent || 0) > 60 ? '#ff9500' : '#8b5cf6';
+    const diskColor = (stats?.disk?.percent || 0) > 80 ? '#ff2d55' : (stats?.disk?.percent || 0) > 60 ? '#ff9500' : '#3b82f6';
 
     return (
         <div className="space-y-6 text-white">
@@ -81,59 +103,67 @@ export default function SuperAdminDashboard() {
                         Cập nhật lúc {lastUpdate.toLocaleTimeString('vi-VN')} • {stats?.os?.hostname}
                     </p>
                 </div>
-                <button onClick={fetchAll} className="w-full sm:w-auto px-4 py-2 sm:py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                    Làm mới
+                <button
+                    onClick={() => fetchAll(true)}
+                    disabled={isRefreshing}
+                    className="w-full sm:w-auto px-4 py-2 sm:py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                    {isRefreshing ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    )}
+                    {isRefreshing ? 'Đang làm mới...' : 'Làm mới'}
                 </button>
             </div>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <StatCard icon="🏢" label="Tổng Tenant" value={stats?.stats?.tenants || 0} color="text-purple-400" sub={`${tenants.filter(t => t.status === 'active').length} đang hoạt động`} />
-                <StatCard icon="👥" label="Tổng User" value={stats?.stats?.users || 0} color="text-blue-400" />
-                <StatCard icon="🚨" label="Sự cố" value={stats?.stats?.incidents || 0} color="text-red-400" />
-                <StatCard icon="⏱️" label="Uptime" value={stats?.uptime?.formatted || '—'} color="text-green-400" sub="Thời gian hoạt động" />
+                <StatCard icon={<HiOutlineOfficeBuilding className="w-5 h-5" />} label="Tổng Tenant" value={stats?.stats?.tenants || 0} accent="#8b5cf6" sub={`${tenants.filter(t => t.status === 'active').length} đang hoạt động`} />
+                <StatCard icon={<HiOutlineUserGroup className="w-5 h-5" />} label="Tổng User" value={stats?.stats?.users || 0} accent="#3b82f6" />
+                <StatCard icon={<HiOutlineExclamation className="w-5 h-5" />} label="Sự cố" value={stats?.stats?.incidents || 0} accent="#ff2d55" />
+                <StatCard icon={<HiOutlineClock className="w-5 h-5" />} label="Uptime" value={stats?.uptime?.formatted || '—'} accent="#34c759" sub="Thời gian hoạt động" />
             </div>
 
             {/* Resources */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5">
                     <div className="flex justify-between items-start mb-1">
                         <div>
-                            <p className="text-gray-400 text-xs uppercase tracking-widest">CPU</p>
+                            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>CPU</p>
                             <p className="text-white text-xs mt-0.5">{stats?.cpu?.cores} cores • {stats?.cpu?.model?.slice(0, 25)}</p>
                         </div>
-                        <span className={`text-3xl font-bold ${(stats?.cpu?.usage || 0) > 80 ? 'text-red-400' : 'text-green-400'}`}>{stats?.cpu?.usage || 0}%</span>
+                        <span style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'JetBrains Mono, monospace', color: cpuColor }}>{stats?.cpu?.usage || 0}%</span>
                     </div>
                     <GaugeBar percent={stats?.cpu?.usage || 0} color={cpuColor} />
                 </div>
 
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5">
                     <div className="flex justify-between items-start mb-1">
                         <div>
-                            <p className="text-gray-400 text-xs uppercase tracking-widest">RAM</p>
+                            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>RAM</p>
                             <p className="text-white text-xs mt-0.5">{fmt(stats?.memory?.used || 0)} / {fmt(stats?.memory?.total || 0)}</p>
                         </div>
-                        <span className={`text-3xl font-bold ${(stats?.memory?.percent || 0) > 80 ? 'text-red-400' : 'text-purple-400'}`}>{stats?.memory?.percent || 0}%</span>
+                        <span style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'JetBrains Mono, monospace', color: memColor }}>{stats?.memory?.percent || 0}%</span>
                     </div>
                     <GaugeBar percent={stats?.memory?.percent || 0} color={memColor} />
                 </div>
 
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-5">
                     <div className="flex justify-between items-start mb-1">
                         <div>
-                            <p className="text-gray-400 text-xs uppercase tracking-widest">Disk</p>
+                            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Disk</p>
                             <p className="text-white text-xs mt-0.5">{fmt(stats?.disk?.used || 0)} / {fmt(stats?.disk?.total || 0)}</p>
                         </div>
-                        <span className={`text-3xl font-bold ${(stats?.disk?.percent || 0) > 80 ? 'text-red-400' : 'text-blue-400'}`}>{stats?.disk?.percent || 0}%</span>
+                        <span style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'JetBrains Mono, monospace', color: diskColor }}>{stats?.disk?.percent || 0}%</span>
                     </div>
                     <GaugeBar percent={stats?.disk?.percent || 0} color={diskColor} />
                 </div>
             </div>
 
             {/* OS Info */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
-                <h2 className="text-gray-400 text-xs uppercase tracking-widest mb-4">Thông tin máy chủ</h2>
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-4 sm:p-5">
+                <h2 style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }} className="mb-4">Thông tin máy chủ</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {[
                         { label: 'Platform', value: stats?.os?.platform },
@@ -150,22 +180,22 @@ export default function SuperAdminDashboard() {
             </div>
 
             {/* Tenant Table */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="overflow-hidden">
+                <div className="px-5 py-4 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between">
                     <h2 className="text-white font-semibold">Danh sách Tenant <span className="text-gray-500 font-normal">({tenants.length})</span></h2>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-gray-800">
+                            <tr className="border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)]">
                                 {['Tên công ty', 'Gói', 'Trạng thái', 'Users', 'Projects', 'QR Codes', 'Ngày tạo'].map(h => (
-                                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                                    <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {tenants.map(t => (
-                                <tr key={t.id} className="border-b border-gray-800 hover:bg-gray-800 transition-colors">
+                                <tr key={t.id} className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                                     <td className="px-4 py-3 font-medium text-white whitespace-nowrap">{t.name}</td>
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         <span className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase ${planBadge[t.subscriptionPlan?.toLowerCase()] || planBadge.starter}`}>
@@ -173,14 +203,14 @@ export default function SuperAdminDashboard() {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${t.status === 'active' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${t.status === 'active' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${t.status === 'active' ? 'bg-[#34c759]/10 text-[#34c759] border border-[#34c759]/20' : 'bg-[#ff2d55]/10 text-[#ff2d55] border border-[#ff2d55]/20'}`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${t.status === 'active' ? 'bg-[#34c759]' : 'bg-[#ff2d55]'}`}></span>
                                             {t.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{t._count?.users || 0}</td>
-                                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{t._count?.projects || 0}</td>
-                                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{t._count?.qrcodes || 0}</td>
+                                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap font-mono">{t._count?.users || 0}</td>
+                                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap font-mono">{t._count?.projects || 0}</td>
+                                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap font-mono">{t._count?.qrcodes || 0}</td>
                                     <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{new Date(t.createdAt).toLocaleDateString('vi-VN')}</td>
                                 </tr>
                             ))}

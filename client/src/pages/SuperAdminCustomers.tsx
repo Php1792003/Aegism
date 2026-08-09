@@ -138,14 +138,15 @@ const PlanBadge = ({ plan }: { plan: string }) => {
 
 // ─── STAT CARD ────────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, sub, icon: Icon, accent }: any) => (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${accent}`}>
+    <div style={{ background: 'rgba(17,17,27,0.8)', border: `1px solid rgba(255,255,255,0.07)`, borderRadius: '14px', padding: '20px', backdropFilter: 'blur(12px)', position: 'relative', overflow: 'hidden' }} className="flex items-center gap-4">
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+        <div style={{ width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${accent}18`, color: accent, border: `1px solid ${accent}30`, flexShrink: 0 }}>
             <Icon className="w-6 h-6" />
         </div>
         <div>
-            <div className="text-2xl font-bold text-white">{value}</div>
-            <div className="text-xs text-gray-400">{label}</div>
-            {sub && <div className="text-xs text-gray-500 mt-0.5">{sub}</div>}
+            <div style={{ fontSize: '24px', fontWeight: '700', color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>{value}</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{label}</div>
+            {sub && <div className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>{sub}</div>}
         </div>
     </div>
 );
@@ -214,8 +215,8 @@ const CustomerFormModal = ({ customer, onClose, onSave, planConfigs }: { custome
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
                     <div>
                         <h2 className="text-white font-bold text-lg">{isEdit ? 'Chỉnh sửa khách hàng' : 'Thêm khách hàng mới'}</h2>
@@ -307,8 +308,8 @@ const RenewModal = ({ customer, onClose, onRenew, planConfigs }: { customer: Cus
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div style={{ background: 'rgba(17,17,27,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(24px)' }} className="w-full max-w-lg shadow-2xl">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
                     <div>
                         <h2 className="text-white font-bold text-lg">Gia hạn gói thủ công</h2>
@@ -404,9 +405,9 @@ const RenewModal = ({ customer, onClose, onRenew, planConfigs }: { customer: Cus
 // ─── DETAIL DRAWER ────────────────────────────────────────────────────────────
 const DetailDrawer = ({ customer, onClose, onEdit, onRenew }: { customer: Customer; onClose: () => void; onEdit: () => void; onRenew: () => void }) => {
     return (
-        <div className="fixed inset-0 z-50 flex justify-end">
+        <div className="fixed inset-0 z-[100] flex justify-end">
             <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-            <div className="relative w-full max-w-md bg-gray-900 border-l border-gray-800 flex flex-col h-full shadow-2xl overflow-y-auto">
+            <div style={{ background: 'rgba(17,17,27,0.95)', borderLeft: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(24px)' }} className="relative w-full max-w-md flex flex-col h-full shadow-2xl overflow-y-auto">
                 {/* Header */}
                 <div className="p-6 border-b border-gray-800 flex items-start justify-between">
                     <div className="flex items-center gap-4">
@@ -621,14 +622,14 @@ const SuperAdminCustomers = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Tổng khách hàng" value={customers.length} icon={HiOutlineUser} accent="bg-blue-900/40 text-blue-400" />
-                <StatCard label="Đang hoạt động" value={activeCount} sub={`${customers.length ? Math.round(activeCount / customers.length * 100) : 0}% tổng số`} icon={HiOutlineCheckCircle} accent="bg-emerald-900/40 text-emerald-400" />
-                <StatCard label="Sắp hết hạn (30 ngày)" value={expiringCount} icon={HiOutlineClock} accent="bg-orange-900/40 text-orange-400" />
-                <StatCard label="Tổng doanh thu" value={`${(totalRevenue / 1000000).toFixed(0)}M ₫`} icon={HiOutlineCurrencyDollar} accent="bg-purple-900/40 text-purple-400" />
+                <StatCard label="Tổng khách hàng" value={customers.length} icon={HiOutlineUser} accent="#3b82f6" />
+                <StatCard label="Đang hoạt động" value={activeCount} sub={`${customers.length ? Math.round(activeCount / customers.length * 100) : 0}% tổng số`} icon={HiOutlineCheckCircle} accent="#34c759" />
+                <StatCard label="Sắp hết hạn (30 ngày)" value={expiringCount} icon={HiOutlineClock} accent="#ff9500" />
+                <StatCard label="Tổng doanh thu" value={`${(totalRevenue / 1000000).toFixed(0)}M ₫`} icon={HiOutlineCurrencyDollar} accent="#8b5cf6" />
             </div>
 
             {/* Filters */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col sm:flex-row gap-3">
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="p-4 flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                     <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
@@ -648,11 +649,11 @@ const SuperAdminCustomers = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <div style={{ background: 'rgba(17,17,27,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', backdropFilter: 'blur(12px)' }} className="overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
+                            <tr className="border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] text-gray-400 text-[11px] uppercase tracking-wider">
                                 <th className="text-left px-5 py-3.5 whitespace-nowrap">Khách hàng</th>
                                 <th className="text-left px-4 py-3.5 whitespace-nowrap">Thống kê</th>
                                 <th className="text-left px-4 py-3.5 whitespace-nowrap">Gói</th>
@@ -677,7 +678,7 @@ const SuperAdminCustomers = () => {
                             ) : paginated.length === 0 ? (
                                 <tr><td colSpan={10} className="text-center py-16 text-gray-600">Không tìm thấy khách hàng nào</td></tr>
                             ) : paginated.map(c => (
-                                <tr key={c.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors group">
+                                <tr key={c.id} className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors group">
                                     <td className="px-5 py-4 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-purple-800/60 flex items-center justify-center text-purple-300 font-semibold text-sm flex-shrink-0">
@@ -748,7 +749,7 @@ const SuperAdminCustomers = () => {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-800">
+                    <div className="flex items-center justify-between px-5 py-3.5 border-t border-[rgba(255,255,255,0.05)]">
                         <span className="text-xs text-gray-500">
                             Hiển thị {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} / {filtered.length} khách hàng
                         </span>
