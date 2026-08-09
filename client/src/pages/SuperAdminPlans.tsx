@@ -103,7 +103,7 @@ const EditPlanModal = ({ plan, isNew = false, onClose, onSave }: { plan: any; is
                         <input value={form.displayName} onChange={e => setForm(p => ({ ...p, displayName: e.target.value }))}
                             className="w-full bg-gray-800 border border-gray-700 text-white text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500" />
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="col-span-1">
                             <label className="text-xs text-gray-400 mb-1.5 block">Giá tháng (VND)</label>
                             <input type="number" value={form.monthlyPrice} onChange={e => updateMonthlyPrice(Number(e.target.value))}
@@ -120,7 +120,7 @@ const EditPlanModal = ({ plan, isNew = false, onClose, onSave }: { plan: any; is
                                 className="w-full bg-gray-800 border border-gray-700 text-white text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500" />
                         </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {[['maxUsers', 'Max Users'], ['maxProjects', 'Max Projects'], ['maxQRCodes', 'Max QR']].map(([k, l]) => (
                             <div key={k}>
                                 <label className="text-xs text-gray-400 mb-1.5 block">{l}</label>
@@ -175,36 +175,36 @@ const TenantHistoryModal = ({ tenantId, tenantName, onClose }: { tenantId: strin
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
             <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-gray-800 gap-4">
                     <div>
                         <h2 className="text-white font-bold">Lịch sử thanh toán</h2>
                         <p className="text-gray-400 text-sm">{tenantName} · Tổng: <span className="text-emerald-400 font-semibold">{fmt(data?.totalSpent || 0)}</span></p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full sm:w-auto justify-end">
                         <button onClick={exportCSV} className="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Xuất CSV</button>
                         <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg"><HiOutlineX className="w-5 h-5" /></button>
                     </div>
                 </div>
-                <div className="overflow-y-auto flex-1">
+                <div className="overflow-auto flex-1">
                     {loading ? <div className="flex items-center justify-center py-16"><div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" /></div>
                         : !data?.payments?.length ? <p className="text-center py-16 text-gray-600">Chưa có giao dịch nào</p>
                             : (
                                 <table className="w-full text-sm">
                                     <thead><tr className="border-b border-gray-800 text-gray-500 text-xs uppercase">
-                                        <th className="text-left px-5 py-3">Mã GD</th>
-                                        <th className="text-left px-4 py-3">Gói</th>
-                                        <th className="text-right px-4 py-3">Số tiền</th>
-                                        <th className="text-left px-4 py-3">Trạng thái</th>
-                                        <th className="text-left px-4 py-3">Ngày</th>
+                                        <th className="text-left px-5 py-3 whitespace-nowrap">Mã GD</th>
+                                        <th className="text-left px-4 py-3 whitespace-nowrap">Gói</th>
+                                        <th className="text-right px-4 py-3 whitespace-nowrap">Số tiền</th>
+                                        <th className="text-left px-4 py-3 whitespace-nowrap">Trạng thái</th>
+                                        <th className="text-left px-4 py-3 whitespace-nowrap">Ngày</th>
                                     </tr></thead>
                                     <tbody>
                                         {data.payments.map((p: any) => (
                                             <tr key={p.id} className="border-b border-gray-800/50 hover:bg-gray-800/20">
-                                                <td className="px-5 py-3 font-mono text-xs text-gray-400">{p.orderCode}</td>
-                                                <td className="px-4 py-3"><span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: (PLAN_COLORS[p.plan] || '#6b7280') + '20', color: PLAN_COLORS[p.plan] || '#6b7280' }}>{p.plan}</span></td>
-                                                <td className="px-4 py-3 text-right font-bold text-white">{fmt(p.amount)}</td>
-                                                <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-400' : p.status === 'PENDING' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-red-500/10 text-red-400'}`}>{p.status}</span></td>
-                                                <td className="px-4 py-3 text-gray-400 text-xs">{fmtDate(p.createdAt)}</td>
+                                                <td className="px-5 py-3 font-mono text-xs text-gray-400 whitespace-nowrap">{p.orderCode}</td>
+                                                <td className="px-4 py-3 whitespace-nowrap"><span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: (PLAN_COLORS[p.plan] || '#6b7280') + '20', color: PLAN_COLORS[p.plan] || '#6b7280' }}>{p.plan}</span></td>
+                                                <td className="px-4 py-3 text-right font-bold text-white whitespace-nowrap">{fmt(p.amount)}</td>
+                                                <td className="px-4 py-3 whitespace-nowrap"><span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-400' : p.status === 'PENDING' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-red-500/10 text-red-400'}`}>{p.status}</span></td>
+                                                <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{fmtDate(p.createdAt)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -304,7 +304,7 @@ const SuperAdminPlans = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Quản lý Gói dịch vụ</h1>
                     <p className="text-gray-400 text-sm mt-0.5">Cấu hình giá, tính năng và theo dõi phân bổ tenant</p>
@@ -421,21 +421,21 @@ const SuperAdminPlans = () => {
 
             {/* Tenant payment history lookup */}
             <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 border-b border-gray-800 gap-4">
                     <h3 className="text-sm font-semibold text-white">Lịch sử thanh toán theo khách hàng</h3>
-                    <div className="relative">
+                    <div className="relative w-full sm:w-auto">
                         <input value={tenantSearch} onChange={e => setTenantSearch(e.target.value)} placeholder="Tìm khách hàng..."
-                            className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg pl-3 pr-4 py-2 focus:outline-none focus:border-purple-500 placeholder-gray-600 w-52" />
+                            className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg pl-3 pr-4 py-2 focus:outline-none focus:border-purple-500 placeholder-gray-600 w-full sm:w-52" />
                     </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead><tr className="border-b border-gray-800 text-gray-500 text-xs uppercase">
-                            <th className="text-left px-5 py-3">Tenant</th>
-                            <th className="text-left px-4 py-3">Gói hiện tại</th>
-                            <th className="text-left px-4 py-3">Users</th>
-                            <th className="text-left px-4 py-3">Ngày tạo</th>
-                            <th className="text-center px-4 py-3">Lịch sử TT</th>
+                            <th className="text-left px-5 py-3 whitespace-nowrap">Tenant</th>
+                            <th className="text-left px-4 py-3 whitespace-nowrap">Gói hiện tại</th>
+                            <th className="text-left px-4 py-3 whitespace-nowrap">Users</th>
+                            <th className="text-left px-4 py-3 whitespace-nowrap">Ngày tạo</th>
+                            <th className="text-center px-4 py-3 whitespace-nowrap">Lịch sử TT</th>
                         </tr></thead>
                         <tbody>
                             {loading ? Array.from({ length: 5 }).map((_, i) => (
@@ -444,7 +444,7 @@ const SuperAdminPlans = () => {
                                 </tr>
                             )) : filteredTenants.slice(0, 15).map((t: any) => (
                                 <tr key={t.id} className="border-b border-gray-800/50 hover:bg-gray-800/20 transition-colors group">
-                                    <td className="px-5 py-3">
+                                    <td className="px-5 py-3 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-purple-800/60 flex items-center justify-center text-purple-300 font-semibold text-sm flex-shrink-0">{t.name?.charAt(0)}</div>
                                             <div>
@@ -453,16 +453,16 @@ const SuperAdminPlans = () => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-3 whitespace-nowrap">
                                         <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: (PLAN_COLORS[t.subscriptionPlan] || '#6b7280') + '20', color: PLAN_COLORS[t.subscriptionPlan] || '#6b7280' }}>
                                             {t.subscriptionPlan || 'NONE'}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-gray-400 text-sm">{t._count?.users || 0}</td>
-                                    <td className="px-4 py-3 text-gray-400 text-xs">{t.createdAt ? new Date(t.createdAt).toLocaleDateString('vi-VN') : '—'}</td>
-                                    <td className="px-4 py-3 text-center">
+                                    <td className="px-4 py-3 text-gray-400 text-sm whitespace-nowrap">{t._count?.users || 0}</td>
+                                    <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{t.createdAt ? new Date(t.createdAt).toLocaleDateString('vi-VN') : '—'}</td>
+                                    <td className="px-4 py-3 text-center whitespace-nowrap">
                                         <button onClick={() => setHistoryTenant(t)}
-                                            className="opacity-60 group-hover:opacity-100 transition-opacity text-xs px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg border border-purple-600/30 hover:border-purple-600">
+                                            className="opacity-60 group-hover:opacity-100 transition-opacity text-xs px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg border border-purple-600/30 hover:border-purple-600 whitespace-nowrap">
                                             Xem lịch sử
                                         </button>
                                     </td>

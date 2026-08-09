@@ -390,7 +390,7 @@ const Staff = () => {
     return (
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 h-full font-sans text-gray-800">
             {/* Toolbar */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 m-6">
+            <div className="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-gray-200 mb-4 sm:mb-6 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 mx-3 sm:mx-6 mt-3 sm:mt-6">
                 <div className="relative w-full md:w-72">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><FaMagnifyingGlass className="text-gray-400" /></div>
                     <select value={selectedProjectId} onChange={(e) => setSelectedProjectId(e.target.value)}
@@ -406,13 +406,13 @@ const Staff = () => {
             </div>
 
             {/* Tabs */}
-            <div className="mb-6 border-b border-gray-200 px-6">
-                <nav className="-mb-px flex space-x-8">
-                    {[{ key: 'staff', icon: <FaUsers className="mr-2" />, label: 'Danh sách Nhân sự' },
-                    { key: 'roles', icon: <FaShieldHalved className="mr-2" />, label: 'Quản lý Vai trò & Quyền hạn' }].map(tab => (
+            <div className="mb-4 sm:mb-6 border-b border-gray-200 px-3 sm:px-6 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <nav className="-mb-px flex space-x-3 sm:space-x-8 min-w-max">
+                    {[{ key: 'staff', icon: <FaUsers className="mr-1.5 sm:mr-2 flex-shrink-0" />, label: 'Nhân sự', labelFull: 'Danh sách Nhân sự' },
+                    { key: 'roles', icon: <FaShieldHalved className="mr-1.5 sm:mr-2 flex-shrink-0" />, label: 'Vai trò', labelFull: 'Quản lý Vai trò & Quyền hạn' }].map(tab => (
                         <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                            className={`whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm flex items-center transition-colors ${activeTab === tab.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-                            {tab.icon}{tab.label}
+                            className={`whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-bold text-xs sm:text-sm flex items-center transition-colors ${activeTab === tab.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+                            {tab.icon}<span className="sm:hidden">{tab.label}</span><span className="hidden sm:inline">{tab.labelFull}</span>
                         </button>
                     ))}
                 </nav>
@@ -422,14 +422,14 @@ const Staff = () => {
 
             {/* TAB STAFF */}
             {activeTab === 'staff' && selectedProjectId && !isLoading && (
-                <div className="px-6 pb-6">
-                    <div className="flex justify-between items-center mb-5">
+                <div className="px-3 sm:px-6 pb-6">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-5">
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">Đội ngũ Dự án</h3>
-                            <p className="text-sm text-gray-500">Quản lý thành viên và phân quyền truy cập.</p>
+                            <h3 className="text-base sm:text-lg font-bold text-gray-900">Đội ngũ Dự án</h3>
+                            <p className="text-xs sm:text-sm text-gray-500">Quản lý thành viên và phân quyền truy cập.</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <div className={`text-sm px-3 py-1.5 rounded-full font-medium ${allStaff.length >= tenantLimits.maxUsers
+                        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                            <div className={`text-xs sm:text-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium ${allStaff.length >= tenantLimits.maxUsers
                                 ? 'bg-red-100 text-red-600'
                                 : allStaff.length >= tenantLimits.maxUsers * 0.8
                                     ? 'bg-yellow-100 text-yellow-700'
@@ -439,13 +439,15 @@ const Staff = () => {
                             </div>
                             {(hasPermission('CREATE_USER') || hasPermission('MANAGE_USER')) && (
                                 <button onClick={openAddStaffModal} disabled={!canAddUser}
-                                    className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${canAddUser ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
-                                    <FaUserPlus className="mr-2" /> Thêm Nhân sự
+                                    className={`flex items-center px-3 sm:px-4 py-2 rounded-lg font-medium text-sm transition-all ${canAddUser ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
+                                    <FaUserPlus className="mr-1.5 sm:mr-2" /> <span className="hidden xs:inline">Thêm</span> Nhân sự
                                 </button>
                             )}
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+                    {/* Desktop/Tablet Table (hidden on mobile) */}
+                    <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
@@ -504,40 +506,95 @@ const Staff = () => {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Mobile Card Layout (shown only on mobile) */}
+                    <div className="md:hidden space-y-3">
+                        {filteredStaff.map((staff: any) => (
+                            <div key={staff.id}
+                                className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 active:bg-gray-50 transition-colors cursor-pointer"
+                                onClick={() => { setSelectedStaff(staff); setShowDetailModal(true); }}>
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <div className="flex-shrink-0 h-11 w-11 relative">
+                                            <img className="h-11 w-11 rounded-full object-cover border-2 border-white shadow-sm" src={getAvatarUrl(staff)} alt="" />
+                                            {staff.isTenantAdmin && <div className="absolute -bottom-1 -right-1 bg-purple-600 rounded-full p-0.5 border-2 border-white"><FaCrown className="text-[10px] text-white" /></div>}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="text-sm font-bold text-gray-900 truncate">{staff.fullName}</div>
+                                            <div className="text-xs text-gray-500 truncate">{staff.email}</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex-shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
+                                        <div className="relative">
+                                            <button onClick={(e) => { e.stopPropagation(); setDropdownOpenId(dropdownOpenId === staff.id ? null : staff.id); }}
+                                                className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100" aria-label="Hành động">
+                                                <FaEllipsisVertical />
+                                            </button>
+                                            {dropdownOpenId === staff.id && (
+                                                <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-lg py-1 z-20 border border-gray-100">
+                                                    {(hasPermission('EDIT_USER') || hasPermission('UPDATE_USER') || hasPermission('MANAGE_USER')) && (
+                                                        <button onClick={() => { openEditStaffModal(staff); setDropdownOpenId(null); }} className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                                                            <span className="flex items-center"><FaPenToSquare className="w-4 mr-2" /> Chỉnh sửa</span>
+                                                        </button>
+                                                    )}
+                                                    {(hasPermission('DELETE_USER') || hasPermission('MANAGE_USER')) && (
+                                                        <button onClick={() => { deleteStaff(staff.id); setDropdownOpenId(null); }} className="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
+                                                            <span className="flex items-center"><FaTrash className="w-4 mr-2" /> Xóa nhân sự</span>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 mt-3 flex-wrap">
+                                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-100">{getRoleName(staff.role)}</span>
+                                    <div className="flex items-center">
+                                        <div className={`h-2 w-2 rounded-full mr-1.5 ${staff.status === 'active' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]' : 'bg-gray-400'}`}></div>
+                                        <span className="text-xs text-gray-600 font-medium">{staff.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}</span>
+                                    </div>
+                                    <span className="text-xs text-gray-400 ml-auto">{new Date(staff.createdAt || Date.now()).toLocaleDateString('vi-VN')}</span>
+                                </div>
+                            </div>
+                        ))}
+                        {filteredStaff.length === 0 && (
+                            <div className="bg-white rounded-xl border border-gray-200 px-4 py-10 text-center text-gray-500 italic text-sm">Chưa tìm thấy nhân sự phù hợp.</div>
+                        )}
+                    </div>
                 </div>
             )}
 
             {/* TAB ROLES */}
             {activeTab === 'roles' && selectedProjectId && !isLoading && (
-                <div className="px-6 pb-6">
-                    <div className="flex justify-between items-center mb-6">
+                <div className="px-3 sm:px-6 pb-6">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">Vai trò & Quyền hạn</h3>
-                            <p className="text-sm text-gray-500">Định nghĩa các nhóm quyền để gán cho nhân viên.</p>
+                            <h3 className="text-base sm:text-lg font-bold text-gray-900">Vai trò & Quyền hạn</h3>
+                            <p className="text-xs sm:text-sm text-gray-500">Định nghĩa các nhóm quyền để gán cho nhân viên.</p>
                         </div>
                         {(hasPermission('MANAGE_ROLE') || hasPermission('CREATE_ROLE')) && (
-                            <button onClick={openRoleModal} className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium shadow-sm">
-                                <FaPlus className="mr-2 text-gray-500" /> Tạo Vai trò Mới
+                            <button onClick={openRoleModal} className="flex items-center px-3 sm:px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium shadow-sm text-sm self-start sm:self-auto">
+                                <FaPlus className="mr-1.5 sm:mr-2 text-gray-500" /> Tạo Vai trò Mới
                             </button>
                         )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                         {roles.map((role: any) => {
                             const perms = parsePermissions(role.permissions);
                             return (
-                                <div key={role.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-blue-300 transition-all group flex flex-col gap-3">
+                                <div key={role.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 hover:shadow-md hover:border-blue-300 transition-all group flex flex-col gap-3">
                                     <div className="flex justify-between items-start">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0"><FaShieldHalved /></div>
-                                            <div>
-                                                <h4 className="text-base font-bold text-gray-800">{role.name}</h4>
+                                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0"><FaShieldHalved /></div>
+                                            <div className="min-w-0">
+                                                <h4 className="text-sm sm:text-base font-bold text-gray-800 truncate">{role.name}</h4>
                                                 <span className="text-xs text-gray-400">{perms.length} quyền</span>
                                             </div>
                                         </div>
                                         {hasPermission('MANAGE_ROLE') && (
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => openEditRoleModal(role)} className="p-1.5 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-md hover:bg-blue-50"><FaPen /></button>
-                                                <button onClick={() => deleteRole(role.id)} className="p-1.5 text-gray-400 hover:text-red-600 bg-gray-50 rounded-md hover:bg-red-50"><FaTrash /></button>
+                                            <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                                <button onClick={() => openEditRoleModal(role)} className="p-2 sm:p-1.5 text-gray-400 hover:text-blue-600 bg-gray-50 rounded-md hover:bg-blue-50" aria-label="Chỉnh sửa vai trò"><FaPen /></button>
+                                                <button onClick={() => deleteRole(role.id)} className="p-2 sm:p-1.5 text-gray-400 hover:text-red-600 bg-gray-50 rounded-md hover:bg-red-50" aria-label="Xóa vai trò"><FaTrash /></button>
                                             </div>
                                         )}
                                     </div>
@@ -552,7 +609,7 @@ const Staff = () => {
                                                     <span className="text-xs mt-0.5 flex-shrink-0">{group.icon}</span>
                                                     <div className="flex flex-wrap gap-1">
                                                         {matched.map(p => (
-                                                            <span key={p} className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${c.tagOn}`}>{p.replace(/_/g, ' ')}</span>
+                                                            <span key={p} className={`px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold border ${c.tagOn}`}>{p.replace(/_/g, ' ')}</span>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -563,9 +620,9 @@ const Staff = () => {
                             );
                         })}
                         {roles.length === 0 && (
-                            <div className="col-span-full flex flex-col items-center justify-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                            <div className="col-span-full flex flex-col items-center justify-center py-10 sm:py-12 bg-white rounded-xl border border-dashed border-gray-300">
                                 <FaRegFolderOpen className="text-3xl text-gray-400 mb-2" />
-                                <span className="text-gray-500 font-medium">Chưa có vai trò nào được tạo.</span>
+                                <span className="text-gray-500 font-medium text-sm">Chưa có vai trò nào được tạo.</span>
                             </div>
                         )}
                     </div>
@@ -582,45 +639,45 @@ const Staff = () => {
 
             {/* ══════════════ MODAL: ROLE FORM ══════════════ */}
             {showRoleModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-2 sm:px-4">
                     <div className="fixed inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={() => setShowRoleModal(false)} />
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 flex flex-col max-h-[90vh]">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 flex flex-col max-h-[95vh] sm:max-h-[90vh]">
 
                         {/* Header gradient */}
-                        <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-2xl flex justify-between items-center flex-shrink-0">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-white/20 p-2 rounded-lg"><FaShieldHalved className="text-white" /></div>
+                        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-2xl flex justify-between items-center flex-shrink-0">
+                            <div className="flex items-center gap-2.5 sm:gap-3">
+                                <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg"><FaShieldHalved className="text-white" /></div>
                                 <div>
-                                    <h3 className="text-base font-bold text-white">{isEditingRole ? 'Chỉnh sửa Vai trò' : 'Tạo Vai trò Mới'}</h3>
-                                    <p className="text-blue-100 text-xs">Chọn quyền hạn cho vai trò này</p>
+                                    <h3 className="text-sm sm:text-base font-bold text-white">{isEditingRole ? 'Chỉnh sửa Vai trò' : 'Tạo Vai trò Mới'}</h3>
+                                    <p className="text-blue-100 text-[11px] sm:text-xs">Chọn quyền hạn cho vai trò này</p>
                                 </div>
                             </div>
-                            <button onClick={() => setShowRoleModal(false)} className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-1.5 transition"><FaXmark /></button>
+                            <button onClick={() => setShowRoleModal(false)} className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-1.5 transition" aria-label="Đóng"><FaXmark /></button>
                         </div>
 
-                        <div className="p-5 overflow-y-auto flex-1 space-y-4">
+                        <div className="p-3 sm:p-5 overflow-y-auto flex-1 space-y-3 sm:space-y-4">
                             {/* Role name input */}
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1.5">Tên Vai trò <span className="text-red-500">*</span></label>
                                 <input type="text" value={roleForm.name}
                                     onChange={(e) => { setRoleForm({ ...roleForm, name: e.target.value }); setErrors({ ...errors, roleName: null }); }}
-                                    className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 ${errors.roleName ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300 focus:border-blue-400'}`}
+                                    className={`w-full px-3 sm:px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 ${errors.roleName ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300 focus:border-blue-400'}`}
                                     placeholder="Ví dụ: Giám sát viên, Bảo vệ, Kỹ thuật viên..." />
                                 {errors.roleName && <p className="text-red-500 text-xs mt-1">{errors.roleName}</p>}
                             </div>
 
                             {/* Summary pill bar */}
-                            <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl px-4 py-2.5">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FaShieldHalved className="text-white text-sm" />
+                            <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl px-3 sm:px-4 py-2.5">
+                                <div className="flex items-center gap-2 sm:gap-2.5">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <FaShieldHalved className="text-white text-xs sm:text-sm" />
                                     </div>
                                     <div>
                                         <p className="text-[11px] text-gray-400 leading-none">Đã chọn</p>
-                                        <p className="text-xl font-black text-blue-700 leading-tight">{roleForm.permissions.length}<span className="text-sm font-normal text-gray-400">/{totalPerms}</span></p>
+                                        <p className="text-lg sm:text-xl font-black text-blue-700 leading-tight">{roleForm.permissions.length}<span className="text-xs sm:text-sm font-normal text-gray-400">/{totalPerms}</span></p>
                                     </div>
                                 </div>
-                                <div className="flex gap-1 flex-wrap justify-end max-w-xs">
+                                <div className="flex gap-1 flex-wrap flex-1 justify-end">
                                     {PERMISSION_GROUPS.map(g => {
                                         const cnt = g.perms.filter(p => roleForm.permissions.includes(p)).length;
                                         if (!cnt) return null;
@@ -629,12 +686,12 @@ const Staff = () => {
                                 </div>
                                 {roleForm.permissions.length > 0 && (
                                     <button type="button" onClick={() => setRoleForm({ ...roleForm, permissions: [] })}
-                                        className="text-xs text-gray-400 hover:text-red-500 ml-2 transition flex-shrink-0">Xóa hết</button>
+                                        className="text-xs text-gray-400 hover:text-red-500 ml-auto transition flex-shrink-0">Xóa hết</button>
                                 )}
                             </div>
 
                             {/* Accordion groups */}
-                            <div className="space-y-2.5">
+                            <div className="space-y-2 sm:space-y-2.5">
                                 {PERMISSION_GROUPS.map(group => (
                                     <PermissionGroup key={group.key} group={group} selectedPerms={roleForm.permissions} onChange={handleRolePermissionChange} />
                                 ))}
@@ -642,11 +699,11 @@ const Staff = () => {
                         </div>
 
                         {/* Footer */}
-                        <div className="px-5 py-3 bg-gray-50 border-t flex justify-between items-center rounded-b-2xl flex-shrink-0">
-                            <span className="text-xs text-gray-400">{roleForm.permissions.length}/{totalPerms} quyền đã chọn</span>
-                            <div className="flex gap-2">
+                        <div className="px-3 sm:px-5 py-3 bg-gray-50 border-t flex justify-between items-center rounded-b-2xl flex-shrink-0">
+                            <span className="text-xs text-gray-400 hidden sm:inline">{roleForm.permissions.length}/{totalPerms} quyền đã chọn</span>
+                            <div className="flex gap-2 w-full sm:w-auto justify-end">
                                 <button onClick={() => setShowRoleModal(false)} className="px-4 py-2 bg-white border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">Hủy</button>
-                                <button onClick={saveRole} className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium text-sm shadow-md shadow-blue-500/30 transition">
+                                <button onClick={saveRole} className="px-4 sm:px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium text-sm shadow-md shadow-blue-500/30 transition">
                                     {isEditingRole ? 'Lưu thay đổi' : 'Tạo vai trò'}
                                 </button>
                             </div>
@@ -657,36 +714,36 @@ const Staff = () => {
 
             {/* ══════════════ MODAL: STAFF FORM ══════════════ */}
             {showStaffModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center px-2 sm:px-4 overflow-y-auto">
                     <div className="fixed inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={() => setShowStaffModal(false)} />
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 my-8">
-                        <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
-                            <h3 className="text-base font-bold text-gray-900 flex items-center">
-                                <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg mr-3"><FaUserPen /></span>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 my-4 sm:my-8 flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+                        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl flex-shrink-0">
+                            <h3 className="text-sm sm:text-base font-bold text-gray-900 flex items-center">
+                                <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg mr-2 sm:mr-3"><FaUserPen /></span>
                                 {isEditingStaff ? 'Cập nhật Thông tin' : 'Thêm Nhân sự Mới'}
                             </h3>
-                            <button onClick={() => setShowStaffModal(false)} className="text-gray-400 hover:text-gray-600"><FaXmark className="text-xl" /></button>
+                            <button onClick={() => setShowStaffModal(false)} className="text-gray-400 hover:text-gray-600 p-1" aria-label="Đóng"><FaXmark className="text-xl" /></button>
                         </div>
-                        <div className="p-6 space-y-4">
+                        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Họ và Tên <span className="text-red-500">*</span></label>
                                 <input type="text" value={staffForm.fullName} onChange={(e) => { setStaffForm({ ...staffForm, fullName: e.target.value }); setErrors({ ...errors, fullName: null }); }}
-                                    className={`w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'}`} placeholder="Nhập tên nhân viên" />
+                                    className={`w-full px-3 sm:px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'}`} placeholder="Nhập tên nhân viên" />
                                 {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Email <span className="text-red-500">*</span></label>
                                 <input type="email" value={staffForm.email} disabled={isEditingStaff}
                                     onChange={(e) => { setStaffForm({ ...staffForm, email: e.target.value }); setErrors({ ...errors, email: null }); }}
-                                    className={`w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 disabled:bg-gray-100 ${errors.email ? 'border-red-400' : 'border-gray-300 focus:ring-blue-300'}`} placeholder="email@example.com" />
+                                    className={`w-full px-3 sm:px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 disabled:bg-gray-100 ${errors.email ? 'border-red-400' : 'border-gray-300 focus:ring-blue-300'}`} placeholder="email@example.com" />
                                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Ảnh đại diện</label>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 sm:gap-4">
                                     <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                         <img src={getAvatar(staffForm)}
-                                            className="h-14 w-14 rounded-full border-2 border-gray-200 object-cover group-hover:border-blue-500 transition-colors" alt="" />
+                                            className="h-12 w-12 sm:h-14 sm:w-14 rounded-full border-2 border-gray-200 object-cover group-hover:border-blue-500 transition-colors" alt="" />
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 rounded-full flex items-center justify-center transition-all"><FaCamera className="text-white opacity-0 group-hover:opacity-100" /></div>
                                     </div>
                                     <div>
@@ -700,7 +757,7 @@ const Staff = () => {
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu <span className="text-red-500">*</span></label>
                                     <input type="password" value={staffForm.password} onChange={(e) => { setStaffForm({ ...staffForm, password: e.target.value }); setErrors({ ...errors, password: null }); }}
-                                        className={`w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 ${errors.password ? 'border-red-400' : 'border-gray-300 focus:ring-blue-300'}`} placeholder="••••••••" />
+                                        className={`w-full px-3 sm:px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 ${errors.password ? 'border-red-400' : 'border-gray-300 focus:ring-blue-300'}`} placeholder="••••••••" />
                                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                                 </div>
                             )}
@@ -712,7 +769,7 @@ const Staff = () => {
                                     <input type="text" value={projectSearchQuery}
                                         onChange={(e) => { setProjectSearchQuery(e.target.value); setShowProjectDropdown(true); }}
                                         onFocus={() => setShowProjectDropdown(true)}
-                                        className={`w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 pr-10 ${errors.projectId ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'}`}
+                                        className={`w-full px-3 sm:px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 pr-10 ${errors.projectId ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'}`}
                                         placeholder="Tìm kiếm và chọn dự án..." />
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
                                         <FaChevronDown style={{ fontSize: 10 }} />
@@ -720,7 +777,7 @@ const Staff = () => {
                                 </div>
                                 {errors.projectId && <p className="text-red-500 text-xs mt-1">{errors.projectId}</p>}
                                 {showProjectDropdown && (
-                                    <div className="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1">
+                                    <div className="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 sm:max-h-60 overflow-y-auto py-1">
                                         {projects.filter((p: any) => p.name.toLowerCase().includes(projectSearchQuery.toLowerCase())).map((p: any) => {
                                             const isSelected = p.id === staffForm.projectId;
                                             return (
@@ -732,7 +789,7 @@ const Staff = () => {
                                                         setErrors((prev: any) => ({ ...prev, projectId: null }));
                                                         fetchModalRoles(p.id);
                                                     }}
-                                                    className={`w-full text-left px-4 py-2 text-sm hover:bg-blue-50 transition-colors flex items-center justify-between ${isSelected ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-700'}`}>
+                                                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 transition-colors flex items-center justify-between ${isSelected ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-700'}`}>
                                                     <span>{p.name}</span>
                                                     {isSelected && <FaCheck className="text-blue-600 text-xs" />}
                                                 </button>
@@ -745,7 +802,7 @@ const Staff = () => {
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Vai trò <span className="text-red-500">*</span></label>
                                     <select value={staffForm.roleId} onChange={(e) => { setStaffForm({ ...staffForm, roleId: e.target.value }); setErrors({ ...errors, roleId: null }); }}
@@ -763,34 +820,34 @@ const Staff = () => {
                                     </select>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between bg-purple-50 p-4 rounded-xl border border-purple-100">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50 p-3 sm:p-4 rounded-xl border border-purple-100">
                                 <div className="flex items-center">
-                                    <div className="bg-purple-100 p-2 rounded-lg mr-3"><FaShieldHalved className="text-purple-600" /></div>
+                                    <div className="bg-purple-100 p-2 rounded-lg mr-3 flex-shrink-0"><FaShieldHalved className="text-purple-600" /></div>
                                     <div>
                                         <span className="block text-sm font-bold text-gray-800">Quản trị viên dự án</span>
                                         <span className="block text-xs text-gray-500">Toàn quyền cấu hình dự án</span>
                                     </div>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
+                                <label className="relative inline-flex items-center cursor-pointer self-end sm:self-auto flex-shrink-0">
                                     <input type="checkbox" checked={staffForm.isTenantAdmin} onChange={(e) => setStaffForm({ ...staffForm, isTenantAdmin: e.target.checked })} className="sr-only peer" />
                                     <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                                 </label>
                             </div>
                         </div>
-                        <div className="px-6 py-4 bg-gray-50 border-t flex justify-end gap-3 rounded-b-2xl">
+                        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t flex justify-end gap-2 sm:gap-3 rounded-b-2xl flex-shrink-0">
                             <button onClick={() => { setShowStaffModal(false); setTempPassword(null); }} className="px-4 py-2 bg-white border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">Hủy</button>
                             {!tempPassword && (
-                                <button onClick={saveStaff} className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium text-sm shadow-md shadow-blue-500/30 transition">
+                                <button onClick={saveStaff} className="px-5 sm:px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium text-sm shadow-md shadow-blue-500/30 transition">
                                     {isEditingStaff ? 'Lưu thay đổi' : 'Tạo nhân sự'}
                                 </button>
                             )}
                         </div>
                         {tempPassword && (
-                            <div className="m-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start">
+                            <div className="mx-4 sm:mx-6 mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-xl flex items-start">
                                 <FaCheck className="text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-sm font-bold text-green-800 mb-1">Tạo tài khoản thành công!</p>
-                                    <p className="text-sm text-green-700">Mật khẩu tạm thời: <code className="px-2 py-1 bg-white border border-green-300 rounded text-blue-600 font-mono font-bold select-all">{tempPassword}</code></p>
+                                    <p className="text-sm text-green-700 break-all">Mật khẩu tạm thời: <code className="px-2 py-1 bg-white border border-green-300 rounded text-blue-600 font-mono font-bold select-all">{tempPassword}</code></p>
                                     <p className="text-xs text-green-600 mt-1">Vui lòng sao chép và gửi cho nhân viên.</p>
                                 </div>
                             </div>
@@ -801,46 +858,49 @@ const Staff = () => {
 
             {/* ══════════════ MODAL: DETAIL ══════════════ */}
             {showDetailModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-2 sm:px-4">
                     <div className="fixed inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={() => setShowDetailModal(false)} />
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden">
-                        <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600 relative">
-                            <button onClick={() => setShowDetailModal(false)} className="absolute top-4 right-4 text-white/80 hover:text-white bg-black/20 hover:bg-black/30 rounded-full p-1 transition"><FaXmark /></button>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden max-h-[95vh] overflow-y-auto">
+                        <div className="h-20 sm:h-24 bg-gradient-to-r from-blue-500 to-purple-600 relative flex-shrink-0">
+                            <button onClick={() => setShowDetailModal(false)} className="absolute top-3 right-3 sm:top-4 sm:right-4 text-white/80 hover:text-white bg-black/20 hover:bg-black/30 rounded-full p-1.5 transition" aria-label="Đóng"><FaXmark /></button>
                         </div>
-                        <div className="px-6 pb-6 relative">
-                            <div className="flex justify-between items-end -mt-10 mb-4">
-                                <img className="h-20 w-20 rounded-full border-4 border-white shadow-md object-cover" src={getAvatarUrl(selectedStaff)} alt="" />
+                        <div className="px-4 sm:px-6 pb-5 sm:pb-6 relative">
+                            <div className="flex justify-between items-end -mt-8 sm:-mt-10 mb-3 sm:mb-4">
+                                <img className="h-16 w-16 sm:h-20 sm:w-20 rounded-full border-4 border-white shadow-md object-cover" src={getAvatarUrl(selectedStaff)} alt="" />
                                 {(hasPermission('EDIT_USER') || hasPermission('MANAGE_USER')) && (
                                     <button onClick={() => { setShowDetailModal(false); openEditStaffModal(selectedStaff); }}
-                                        className="mb-1 px-4 py-1.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-full shadow-sm hover:bg-gray-50 flex items-center">
-                                        <FaPen className="mr-1.5" /> Chỉnh sửa
+                                        className="mb-1 px-3 sm:px-4 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-full shadow-sm hover:bg-gray-50 flex items-center">
+                                        <FaPen className="mr-1 sm:mr-1.5" /> Chỉnh sửa
                                     </button>
                                 )}
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900">{selectedStaff.fullName}</h3>
-                            <div className="flex items-center text-gray-500 text-sm mt-1 mb-5"><FaRegEnvelope className="mr-1.5" />{selectedStaff.email}</div>
-                            <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{selectedStaff.fullName}</h3>
+                            <div className="flex items-center text-gray-500 text-xs sm:text-sm mt-1 mb-4 sm:mb-5 min-w-0">
+                                <FaRegEnvelope className="mr-1.5 flex-shrink-0" />
+                                <span className="truncate">{selectedStaff.email}</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-100">
                                 <div>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Vai trò</span>
-                                    <div className="mt-1"><span className="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-800 text-sm font-semibold">{getRoleName(selectedStaff.role)}</span></div>
+                                    <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wide">Vai trò</span>
+                                    <div className="mt-1"><span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-800 text-xs sm:text-sm font-semibold">{getRoleName(selectedStaff.role)}</span></div>
                                 </div>
                                 <div>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Trạng thái</span>
+                                    <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wide">Trạng thái</span>
                                     <div className="mt-1 flex items-center">
                                         <div className={`h-2 w-2 rounded-full mr-2 ${selectedStaff.status === 'active' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                                        <span className="text-sm font-medium">{selectedStaff.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}</span>
+                                        <span className="text-xs sm:text-sm font-medium">{selectedStaff.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2 border-t border-gray-200" />
                                 <div>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Quyền Admin</span>
-                                    <div className="mt-1 text-sm font-medium">
+                                    <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wide">Quyền Admin</span>
+                                    <div className="mt-1 text-xs sm:text-sm font-medium">
                                         {selectedStaff.isTenantAdmin ? <span className="text-purple-600 flex items-center"><FaCrown className="mr-1" /> Có</span> : <span className="text-gray-500">Không</span>}
                                     </div>
                                 </div>
                                 <div>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Ngày tham gia</span>
-                                    <div className="mt-1 text-sm font-medium text-gray-700">{new Date(selectedStaff.createdAt || Date.now()).toLocaleDateString('vi-VN')}</div>
+                                    <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wide">Ngày tham gia</span>
+                                    <div className="mt-1 text-xs sm:text-sm font-medium text-gray-700">{new Date(selectedStaff.createdAt || Date.now()).toLocaleDateString('vi-VN')}</div>
                                 </div>
                             </div>
                         </div>

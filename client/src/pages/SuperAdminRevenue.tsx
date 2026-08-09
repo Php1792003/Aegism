@@ -3,8 +3,10 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, BarChart, Bar, Legend,
 } from 'recharts';
-import { HiOutlineRefresh, HiOutlineDownload, HiOutlineSearch, HiOutlineFilter,
-    HiOutlineCurrencyDollar, HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineX, HiOutlineTicket, HiOutlinePlus, HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi';
+import {
+    HiOutlineRefresh, HiOutlineDownload, HiOutlineSearch, HiOutlineFilter,
+    HiOutlineCurrencyDollar, HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineX, HiOutlineTicket, HiOutlinePlus, HiOutlineTrash, HiOutlinePencil
+} from 'react-icons/hi';
 import Swal from 'sweetalert2';
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -113,7 +115,7 @@ const VoucherManagerModal = ({ onClose }: { onClose: () => void }) => {
         try {
             const url = editingVoucher ? `${apiUrl}/api/master-admin/vouchers/${encodeURIComponent(editingVoucher)}` : `${apiUrl}/api/master-admin/vouchers`;
             const method = editingVoucher ? 'PUT' : 'POST';
-            
+
             const res = await fetch(url, {
                 method, headers: hdrs(), body: JSON.stringify(form)
             });
@@ -155,19 +157,19 @@ const VoucherManagerModal = ({ onClose }: { onClose: () => void }) => {
                     {isCreating ? (
                         <div className="bg-gray-800/50 border border-gray-700 p-4 rounded-xl">
                             <h3 className="text-sm font-semibold text-white mb-3">{editingVoucher ? 'Cập nhật Voucher' : 'Thêm Voucher Mới'}</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-                                <div className="col-span-2"><label className="text-xs text-gray-400 block mb-1">Mã (VD: GIAM50)</label>
-                                <input disabled={!!editingVoucher} value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed" /></div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
+                                <div className="sm:col-span-2"><label className="text-xs text-gray-400 block mb-1">Mã (VD: GIAM50)</label>
+                                    <input disabled={!!editingVoucher} value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed" /></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Loại</label>
-                                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2">
-                                    <option value="percent">% (Phần trăm)</option><option value="fixed">VND (Cố định)</option>
-                                </select></div>
+                                    <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2">
+                                        <option value="percent">% (Phần trăm)</option><option value="fixed">VND (Cố định)</option>
+                                    </select></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Giá trị</label>
-                                <input type="number" value={form.value} onChange={e => setForm(p => ({ ...p, value: Number(e.target.value) }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
+                                    <input type="number" value={form.value} onChange={e => setForm(p => ({ ...p, value: Number(e.target.value) }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Giới hạn (lần)</label>
-                                <input type="number" placeholder="Vô hạn" value={form.maxUses} onChange={e => setForm(p => ({ ...p, maxUses: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
+                                    <input type="number" placeholder="Vô hạn" value={form.maxUses} onChange={e => setForm(p => ({ ...p, maxUses: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
                                 <div><label className="text-xs text-gray-400 block mb-1">Hạn sử dụng</label>
-                                <input type="date" value={form.expiresAt} onChange={e => setForm(p => ({ ...p, expiresAt: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
+                                    <input type="date" value={form.expiresAt} onChange={e => setForm(p => ({ ...p, expiresAt: e.target.value }))} className="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-2" /></div>
                             </div>
                             <div className="mt-3 flex items-center justify-between">
                                 <label className="flex items-center gap-2 cursor-pointer">
@@ -185,23 +187,23 @@ const VoucherManagerModal = ({ onClose }: { onClose: () => void }) => {
                             <button onClick={() => setIsCreating(true)} className="flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg"><HiOutlinePlus /> Thêm Voucher</button>
                         </div>
                     )}
-                    
-                    <div className="flex-1 overflow-y-auto border border-gray-800 rounded-xl">
+
+                    <div className="flex-1 overflow-auto border border-gray-800 rounded-xl">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-gray-800/50 text-gray-400 text-xs uppercase border-b border-gray-800">
                                 <tr>
-                                    <th className="px-4 py-3">Mã Voucher</th><th className="px-4 py-3">Giá trị</th><th className="px-4 py-3">Đã dùng / Giới hạn</th><th className="px-4 py-3">Hạn sử dụng</th><th className="px-4 py-3">Trạng thái</th><th className="px-4 py-3 text-right">Thao tác</th>
+                                    <th className="px-4 py-3 whitespace-nowrap">Mã Voucher</th><th className="px-4 py-3 whitespace-nowrap">Giá trị</th><th className="px-4 py-3 whitespace-nowrap">Đã dùng / Giới hạn</th><th className="px-4 py-3 whitespace-nowrap">Hạn sử dụng</th><th className="px-4 py-3 whitespace-nowrap">Trạng thái</th><th className="px-4 py-3 text-right whitespace-nowrap">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? <tr><td colSpan={6} className="text-center py-4 text-gray-500">Đang tải...</td></tr> : vouchers.map(v => (
                                     <tr key={v.id} className="border-b border-gray-800/50 hover:bg-gray-800/20">
-                                        <td className="px-4 py-3 font-mono font-bold text-white">{v.code}</td>
-                                        <td className="px-4 py-3 text-emerald-400 font-semibold">{v.type === 'percent' ? `${v.value}%` : fmt(v.value)}</td>
-                                        <td className="px-4 py-3 text-gray-400">{v.usedCount} / {v.maxUses || '∞'}</td>
-                                        <td className="px-4 py-3 text-gray-400">{v.expiresAt ? new Date(v.expiresAt).toLocaleDateString('vi-VN') : 'Vô hạn'}</td>
-                                        <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-xs ${v.isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>{v.isActive ? 'Đang bật' : 'Tạm tắt'}</span></td>
-                                        <td className="px-4 py-3 text-right">
+                                        <td className="px-4 py-3 font-mono font-bold text-white whitespace-nowrap">{v.code}</td>
+                                        <td className="px-4 py-3 text-emerald-400 font-semibold whitespace-nowrap">{v.type === 'percent' ? `${v.value}%` : fmt(v.value)}</td>
+                                        <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{v.usedCount} / {v.maxUses || '∞'}</td>
+                                        <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{v.expiresAt ? new Date(v.expiresAt).toLocaleDateString('vi-VN') : 'Vô hạn'}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap"><span className={`px-2 py-0.5 rounded text-xs ${v.isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>{v.isActive ? 'Đang bật' : 'Tạm tắt'}</span></td>
+                                        <td className="px-4 py-3 text-right whitespace-nowrap">
                                             <button onClick={() => handleEdit(v)} className="text-gray-500 hover:text-purple-500 p-1 mr-1 transition-colors"><HiOutlinePencil className="w-4 h-4" /></button>
                                             <button onClick={() => handleDelete(v.code)} className="text-gray-500 hover:text-red-500 p-1 transition-colors"><HiOutlineTrash className="w-4 h-4" /></button>
                                         </td>
@@ -267,7 +269,7 @@ const SuperAdminRevenue = () => {
 
     useEffect(() => {
         fetch(`${apiUrl}/api/master-admin/tenants`, { headers: hdrs() })
-            .then(r => r.json()).then(setTenants).catch(() => {});
+            .then(r => r.json()).then(setTenants).catch(() => { });
     }, []);
 
     useEffect(() => { load(); }, [load]);
@@ -320,7 +322,7 @@ const SuperAdminRevenue = () => {
                     <h1 className="text-2xl font-bold text-white">Doanh thu & Giao dịch</h1>
                     <p className="text-sm text-gray-400 mt-0.5">Theo dõi doanh thu từ các giao dịch PayOS</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     <button onClick={load} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 border border-gray-700 hover:border-gray-600 hover:text-white rounded-lg transition-colors">
                         <HiOutlineRefresh className="w-4 h-4" /> Làm mới
                     </button>
@@ -357,7 +359,7 @@ const SuperAdminRevenue = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
                             <label className="text-xs text-gray-400 mb-1 block">Từ ngày</label>
                             <input type="date" value={startDate} onChange={e => { setStartDate(e.target.value); setDatePreset(0); }}
@@ -386,7 +388,7 @@ const SuperAdminRevenue = () => {
                             </select>
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label className="text-xs text-gray-400 mb-1 block">Khách hàng</label>
                             <select value={tenantId} onChange={e => setTenantId(e.target.value)}
@@ -409,7 +411,7 @@ const SuperAdminRevenue = () => {
             )}
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Tổng doanh thu" value={loading ? '...' : fmtShort(summary.totalRevenue || 0) + ' ₫'} icon={HiOutlineCurrencyDollar} accent="bg-purple-500/10 text-purple-400" />
                 <StatCard label="Tháng này" value={loading ? '...' : fmtShort(summary.thisMonthRevenue || 0) + ' ₫'} sub={`${summary.growth >= 0 ? '▲' : '▼'} ${Math.abs(summary.growth || 0)}% so với tháng trước`} trend={summary.growth} icon={HiOutlineTrendingUp} accent="bg-emerald-500/10 text-emerald-400" />
                 <StatCard label="Tổng giao dịch" value={loading ? '...' : summary.totalTransactions || 0} icon={HiOutlineChartBar} accent="bg-blue-500/10 text-blue-400" />
@@ -481,26 +483,26 @@ const SuperAdminRevenue = () => {
 
             {/* Transactions table */}
             <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 border-b border-gray-800 gap-4">
                     <h3 className="text-sm font-semibold text-white">Lịch sử giao dịch</h3>
-                    <div className="relative">
+                    <div className="relative w-full sm:w-auto">
                         <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
                             placeholder="Tìm mã GD, tên khách..."
-                            className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-purple-500 placeholder-gray-600 w-64" />
+                            className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-purple-500 placeholder-gray-600 w-full sm:w-64" />
                     </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
-                                <th className="text-left px-5 py-3.5">Mã GD</th>
-                                <th className="text-left px-4 py-3.5">Khách hàng</th>
-                                <th className="text-left px-4 py-3.5">Gói</th>
-                                <th className="text-right px-4 py-3.5">Gốc / Giảm</th>
-                                <th className="text-right px-4 py-3.5">Thực thu</th>
-                                <th className="text-left px-4 py-3.5">Trạng thái</th>
-                                <th className="text-left px-4 py-3.5">Ngày</th>
+                                <th className="text-left px-5 py-3.5 whitespace-nowrap">Mã GD</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Khách hàng</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Gói</th>
+                                <th className="text-right px-4 py-3.5 whitespace-nowrap">Gốc / Giảm</th>
+                                <th className="text-right px-4 py-3.5 whitespace-nowrap">Thực thu</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Trạng thái</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Ngày</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -517,23 +519,23 @@ const SuperAdminRevenue = () => {
                                 const planColor = PLAN_COLORS[t.plan] || '#6b7280';
                                 return (
                                     <tr key={t.id} className="border-b border-gray-800/50 hover:bg-gray-800/20 transition-colors">
-                                        <td className="px-5 py-3.5 font-mono text-xs text-gray-400">{t.orderCode}</td>
-                                        <td className="px-4 py-3.5 text-white text-sm">{t.tenant?.name || '—'}</td>
-                                        <td className="px-4 py-3.5">
+                                        <td className="px-5 py-3.5 font-mono text-xs text-gray-400 whitespace-nowrap">{t.orderCode}</td>
+                                        <td className="px-4 py-3.5 text-white text-sm whitespace-nowrap">{t.tenant?.name || '—'}</td>
+                                        <td className="px-4 py-3.5 whitespace-nowrap">
                                             <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: planColor + '20', color: planColor, border: `1px solid ${planColor}40` }}>
                                                 {t.plan}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3.5 text-right">
+                                        <td className="px-4 py-3.5 text-right whitespace-nowrap">
                                             {t.originalAmount && t.originalAmount !== t.amount && <div className="text-gray-400 text-xs line-through">{fmt(t.originalAmount)}</div>}
                                             {t.voucherCode && <div className="text-purple-400 text-xs font-mono">-{fmt(t.discountAmount || 0)} ({t.voucherCode})</div>}
                                             {(!t.originalAmount || t.originalAmount === t.amount) && <span className="text-gray-400 text-xs">—</span>}
                                         </td>
-                                        <td className="px-4 py-3.5 text-right font-bold text-white">{fmt(t.amount)}</td>
-                                        <td className="px-4 py-3.5">
+                                        <td className="px-4 py-3.5 text-right font-bold text-white whitespace-nowrap">{fmt(t.amount)}</td>
+                                        <td className="px-4 py-3.5 whitespace-nowrap">
                                             <span className={`inline-flex text-xs font-medium px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
                                         </td>
-                                        <td className="px-4 py-3.5 text-gray-400 text-xs">{fmtDateTime(t.createdAt)}</td>
+                                        <td className="px-4 py-3.5 text-gray-400 text-xs whitespace-nowrap">{fmtDateTime(t.createdAt)}</td>
                                     </tr>
                                 );
                             })}
@@ -555,7 +557,7 @@ const SuperAdminRevenue = () => {
                     </div>
                 )}
             </div>
-            
+
             {showVouchers && <VoucherManagerModal onClose={() => setShowVouchers(false)} />}
         </div>
     );

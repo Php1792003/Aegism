@@ -97,7 +97,7 @@ const SuperAdminApiKeys: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-transparent p-6">
+        <div className="flex-1 flex flex-col overflow-hidden bg-transparent p-4 sm:p-6">
 
             {/* Toast */}
             {toast && (
@@ -107,20 +107,18 @@ const SuperAdminApiKeys: React.FC = () => {
                 </div>
             )}
 
-            <div className="max-w-7xl mx-auto w-full space-y-6">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-white">Quản lý API Keys</h2>
-                    <div className="flex items-center space-x-4">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm key, tên KH, email..."
-                                value={search}
-                                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                                className="w-72 pl-10 pr-4 py-2 border border-gray-800 bg-gray-900 text-gray-300 placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 shadow-sm text-sm"
-                            />
-                            <svg className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                        </div>
+            <div className="max-w-7xl mx-auto w-full space-y-4 sm:space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white">Quản lý API Keys</h2>
+                    <div className="w-full sm:w-auto relative">
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm key, tên KH, email..."
+                            value={search}
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                            className="w-full sm:w-72 pl-10 pr-4 py-2.5 sm:py-2 border border-gray-800 bg-gray-900 text-gray-300 placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 shadow-sm text-sm"
+                        />
+                        <svg className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
                 </div>
 
@@ -159,11 +157,17 @@ const SuperAdminApiKeys: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             {key.isActive ? (
-                                                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-900/30 text-green-400 border border-green-800/50">● Active</span>
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-green-500/10 text-green-400 border border-green-500/20">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                                                    Active
+                                                </span>
                                             ) : (
                                                 <div>
-                                                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-red-900/30 text-red-400 border border-red-800/50">○ Revoked</span>
-                                                    {key.revokeReason && <p className="text-[11px] text-red-500 mt-1 max-w-[150px] truncate" title={key.revokeReason}>{key.revokeReason}</p>}
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                                        Revoked
+                                                    </span>
+                                                    {key.revokeReason && <p className="text-[11px] text-red-500 mt-1.5 max-w-[150px] truncate" title={key.revokeReason}>{key.revokeReason}</p>}
                                                 </div>
                                             )}
                                         </td>
@@ -182,13 +186,13 @@ const SuperAdminApiKeys: React.FC = () => {
                     </div>
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div className="px-6 py-4 border-t border-gray-800 flex items-center justify-between bg-gray-900/50">
-                            <span className="text-sm text-gray-500">Trang {page} / {totalPages}</span>
+                        <div className="px-4 sm:px-6 py-4 border-t border-gray-800 flex items-center justify-between bg-gray-900/50">
+                            <span className="text-xs sm:text-sm text-gray-500">Trang {page} / {totalPages}</span>
                             <div className="flex gap-2">
                                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                                    className="px-3 py-1 border border-gray-700 bg-gray-800 text-gray-300 rounded text-sm disabled:opacity-50 font-medium hover:bg-gray-700">Trước</button>
+                                    className="px-3 py-1.5 border border-gray-700 bg-gray-800 text-gray-300 rounded text-xs sm:text-sm disabled:opacity-50 font-medium hover:bg-gray-700 transition-colors">Trước</button>
                                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                                    className="px-3 py-1 border border-gray-700 bg-gray-800 text-gray-300 rounded text-sm disabled:opacity-50 font-medium hover:bg-gray-700">Sau</button>
+                                    className="px-3 py-1.5 border border-gray-700 bg-gray-800 text-gray-300 rounded text-xs sm:text-sm disabled:opacity-50 font-medium hover:bg-gray-700 transition-colors">Sau</button>
                             </div>
                         </div>
                     )}

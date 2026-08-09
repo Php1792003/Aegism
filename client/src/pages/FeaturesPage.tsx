@@ -96,13 +96,6 @@ const featuresData = [
 const FeaturesPage = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const scrollToSection = (id: string) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
-
     return (
         <div className="bg-white text-gray-800 font-sans">
             <main>
@@ -129,20 +122,20 @@ const FeaturesPage = () => {
                         </p>
 
                         <div className="mt-10 flex flex-wrap justify-center gap-4">
-                            <button onClick={() => scrollToSection('feature-management')} className="flex items-center px-6 py-3 rounded-full bg-white shadow-md text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition border border-gray-100">
+                            <a href="#feature-management" className="flex items-center px-6 py-3 rounded-full bg-white shadow-md text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition border border-gray-100">
                                 <HiMap className="mr-2 text-blue-500" /> Quản lý Vận hành
-                            </button>
-                            <button onClick={() => scrollToSection('feature-qr')} className="flex items-center px-6 py-3 rounded-full bg-white shadow-md text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition border border-gray-100">
+                            </a>
+                            <a href="#feature-qr" className="flex items-center px-6 py-3 rounded-full bg-white shadow-md text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition border border-gray-100">
                                 <HiShieldCheck className="mr-2 text-green-500" /> Tuần tra QR
-                            </button>
-                            <button onClick={() => scrollToSection('feature-analytics')} className="flex items-center px-6 py-3 rounded-full bg-white shadow-md text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition border border-gray-100">
+                            </a>
+                            <a href="#feature-analytics" className="flex items-center px-6 py-3 rounded-full bg-white shadow-md text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition border border-gray-100">
                                 <HiBolt className="mr-2 text-yellow-500" /> Báo cáo & KPI
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </section>
 
-                {featuresData.map((feature) => (
+                {featuresData.map((feature, index) => (
                     <section
                         key={feature.id}
                         id={feature.id}
@@ -157,6 +150,9 @@ const FeaturesPage = () => {
                                         src={feature.image}
                                         alt={feature.title}
                                         className="relative w-full rounded-2xl shadow-2xl border border-gray-100 transform transition-transform duration-500 hover:scale-[1.02]"
+                                        loading={index === 0 ? "eager" : "lazy"}
+                                        width="800"
+                                        height="600"
                                     />
                                     <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-gray-100 hidden md:block">
                                         <div className="flex items-center gap-3">
@@ -197,9 +193,9 @@ const FeaturesPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="ml-4">
-                                                    <h4 className={`text-lg font-bold ${colors.dark}`}>
+                                                    <h3 className={`text-lg font-bold ${colors.dark}`}>
                                                         {sub.title}
-                                                    </h4>
+                                                    </h3>
                                                     <p className="mt-1 text-gray-600">
                                                         {sub.desc}
                                                     </p>

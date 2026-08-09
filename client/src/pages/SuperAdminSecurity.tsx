@@ -178,7 +178,7 @@ export default function SuperAdminSecurity() {
     const threatLabel = threatScore >= 90 ? 'CRITICAL' : threatScore >= 60 ? 'HIGH' : threatScore >= 30 ? 'MEDIUM' : 'LOW';
 
     return (
-        <div style={{ minHeight: '100vh', background: '#080810', color: '#e5e7eb', fontFamily: "'Inter', 'SF Pro Display', sans-serif", padding: '24px' }}>
+        <div style={{ minHeight: '100vh', background: '#080810', color: '#e5e7eb', fontFamily: "'Inter', 'SF Pro Display', sans-serif" }} className="p-4 sm:p-6">
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
                 * { box-sizing: border-box; }
@@ -222,7 +222,7 @@ export default function SuperAdminSecurity() {
                     display: 'flex', alignItems: 'center', gap: '14px',
                     background: 'rgba(17,17,27,0.8)', border: `1px solid ${threatColor}30`,
                     borderRadius: '16px', padding: '14px 20px', backdropFilter: 'blur(12px)',
-                }}>
+                }} className="w-full sm:w-auto">
                     <ThreatRing score={threatScore} />
                     <div>
                         <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>Threat Level</div>
@@ -240,7 +240,7 @@ export default function SuperAdminSecurity() {
             </div>
 
             {/* ── TAB BAR ────────────────────────────────────────────── */}
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
                 {([['audit', 'Nhật ký hoạt động', HiOutlineDocumentReport], ['blacklist', 'IP Firewall', HiOutlineServer]] as const).map(([id, label, Icon]) => (
                     <button key={id} className="tab-btn" onClick={() => setActiveTab(id)}
                         style={{
@@ -294,7 +294,7 @@ export default function SuperAdminSecurity() {
                     </div>
 
                     {/* Table */}
-                    <div style={{ flex: 1, overflowY: 'auto' }}>
+                    <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                             <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                                 <tr style={{ background: 'rgba(13,13,21,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
@@ -422,9 +422,11 @@ export default function SuperAdminSecurity() {
             {/* ── BLACKLIST TAB ──────────────────────────────────────── */}
             {activeTab === 'blacklist' && (
                 <div style={{ background: 'rgba(13,13,21,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '18px', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '68vh', backdropFilter: 'blur(12px)' }}>
-                    <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.7)' }}>
-                            <HiOutlineServer style={{ color: '#ff2d55' }} /> Danh sách IP bị chặn
+                    <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', background: 'rgba(255,255,255,0.02)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.7)', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <HiOutlineServer style={{ color: '#ff2d55' }} /> Danh sách IP bị chặn
+                            </div>
                             <span style={{ background: 'rgba(255,45,85,0.15)', color: '#ff2d55', border: '1px solid rgba(255,45,85,0.3)', borderRadius: '20px', padding: '2px 10px', fontSize: '11px', fontWeight: '700' }}>
                                 {ips.filter(i => i.isBlocked).length} active
                             </span>
@@ -437,12 +439,12 @@ export default function SuperAdminSecurity() {
                             <HiOutlineRefresh /> Làm mới
                         </button>
                     </div>
-                    <div style={{ flex: 1, overflowY: 'auto' }}>
+                    <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                             <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                                 <tr style={{ background: 'rgba(13,13,21,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                                     {['IP Address', 'Loại tấn công', 'Thời gian chặn', 'Trạng thái', ''].map(h => (
-                                        <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: '10px', fontWeight: '600', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{h}</th>
+                                        <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: '10px', fontWeight: '600', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -455,7 +457,7 @@ export default function SuperAdminSecurity() {
                                         background: ip.isBlocked ? 'rgba(255,45,85,0.04)' : 'transparent',
                                         animationDelay: `${idx * 0.03}s`,
                                     }}>
-                                        <td style={{ padding: '14px 16px' }}>
+                                        <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <div style={{
                                                     width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -467,15 +469,15 @@ export default function SuperAdminSecurity() {
                                                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '13px', fontWeight: '700', color: ip.isBlocked ? '#ff6b7a' : 'rgba(255,255,255,0.5)' }}>{ip.ipAddress}</span>
                                             </div>
                                         </td>
-                                        <td style={{ padding: '14px 16px' }}>
+                                        <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
                                             <span style={{ fontSize: '12px', color: 'rgba(255,149,0,0.85)', fontFamily: 'JetBrains Mono, monospace' }}>{ip.reason || '—'}</span>
                                         </td>
-                                        <td style={{ padding: '14px 16px' }}>
+                                        <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}>
                                                 <HiOutlineClock /> {fmtDate(ip.createdAt)}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '14px 16px' }}>
+                                        <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
                                             {ip.isBlocked ? (
                                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '600', background: 'rgba(255,45,85,0.1)', color: '#ff2d55', border: '1px solid rgba(255,45,85,0.25)' }}>
                                                     <HiOutlineLockClosed /> Đang chặn
@@ -516,9 +518,9 @@ export default function SuperAdminSecurity() {
                         boxShadow: '0 40px 80px rgba(0,0,0,0.6)', animation: 'slideIn 0.25s ease',
                     }}>
                         {/* Modal Header */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)', gap: '16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ minWidth: '32px', height: '32px', borderRadius: '9px', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <HiOutlineDocumentReport style={{ color: '#8b5cf6' }} />
                                 </div>
                                 <div>
@@ -549,7 +551,7 @@ export default function SuperAdminSecurity() {
                             )}
 
                             {/* Meta Grid */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                                 {[
                                     ['Thời gian', fmtDate(selectedEvidence.createdAt), HiOutlineClock],
                                     ['IP Address', selectedEvidence.ipAddress, HiOutlineGlobe],
@@ -557,9 +559,9 @@ export default function SuperAdminSecurity() {
                                 ].map(([label, value, Icon]: any) => (
                                     <div key={label} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '6px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                                            <Icon /> {label}
+                                            <Icon style={{ flexShrink: 0 }} /> {label}
                                         </div>
-                                        <div style={{ fontSize: '13px', fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.75)', fontWeight: '600' }}>{value}</div>
+                                        <div style={{ fontSize: '13px', fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.75)', fontWeight: '600', wordBreak: 'break-word' }}>{value}</div>
                                     </div>
                                 ))}
                             </div>

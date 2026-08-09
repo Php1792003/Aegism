@@ -61,17 +61,17 @@ const Header = () => {
 
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50 font-sans">
-            <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <div className="flex-shrink-0 flex items-center">
                         <Link to="/">
-                            <img src="/img/aegism_logo.png" alt="Logo AEGISM" className="h-[210px] w-auto" onError={(e) => e.currentTarget.style.display = 'none'} />
+                            <img src="/img/aegism_logo_mini.png" alt="Logo AEGISM" className="h-8 sm:h-10 w-auto" onError={(e) => e.currentTarget.style.display = 'none'} />
                         </Link>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex md:items-center md:space-x-10">
+                    <nav className="hidden md:flex md:items-center md:space-x-4 lg:space-x-10 text-sm lg:text-base whitespace-nowrap">
                         <Link to="/" className={getLinkClass('/')}>Trang chủ</Link>
                         <Link to="/about" className={getLinkClass('/about')}>Giới thiệu</Link>
                         <Link to="/pricing" className={getLinkClass('/pricing')}>Bảng giá</Link>
@@ -94,6 +94,20 @@ const Header = () => {
                                         <div className="px-4 py-3 border-b border-gray-100">
                                             <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
                                             <p className="text-xs text-gray-400 mt-0.5">{user.isSuperAdmin ? 'Super Admin' : 'Thành viên'}</p>
+                                        </div>
+                                        <div className="md:hidden py-1 border-b border-gray-100">
+                                            <Link to="/" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-[#4F46E5] transition-colors">
+                                                🌐 Trang chủ
+                                            </Link>
+                                            <Link to="/about" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-[#4F46E5] transition-colors">
+                                                🏢 Giới thiệu
+                                            </Link>
+                                            <Link to="/features" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-[#4F46E5] transition-colors">
+                                                ⭐ Tính năng
+                                            </Link>
+                                            <Link to="/contact" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-[#4F46E5] transition-colors">
+                                                📞 Liên hệ
+                                            </Link>
                                         </div>
                                         <div className="py-1">
                                             <Link to={user.isSuperAdmin ? '/super-admin/dashboard' : '/dashboard'} onClick={() => setDropdownOpen(false)}
@@ -130,10 +144,12 @@ const Header = () => {
                         )}
 
                         {/* Mobile menu button */}
-                        <button type="button" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="ml-2 md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
-                            {!mobileMenuOpen ? <HiBars3 className="h-6 w-6" /> : <HiXMark className="h-6 w-6" />}
-                        </button>
+                        {!isLoggedIn && (
+                            <button type="button" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                className="ml-2 md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                                {!mobileMenuOpen ? <HiBars3 className="h-6 w-6" /> : <HiXMark className="h-6 w-6" />}
+                            </button>
+                        )}
                     </div>
                 </div>
 

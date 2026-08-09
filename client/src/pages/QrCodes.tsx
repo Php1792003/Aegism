@@ -125,6 +125,7 @@ const QrCodes = () => {
     const [currentView, setCurrentView] = useState('list');
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState('');
+    const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
     const [currentProjectQrPoints, setCurrentProjectQrPoints] = useState<any[]>([]);
     const routerLocation = useLocation();
     const [scanLogs, setScanLogs] = useState<any[]>([]);
@@ -182,7 +183,7 @@ const QrCodes = () => {
             startWatchingLocation();
         };
         init();
-        return () => { if (html5QrCode) html5QrCode.stop().catch(() => {}); };
+        return () => { if (html5QrCode) html5QrCode.stop().catch(() => { }); };
     }, []);
 
     useEffect(() => { if (selectedProjectId) changeProject(); }, [selectedProjectId]);
@@ -332,7 +333,7 @@ const QrCodes = () => {
                 const all = await res.json();
                 setCurrentProjectQrPoints(all.filter((q: any) => q.projectId === selectedProjectId));
             }
-        } catch (e) {}
+        } catch (e) { }
     };
 
     const fetchRoles = async () => {
@@ -400,7 +401,7 @@ const QrCodes = () => {
                     { facingMode: 'environment' },
                     { fps: 10 },
                     (txt) => onScanSuccess(txt),
-                    () => {},
+                    () => { },
                 );
                 const nukeOverlays = () => {
                     const reader = document.getElementById('reader');
@@ -437,7 +438,7 @@ const QrCodes = () => {
     };
 
     const stopScanner = async () => {
-        if (html5QrCode) { try { await html5QrCode.stop(); html5QrCode.clear(); setHtml5QrCode(null); } catch (e) {} }
+        if (html5QrCode) { try { await html5QrCode.stop(); html5QrCode.clear(); setHtml5QrCode(null); } catch (e) { } }
         setScannerActive(false); setScanResult(null); setPendingScanData(null); setIsProcessing(false);
     };
 
@@ -943,42 +944,73 @@ const QrCodes = () => {
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 h-full font-sans text-gray-800">
 
             {/* ── TOOLBAR ── */}
-            <div className="bg-white px-6 py-4 border-b border-gray-100 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 m-6 rounded-xl">
-                <div className="flex items-center w-full sm:w-auto gap-3">
-                    <span className="font-semibold text-gray-600 text-sm">Dự án:</span>
-                    <select value={selectedProjectId} onChange={(e) => setSelectedProjectId(e.target.value)}
-                        className="border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-64 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50">
-                        {projects.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                    </select>
+            <div className="bg-white px-4 sm:px-6 py-4 border-b border-gray-100 shadow-sm flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mx-4 sm:mx-6 my-6 rounded-xl">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center w-full xl:w-auto gap-3">
+                    <span className="font-semibold text-gray-600 text-sm whitespace-nowrap">Dự án:</span>
+                    <div className="relative w-full sm:w-64"
+                        tabIndex={0}
+                        onBlur={(e) => {
+                            if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsProjectDropdownOpen(false);
+                        }}>
+                        <div onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
+                            className={`w-full border rounded-lg pl-3 pr-10 py-2 outline-none text-sm bg-white shadow-sm transition-all cursor-pointer font-medium hover:border-blue-300 flex items-center justify-between ${isProjectDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/20 text-blue-700' : 'border-gray-200 text-gray-800'}`}>
+                            <span className="truncate">{projects.find((p: any) => p.id === selectedProjectId)?.name || 'Chọn dự án'}</span>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 pointer-events-none">
+                                <svg className={`h-4 w-4 transition-transform duration-200 ${isProjectDropdownOpen ? 'rotate-180 text-blue-500' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        {isProjectDropdownOpen && (
+                            <div className="absolute z-50 mt-1.5 w-full bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-1">
+                                {projects.length === 0 ? (
+                                    <div className="px-3 py-3 text-sm text-gray-500 text-center">Không có dự án</div>
+                                ) : (
+                                    projects.map((p: any) => (
+                                        <div key={p.id}
+                                            onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                setSelectedProjectId(p.id);
+                                                setIsProjectDropdownOpen(false);
+                                            }}
+                                            className={`px-3 py-2.5 text-sm cursor-pointer transition-colors border-b border-gray-50 last:border-none flex items-center justify-between
+                                                ${selectedProjectId === p.id ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}>
+                                            <span className="truncate">{p.name}</span>
+                                            {selectedProjectId === p.id && <FaCheck className="text-blue-600 text-xs shrink-0" />}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                    <div className="flex bg-gray-100 rounded-lg p-1">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full xl:w-auto justify-between xl:justify-end">
+                    <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto overflow-x-auto">
                         {['list', 'scan', 'incidents'].map(v => (
                             <button key={v} onClick={() => switchView(v)}
-                                className={`px-4 py-1.5 rounded-md text-sm transition-all duration-200 ${currentView === v ? 'bg-white shadow text-blue-600 font-bold' : 'text-gray-500 hover:text-gray-700'}`}>
+                                className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm transition-all duration-200 whitespace-nowrap ${currentView === v ? 'bg-white shadow text-blue-600 font-bold' : 'text-gray-500 hover:text-gray-700'}`}>
                                 {v === 'list' ? 'Danh sách' : v === 'scan' ? 'Quét QR' : 'Sự cố'}
                             </button>
                         ))}
                     </div>
                     {currentView === 'list' && (hasPermission('CREATE_QR') || hasPermission('MANAGE_QRCODE')) && (
-                        <div className="flex items-center gap-2">
-                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                                currentProjectQrPoints.length >= tenantLimits.maxQRCodes
-                                    ? 'bg-red-100 text-red-600'
-                                    : currentProjectQrPoints.length >= tenantLimits.maxQRCodes * 0.8
+                        <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-2">
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${currentProjectQrPoints.length >= tenantLimits.maxQRCodes
+                                ? 'bg-red-100 text-red-600'
+                                : currentProjectQrPoints.length >= tenantLimits.maxQRCodes * 0.8
                                     ? 'bg-yellow-100 text-yellow-700'
                                     : 'bg-green-100 text-green-700'
-                            }`}>
+                                }`}>
                                 🔲 {currentProjectQrPoints.length}/{tenantLimits.maxQRCodes}
                             </span>
                             <button
                                 onClick={openCreateModal}
                                 disabled={currentProjectQrPoints.length >= tenantLimits.maxQRCodes}
-                                className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm transition shadow-sm ${
-                                    currentProjectQrPoints.length >= tenantLimits.maxQRCodes
-                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                                }`}>
+                                className={`px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 text-sm transition shadow-sm whitespace-nowrap ${currentProjectQrPoints.length >= tenantLimits.maxQRCodes
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                                    }`}>
                                 <FaPlus /> Thêm QR
                             </button>
                         </div>
@@ -986,7 +1018,7 @@ const QrCodes = () => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-x-hidden overflow-y-auto px-6 pb-6">
+            <div className="flex-1 overflow-x-hidden overflow-y-auto px-4 sm:px-6 pb-6">
                 {!isLoading && selectedProjectId && (
                     <>
                         {/* ════════════════════════════════ VIEW: LIST ════════════════════════════════ */}
@@ -1014,10 +1046,10 @@ const QrCodes = () => {
                                 </div>
 
                                 {/* QR Cards */}
-                                <div ref={qrScrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+                                <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
                                     {filteredQrPoints.map((point: any) => (
                                         <div key={point.id}
-                                            className={`flex-shrink-0 w-56 bg-white p-5 rounded-xl shadow-sm border-2 transition duration-200 relative group flex flex-col items-center text-center snap-start cursor-pointer
+                                            className={`bg-white p-5 rounded-xl shadow-sm border-2 transition duration-200 relative group flex flex-col items-center text-center cursor-pointer
                                                 ${selectedQrIds.includes(point.id) ? 'border-blue-500 bg-blue-50/30' : 'border-gray-100 hover:border-blue-300 hover:shadow-md'}`}
                                             onClick={() => toggleSelectQr(point.id)}>
                                             <div className={`absolute top-2 left-2 w-5 h-5 rounded border-2 flex items-center justify-center transition
@@ -1061,17 +1093,17 @@ const QrCodes = () => {
                                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                            <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                                            <h3 className="font-bold text-gray-800 flex items-center gap-2 whitespace-nowrap">
                                                 <FaClockRotateLeft className="text-blue-600" /> Nhật ký quét gần đây
                                             </h3>
-                                            <div className="flex items-center gap-3">
-                                                <div className="relative">
+                                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                                <div className="relative flex-1 sm:flex-none">
                                                     <FaMagnifyingGlass className="absolute left-3 top-2.5 text-gray-400 text-xs" />
                                                     <input type="text" value={searchLog} onChange={e => { setSearchLog(e.target.value); setCurrentLogPage(1); }}
                                                         placeholder="Tìm kiếm log..."
-                                                        className="pl-8 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-48 bg-white" />
+                                                        className="pl-8 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-full sm:w-48 bg-white" />
                                                 </div>
-                                                <button onClick={fetchLogs} className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                                                <button onClick={fetchLogs} className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 whitespace-nowrap shrink-0">
                                                     <FaRotate /> Làm mới
                                                 </button>
                                             </div>

@@ -371,9 +371,9 @@ const Projects = () => {
             <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
 
                 {/* Search & Toolbar */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                    <div className="flex flex-1 w-full sm:w-auto space-x-4">
-                        <div className="relative w-full sm:w-64">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
+                    <div className="flex flex-1 flex-col sm:flex-row w-full gap-3">
+                        <div className="relative w-full sm:w-72">
                             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <FaMagnifyingGlass className="text-gray-400" />
                             </span>
@@ -388,7 +388,7 @@ const Projects = () => {
                         <select
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value)}
-                            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-opsera-primary shadow-sm"
+                            className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-opsera-primary shadow-sm bg-white"
                         >
                             <option value="all">Tất cả trạng thái</option>
                             <option value="active">Đang hoạt động</option>
@@ -399,10 +399,10 @@ const Projects = () => {
 
                     <div className="flex items-center space-x-2">
                         <span className={`text-sm mr-2 font-medium px-3 py-1 rounded-full ${projects.length >= tenantLimits.maxProjects
-                                ? 'bg-red-100 text-red-600'
-                                : projects.length >= tenantLimits.maxProjects * 0.8
-                                    ? 'bg-yellow-100 text-yellow-700'
-                                    : 'bg-green-100 text-green-700'
+                            ? 'bg-red-100 text-red-600'
+                            : projects.length >= tenantLimits.maxProjects * 0.8
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-green-100 text-green-700'
                             }`}>
                             📁 {projects.length} / {tenantLimits.maxProjects} dự án
                         </span>
@@ -421,7 +421,7 @@ const Projects = () => {
                 </div>
 
                 {/* Projects Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
                     {filteredProjects.map((project: any) => (
                         <div key={project.id} className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full group">
                             <div className="h-48 bg-gray-100 w-full relative shrink-0 overflow-hidden">
@@ -458,19 +458,19 @@ const Projects = () => {
                                     </div>
                                 </div>
 
-                                <div className="mt-5 flex space-x-3">
-                                    <button onClick={() => openDetail(project)} className="flex-1 py-2 px-3 rounded-lg border border-gray-200 text-gray-600 text-sm font-semibold hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 transition-all">
+                                <div className="mt-5 flex gap-2">
+                                    <button onClick={() => openDetail(project)} className="flex-1 py-2 px-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 transition-all text-center flex justify-center items-center">
                                         Chi tiết
                                     </button>
 
                                     {(hasPermission('UPDATE_PROJECT') || hasPermission('EDIT_PROJECT') || hasPermission('MANAGE_PROJECT')) && (
-                                        <button onClick={() => openEdit(project)} className="flex-1 py-2 px-3 rounded-lg bg-blue-50 text-blue-600 text-sm font-semibold hover:bg-blue-100 hover:text-blue-700 transition-all">
+                                        <button onClick={() => openEdit(project)} className="flex-1 py-2 px-2 rounded-lg bg-blue-50 text-blue-600 text-xs font-semibold hover:bg-blue-100 hover:text-blue-700 transition-all text-center flex justify-center items-center">
                                             Cấu hình
                                         </button>
                                     )}
 
                                     {(hasPermission('DELETE_PROJECT') || hasPermission('MANAGE_PROJECT')) && (
-                                        <button onClick={() => deleteProject(project)} className="py-2 px-3 rounded-lg bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 hover:text-red-700 transition-all">
+                                        <button onClick={() => deleteProject(project)} className="w-10 h-10 shrink-0 rounded-lg bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 hover:text-red-700 transition-all flex justify-center items-center">
                                             <FaTrash />
                                         </button>
                                     )}

@@ -261,29 +261,29 @@ const AuditLog: React.FC = () => {
             {/* Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center w-full md:w-auto gap-4">
-                            <div className="w-full md:w-64">
-                                <label className="text-xs text-gray-500 mb-1 font-semibold block uppercase tracking-wide">Lọc theo Dự án</label>
-                                <select value={selectedProjectId} onChange={(e) => { setSelectedProjectId(e.target.value); setCurrentPage(1); }} className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-opsera-primary focus:border-opsera-primary sm:text-sm rounded-lg bg-gray-50 text-gray-700 font-bold shadow-sm">
+                    <div className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row items-center w-full lg:w-auto gap-3 sm:gap-4">
+                            <div className="w-full sm:w-64">
+                                <label className="text-[10px] md:text-xs text-gray-500 mb-1.5 font-bold block uppercase tracking-wider">Lọc theo Dự án</label>
+                                <select value={selectedProjectId} onChange={(e) => { setSelectedProjectId(e.target.value); setCurrentPage(1); }} className="block w-full pl-3 pr-10 py-2.5 text-sm md:text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opsera-primary focus:border-opsera-primary rounded-lg bg-gray-50 hover:bg-white transition-colors text-gray-700 font-medium shadow-sm">
                                     <option value="">Tất cả dự án</option>
                                     {projects.map((project: any) => (
                                         <option key={project.id} value={project.id}>{project.name}</option>
                                     ))}
                                 </select>
                             </div>
-                            <div className="w-full md:w-64">
-                                <label className="text-xs text-gray-500 mb-1 font-semibold block uppercase tracking-wide">Tìm kiếm</label>
+                            <div className="w-full sm:w-64 mt-2 sm:mt-0">
+                                <label className="text-[10px] md:text-xs text-gray-500 mb-1.5 font-bold block uppercase tracking-wider">Tìm kiếm</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                        <svg className="h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                     </div>
-                                    <input type="text" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Tên, hành động..." className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-opsera-primary focus:border-opsera-primary sm:text-sm shadow-sm" />
+                                    <input type="text" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Tên, hành động..." className="block w-full pl-9 md:pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-opsera-primary focus:border-opsera-primary text-sm shadow-sm transition-shadow" />
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center text-sm text-gray-500 italic">
-                            Hiển thị <span className="font-bold text-gray-800 mx-1">{logs.length}</span> hoạt động gần nhất
+                        <div className="flex items-center text-xs md:text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-md w-full lg:w-auto justify-center lg:justify-end border border-gray-100">
+                            Hiển thị <span className="font-bold text-gray-800 mx-1.5">{logs.length}</span> hoạt động
                         </div>
                     </div>
 
@@ -292,10 +292,10 @@ const AuditLog: React.FC = () => {
                             <svg className="animate-spin h-8 w-8 text-opsera-primary" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
+                        <div className="bg-transparent md:bg-white rounded-none md:rounded-xl shadow-none md:shadow-sm border-none md:border border-gray-200 overflow-hidden">
+                            <div className="overflow-x-hidden md:overflow-x-auto">
+                                <table className="w-full text-left border-collapse block md:table">
+                                    <thead className="hidden md:table-header-group">
                                         <tr className="bg-gray-50 text-xs text-gray-500 uppercase font-semibold border-b border-gray-200">
                                             <th className="px-6 py-4">Người thực hiện</th>
                                             <th className="px-6 py-4">Hành động</th>
@@ -303,48 +303,62 @@ const AuditLog: React.FC = () => {
                                             <th className="px-6 py-4 text-right">Thời gian</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 text-sm">
+                                    <tbody className="block md:table-row-group divide-y divide-gray-100 text-sm">
                                         {logs.map(log => {
                                             const actionStyle = getActionStyle(log.action);
                                             return (
-                                                <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center">
-                                                            <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600 mr-3 flex-shrink-0 border border-blue-200">
-                                                                {(log.user?.fullName || 'Unknown').charAt(0)}
+                                                <tr key={log.id} className="block md:table-row hover:bg-gray-50 transition-colors bg-white md:bg-transparent rounded-xl md:rounded-none shadow-sm md:shadow-none mb-3 md:mb-0 border md:border-none border-gray-100 p-4 md:p-0">
+                                                    <td className="block md:table-cell px-0 py-2 md:px-6 md:py-4 border-b border-gray-50 md:border-none">
+                                                        <div className="flex items-center justify-between md:justify-start">
+                                                            <div className="flex items-center">
+                                                                <div className="h-10 w-10 md:h-9 md:w-9 rounded-full bg-blue-100 flex items-center justify-center text-sm md:text-xs font-bold text-blue-600 mr-3 flex-shrink-0 border border-blue-200">
+                                                                    {(log.user?.fullName || 'Unknown').charAt(0)}
+                                                                </div>
+                                                                <div>
+                                                                    <div className="font-medium text-gray-900 text-sm md:text-base">{log.user?.fullName || 'Unknown User'}</div>
+                                                                    <div className="text-xs text-gray-400 truncate max-w-[140px] md:max-w-[200px]">{log.user?.email || 'N/A'}</div>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <div className="font-medium text-gray-900">{log.user?.fullName || 'Unknown User'}</div>
-                                                                <div className="text-xs text-gray-400 truncate max-w-[150px]">{log.user?.email || 'N/A'}</div>
+                                                            {/* Mobile action badge */}
+                                                            <div className="md:hidden">
+                                                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold border flex items-center w-fit gap-1 shadow-sm ${actionStyle.className}`}>
+                                                                    {actionStyle.icon && React.cloneElement(actionStyle.icon as React.ReactElement<any>, { className: 'w-3 h-3' })}
+                                                                    <span>{getActionLabel(log.action)}</span>
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center w-fit gap-1.5 transition-all hover:shadow-sm ${actionStyle.className}`}>
+                                                    <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap">
+                                                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center w-fit gap-1.5 transition-all shadow-sm ${actionStyle.className}`}>
                                                             {actionStyle.icon}
                                                             <span>{getActionLabel(log.action)}</span>
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-gray-600">
-                                                        <div className="text-sm font-medium text-gray-800 mb-1" dangerouslySetInnerHTML={{ __html: formatDescription(log) }}></div>
-                                                        <div className="text-xs text-gray-400 flex items-center gap-1">
-                                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                                                    <td className="block md:table-cell px-0 py-3 md:px-6 md:py-4 text-gray-600 border-b border-gray-50 md:border-none">
+                                                        <div className="text-sm font-medium text-gray-800 mb-1.5 leading-relaxed" dangerouslySetInnerHTML={{ __html: formatDescription(log) }}></div>
+                                                        <div className="text-[11px] md:text-xs text-gray-400 flex items-center gap-1.5">
+                                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                                             {log.entity} #{log.entityId ? log.entityId.slice(0, 8) : '...'}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                                                        <div className="text-gray-900 font-medium">{new Date(log.createdAt).toLocaleTimeString('vi-VN')}</div>
-                                                        <div className="text-xs text-gray-400">{new Date(log.createdAt).toLocaleDateString('vi-VN')}</div>
+                                                    <td className="block md:table-cell px-0 py-2 md:px-6 md:py-4 whitespace-nowrap md:text-right pt-3 md:pt-4">
+                                                        <div className="flex justify-between items-center md:block">
+                                                            <span className="md:hidden text-[10px] font-bold text-gray-400 uppercase tracking-wider">Thời gian</span>
+                                                            <div className="text-right">
+                                                                <div className="text-gray-900 font-bold md:font-medium text-[13px] md:text-sm">{new Date(log.createdAt).toLocaleTimeString('vi-VN')}</div>
+                                                                <div className="text-[11px] md:text-xs text-gray-400">{new Date(log.createdAt).toLocaleDateString('vi-VN')}</div>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             );
                                         })}
                                         {logs.length === 0 && (
-                                            <tr>
-                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                                            <tr className="block md:table-row bg-white rounded-xl shadow-sm border border-gray-100 md:border-none md:shadow-none">
+                                                <td colSpan={4} className="block md:table-cell px-6 py-12 text-center text-gray-500">
                                                     <div className="flex flex-col items-center justify-center">
                                                         <svg className="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                        <p>Không có hoạt động nào khớp với bộ lọc.</p>
+                                                        <p className="text-sm font-medium">Không có hoạt động nào khớp với bộ lọc.</p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -353,13 +367,15 @@ const AuditLog: React.FC = () => {
                                 </table>
                             </div>
 
-                            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
-                                <span className="text-sm text-gray-500">Trang <span className="font-bold text-gray-900">{currentPage}</span> / {totalPages}</span>
-                                <div className="flex gap-2">
-                                    <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage <= 1} className="px-3 py-1 border border-gray-300 rounded bg-white text-gray-600 hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors">Trước</button>
-                                    <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage >= totalPages} className="px-3 py-1 border border-gray-300 rounded bg-white text-gray-600 hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors">Sau</button>
+                            {logs.length > 0 && (
+                                <div className="px-4 md:px-6 py-4 border-t border-gray-200 bg-white md:bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4 md:gap-0 rounded-b-xl">
+                                    <span className="text-xs md:text-sm text-gray-500">Trang <span className="font-bold text-gray-900">{currentPage}</span> / {totalPages}</span>
+                                    <div className="flex gap-2 w-full sm:w-auto">
+                                        <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage <= 1} className="flex-1 sm:flex-none px-4 py-2 md:px-3 md:py-1 border border-gray-300 rounded-lg md:rounded bg-white text-gray-600 hover:bg-gray-50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors">Trước</button>
+                                        <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage >= totalPages} className="flex-1 sm:flex-none px-4 py-2 md:px-3 md:py-1 border border-gray-300 rounded-lg md:rounded bg-white text-gray-600 hover:bg-gray-50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors">Sau</button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     )}
                 </main>

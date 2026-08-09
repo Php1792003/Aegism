@@ -300,7 +300,7 @@ const AddModal = ({ tenants, onClose, onSave }: { tenants: any[]; onClose: () =>
                         </select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-medium text-gray-400 mb-1.5">Trạng thái</label>
                             <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}
@@ -472,7 +472,7 @@ const SuperAdminUsers = () => {
                     <h1 className="text-xl font-bold text-white tracking-tight">Quản lý Người dùng</h1>
                     <p className="text-sm text-gray-500 mt-0.5">Xem và quản lý tất cả tài khoản trong hệ thống</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white text-sm rounded-lg transition-colors">
                         <HiOutlineRefresh className="w-4 h-4" /> Làm mới
                     </button>
@@ -483,7 +483,7 @@ const SuperAdminUsers = () => {
             </div>
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Tổng tài khoản" value={stats.total} icon={HiOutlineUsers} accent="bg-purple-500/10 text-purple-400" />
                 <StatCard label="Đang hoạt động" value={stats.active} icon={HiOutlineCheckCircle} accent="bg-emerald-500/10 text-emerald-400" />
                 <StatCard label="Đã bị khóa" value={stats.locked} icon={HiOutlineBan} accent="bg-red-500/10 text-red-400" />
@@ -502,16 +502,16 @@ const SuperAdminUsers = () => {
                             className="w-full bg-gray-800 border border-gray-700 text-white pl-9 pr-4 py-2 rounded-lg text-sm outline-none focus:border-purple-500 transition-colors placeholder-gray-600"
                         />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <select value={filterRole} onChange={e => { setFilterRole(e.target.value); setPage(1); }}
-                            className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500 min-w-[130px]">
+                            className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500 min-w-[130px] w-full sm:w-auto">
                             <option value="">Tất cả vai trò</option>
                             <option value="superadmin">Super Admin</option>
                             <option value="admin">Tenant Admin</option>
                             <option value="user">User thường</option>
                         </select>
                         <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1); }}
-                            className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500 min-w-[130px]">
+                            className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-purple-500 min-w-[130px] w-full sm:w-auto">
                             <option value="">Tất cả trạng thái</option>
                             <option value="active">Hoạt động</option>
                             <option value="locked">Đã khóa</option>
@@ -524,13 +524,13 @@ const SuperAdminUsers = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
-                                <th className="text-left px-5 py-3.5 font-semibold">Người dùng</th>
-                                <th className="text-left px-4 py-3.5 font-semibold">Tenant</th>
-                                <th className="text-left px-4 py-3.5 font-semibold">Vai trò</th>
-                                <th className="text-left px-4 py-3.5 font-semibold">Trạng thái</th>
-                                <th className="text-left px-4 py-3.5 font-semibold">ID</th>
-                                <th className="text-left px-4 py-3.5 font-semibold">Ngày tạo</th>
-                                <th className="text-center px-4 py-3.5 font-semibold">Thao tác</th>
+                                <th className="text-left px-5 py-3.5 font-semibold whitespace-nowrap">Người dùng</th>
+                                <th className="text-left px-4 py-3.5 font-semibold whitespace-nowrap">Tenant</th>
+                                <th className="text-left px-4 py-3.5 font-semibold whitespace-nowrap">Vai trò</th>
+                                <th className="text-left px-4 py-3.5 font-semibold whitespace-nowrap">Trạng thái</th>
+                                <th className="text-left px-4 py-3.5 font-semibold whitespace-nowrap">ID</th>
+                                <th className="text-left px-4 py-3.5 font-semibold whitespace-nowrap">Ngày tạo</th>
+                                <th className="text-center px-4 py-3.5 font-semibold whitespace-nowrap">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -548,7 +548,7 @@ const SuperAdminUsers = () => {
                                 const status = getStatusBadge(u.status);
                                 return (
                                     <tr key={u.id} className="border-b border-gray-800/50 hover:bg-gray-800/20 transition-colors group">
-                                        <td className="px-5 py-3.5">
+                                        <td className="px-5 py-3.5 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
                                                 <img
                                                     src={getAvatar(u)}
@@ -560,36 +560,36 @@ const SuperAdminUsers = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3.5">
+                                        <td className="px-4 py-3.5 whitespace-nowrap">
                                             <span className="text-gray-400 text-sm truncate max-w-[140px] block" title={u.tenant?.name}>
                                                 {u.tenant?.name || <span className="text-gray-600">—</span>}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3.5">
-                                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${role.cls}`}>
+                                        <td className="px-4 py-3.5 whitespace-nowrap">
+                                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${role.cls}`}>
                                                 {u.isSuperAdmin && <HiOutlineShieldCheck className="w-3 h-3" />}
                                                 {role.label}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3.5">
-                                            <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${status.cls}`}>
+                                        <td className="px-4 py-3.5 whitespace-nowrap">
+                                            <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${status.cls}`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
                                                 {status.label}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3.5">
+                                        <td className="px-4 py-3.5 whitespace-nowrap">
                                             <button
                                                 onClick={() => copyId(u.id)}
                                                 className="flex items-center gap-1.5 group/id"
                                                 title="Click để sao chép ID"
                                             >
                                                 <span className="font-mono text-xs text-gray-600 group-hover/id:text-gray-400 transition-colors">{u.id.slice(0, 8)}…</span>
-                                                <HiOutlineClipboardCopy className="w-3.5 h-3.5 text-gray-600 opacity-0 group-hover/id:opacity-100 transition-opacity" />
+                                                <HiOutlineClipboardCopy className="w-3.5 h-3.5 text-gray-600 opacity-100 lg:opacity-0 lg:group-hover/id:opacity-100 transition-opacity" />
                                             </button>
                                         </td>
                                         <td className="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">{fmtDate(u.createdAt)}</td>
-                                        <td className="px-4 py-3.5">
-                                            <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <td className="px-4 py-3.5 whitespace-nowrap">
+                                            <div className="flex items-center justify-center gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => handleImpersonate(u)} title="Mạo danh"
                                                     className="p-1.5 rounded-lg hover:bg-purple-500/10 text-gray-500 hover:text-purple-400 transition-colors">
                                                     <HiOutlineEye className="w-4 h-4" />

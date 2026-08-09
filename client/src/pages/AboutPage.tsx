@@ -54,20 +54,20 @@ const AboutPage = () => {
         {
             title: "Tiên phong Đổi mới",
             desc: "Không ngừng nghiên cứu và ứng dụng công nghệ mới nhất (AI, IoT) vào sản phẩm.",
-            icon: <HiOutlineRocketLaunch className="h-8 w-8" />,
-            style: "text-blue-600 bg-blue-50"
+            icon: <HiOutlineRocketLaunch className="h-7 w-7" aria-hidden="true" />,
+            style: "text-blue-600 bg-blue-50 border border-blue-100"
         },
         {
             title: "Cam kết Tin cậy",
             desc: "Bảo mật dữ liệu và sự ổn định hệ thống là ưu tiên hàng đầu trong mọi quyết định.",
-            icon: <HiShieldCheck className="h-8 w-8" />,
-            style: "text-green-600 bg-green-50"
+            icon: <HiShieldCheck className="h-7 w-7" aria-hidden="true" />,
+            style: "text-blue-600 bg-blue-50 border border-blue-100"
         },
         {
             title: "Khách hàng là Trọng tâm",
             desc: "Lắng nghe, thấu hiểu và giải quyết triệt để nỗi đau của khách hàng.",
-            icon: <HiOutlineHeart className="h-8 w-8" />,
-            style: "text-red-600 bg-red-50"
+            icon: <HiOutlineHeart className="h-7 w-7" aria-hidden="true" />,
+            style: "text-blue-600 bg-blue-50 border border-blue-100"
         }
     ];
 
@@ -102,57 +102,59 @@ const AboutPage = () => {
                     keywords="về AEGISM, đội ngũ AEGISM, sứ mệnh AEGISM, công ty công nghệ an ninh Đà Nẵng"
                 />
                 <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Giới thiệu', url: '/about' }]} />
-                <section className="relative py-20 lg:py-28 bg-white overflow-hidden">
+                <section className="relative py-12 lg:py-24 bg-white overflow-hidden">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="text-center max-w-4xl mx-auto">
                             <h1 className={`text-4xl md:text-6xl font-extrabold ${colors.dark} tracking-tight leading-tight mb-6`}>
                                 Chúng tôi là <span className="text-blue-600">AEGISM</span>
                             </h1>
-                            <p className="text-xl text-gray-500 leading-relaxed mb-10">
+                            <p className="text-lg md:text-xl text-gray-600 leading-relaxed md:leading-loose mb-10">
                                 Nền tảng công nghệ tiên phong giúp doanh nghiệp số hóa quy trình
-                                <span className="font-semibold text-gray-700"> Giám sát An ninh</span> và
-                                <span className="font-semibold text-gray-700"> Quản lý Vận hành</span>.
+                                <span className="font-bold text-blue-600"> Giám sát An ninh </span> và
+                                <span className="font-bold text-blue-600"> Quản lý Vận hành</span>.
                                 <br className="hidden md:block" /> Đơn giản, Hiệu quả và Minh bạch.
                             </p>
                         </div>
-                        <div className="mt-10 relative rounded-2xl overflow-hidden shadow-2xl border border-gray-200">
+                        <div className="mt-8 md:mt-12 relative rounded-[2rem] overflow-hidden shadow-2xl">
                             <img
                                 src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
                                 alt="Văn phòng làm việc hiện đại"
                                 className="w-full h-[400px] md:h-[500px] object-cover"
+                                width="1920"
+                                height="500"
+                                fetchPriority="high"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent flex items-end justify-center pb-10">
-                                <p className="text-white/90 text-lg font-medium tracking-wide">Kiến tạo giải pháp từ Đà Nẵng, Việt Nam</p>
+                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/20 to-transparent flex flex-col justify-end p-8 md:p-12">
+                                <div className="text-center md:text-left">
+                                    <p className="text-white text-xl md:text-2xl font-bold tracking-wide">
+                                        Kiến tạo giải pháp từ Đà Nẵng, Việt Nam
+                                    </p>
+                                    <div className="w-16 h-1 bg-blue-500 rounded mt-4 mx-auto md:mx-0"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <section className="py-20 bg-gray-50">
+                <section className="py-12 lg:py-20 bg-gray-50">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                            <div className="relative order-2 md:order-1">
-                                <div className="absolute inset-0 bg-blue-600 rounded-2xl -rotate-3 opacity-10"></div>
-                                <img
-                                    src="../img/img_about_us.png"
-                                    alt="Sứ mệnh & Tầm nhìn"
-                                    className="relative rounded-2xl shadow-xl w-full object-cover"
-                                />
-                            </div>
-                            <div className="space-y-8 order-1 md:order-2">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="p-2 bg-blue-100 rounded-lg text-blue-600"><HiOutlineFlag className="w-6 h-6" /></div>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                            <div className="order-1 lg:order-2 space-y-6">
+                                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -z-10 opacity-50"></div>
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl text-blue-600 shadow-sm"><HiOutlineFlag className="w-6 h-6" aria-hidden="true" /></div>
                                         <h3 className="text-2xl font-bold text-gray-900">Sứ mệnh</h3>
                                     </div>
                                     <p className="text-gray-600 text-lg leading-relaxed">
                                         Cung cấp giải pháp công nghệ toàn diện, giúp doanh nghiệp chuyển đổi số quy trình an ninh một cách dễ dàng, minh bạch và hiệu quả.
                                     </p>
                                 </div>
-                                <hr className="border-gray-200" />
-                                <div>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="p-2 bg-purple-100 rounded-lg text-purple-600"><HiOutlineEye className="w-6 h-6" /></div>
+
+                                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+                                    <div className="absolute bottom-0 right-0 w-32 h-32 bg-purple-50 rounded-tl-full -z-10 opacity-50"></div>
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl text-purple-600 shadow-sm"><HiOutlineEye className="w-6 h-6" aria-hidden="true" /></div>
                                         <h3 className="text-2xl font-bold text-gray-900">Tầm nhìn</h3>
                                     </div>
                                     <p className="text-gray-600 text-lg leading-relaxed">
@@ -160,11 +162,22 @@ const AboutPage = () => {
                                     </p>
                                 </div>
                             </div>
+                            <div className="relative order-2 lg:order-1 mt-4 lg:mt-0">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-transparent rounded-3xl -rotate-2 opacity-50"></div>
+                                <img
+                                    src="../img/img_about_us.png"
+                                    alt="Sứ mệnh & Tầm nhìn"
+                                    className="relative rounded-3xl shadow-lg w-full object-cover border border-white/50"
+                                    loading="lazy"
+                                    width="800"
+                                    height="600"
+                                />
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <section className="py-20 bg-[#1e293b] text-white relative overflow-hidden">
+                <section className="py-12 lg:py-20 bg-[#1e293b] text-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
 
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
@@ -188,7 +201,7 @@ const AboutPage = () => {
                                         "Đội ngũ phản ứng nhanh"
                                     ].map((item, i) => (
                                         <div key={i} className="flex items-center gap-3">
-                                            <HiCheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                                            <HiCheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" aria-hidden="true" />
                                             <span className="text-gray-200 text-sm font-medium">{item}</span>
                                         </div>
                                     ))}
@@ -202,6 +215,9 @@ const AboutPage = () => {
                                         src="/img/argism_contract.png"
                                         alt="Lễ ký kết hợp tác chiến lược"
                                         className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                        loading="lazy"
+                                        width="400"
+                                        height="400"
                                         onError={(e) => e.currentTarget.src = 'https://placehold.co/800x800/1e3a8a/FFFFFF?text=Strategic+Partnership'}
                                     />
                                 </div>
@@ -210,20 +226,21 @@ const AboutPage = () => {
                     </div>
                 </section>
 
-                <section className="py-24 bg-white">
+                <section className="py-12 lg:py-20 bg-white">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
+                        <div className="text-center mb-12">
                             <h2 className={`text-3xl font-extrabold ${colors.dark}`}>Giá trị cốt lõi</h2>
                             <p className="mt-4 text-gray-500">Kim chỉ nam cho mọi hành động của chúng tôi</p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                             {coreValues.map((val, idx) => (
-                                <div key={idx} className="group bg-gray-50 p-8 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-xl transition-all duration-300">
-                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${val.style}`}>
+                                <div key={idx} className="group bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:border-blue-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-bl-full -z-10 group-hover:bg-blue-100/50 transition-colors"></div>
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${val.style}`}>
                                         {val.icon}
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">{val.title}</h3>
-                                    <p className="text-gray-600 leading-relaxed">{val.desc}</p>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">{val.title}</h3>
+                                    <p className="text-gray-600 leading-relaxed text-sm md:text-base">{val.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -231,46 +248,73 @@ const AboutPage = () => {
                 </section>
 
                 {/* --- 5. TIMELINE (ROADMAP) --- */}
-                <section className="py-24 bg-gray-50 overflow-hidden">
-                    <div className="container mx-auto max-w-4xl px-4">
+                <section className="py-16 lg:py-24 bg-gray-50 border-t border-gray-100 relative overflow-hidden">
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50"></div>
+
+                    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="text-center mb-16">
                             <h2 className={`text-3xl font-extrabold ${colors.dark}`}>Lộ trình phát triển</h2>
                             <p className="mt-4 text-gray-500">Hành trình nỗ lực không ngừng nghỉ</p>
                         </div>
 
-                        <div className="relative space-y-12">
-                            {/* The Line */}
-                            <div className="absolute top-0 bottom-0 left-6 md:left-1/2 w-0.5 bg-gray-200 transform md:-translate-x-1/2"></div>
-
+                        {/* --- Mobile View (Vertical) --- */}
+                        <div className="lg:hidden relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-blue-300 before:to-transparent">
                             {timelineEvents.map((event, idx) => (
-                                <div key={idx} className={`relative flex items-center md:justify-between w-full group`}>
-
-                                    {/* The Dot */}
-                                    <div className="absolute left-6 md:left-1/2 w-4 h-4 bg-white border-4 border-blue-600 rounded-full z-10 transform -translate-x-1/2 shadow-sm group-hover:scale-125 transition-transform duration-300"></div>
-
-                                    {/* Spacer */}
-                                    <div className={`hidden md:block w-5/12 ${idx % 2 === 0 ? 'order-2' : 'order-1'}`}></div>
-
-                                    {/* Content Card */}
-                                    <div className={`w-full pl-16 md:pl-0 md:w-5/12 ${idx % 2 === 0 ? 'md:text-right md:pr-12 order-1' : 'md:text-left md:pl-12 order-2'}`}>
-                                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm group-hover:shadow-md group-hover:border-blue-200 transition-all duration-300">
-                                            <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-2">{event.year}</span>
-                                            <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                                {event.title}
-                                            </h3>
-                                            <p className="text-gray-600 text-sm leading-relaxed">{event.desc}</p>
-                                        </div>
+                                <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-blue-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                        <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                                    </div>
+                                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-200 hover:shadow-md transition-all">
+                                        <span className="text-sm font-bold text-blue-600 uppercase tracking-wider block mb-2">{event.year}</span>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
+                                        <p className="text-gray-600 leading-relaxed text-sm">{event.desc}</p>
                                     </div>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* --- Desktop View (Horizontal) --- */}
+                        <div className="hidden lg:block relative mt-12 mb-8">
+                            {/* Horizontal Line */}
+                            <div className="absolute top-1/2 left-0 w-full h-1 bg-gradient-to-r from-blue-100 via-blue-400 to-blue-100 -translate-y-1/2 rounded-full"></div>
+
+                            <div className="grid grid-cols-4 gap-6 relative">
+                                {timelineEvents.map((event, idx) => (
+                                    <div key={idx} className="relative flex flex-col justify-center group h-full">
+                                        {/* Top Section */}
+                                        <div className={`w-full pb-10 ${idx % 2 !== 0 ? 'visible' : 'invisible'}`}>
+                                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 group-hover:shadow-md group-hover:-translate-y-1 transition-all relative">
+                                                <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-gray-100 rotate-45"></div>
+                                                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-2">{event.year}</span>
+                                                <h3 className="text-lg font-bold text-gray-900 mb-2">{event.title}</h3>
+                                                <p className="text-gray-600 text-sm leading-relaxed">{event.desc}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Center Dot */}
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-4 border-white bg-blue-500 shadow-md z-10 group-hover:scale-125 transition-transform duration-300"></div>
+
+                                        {/* Bottom Section */}
+                                        <div className={`w-full pt-10 ${idx % 2 === 0 ? 'visible' : 'invisible'}`}>
+                                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 group-hover:shadow-md group-hover:-translate-y-1 transition-all relative">
+                                                <div className="absolute left-1/2 -top-2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
+                                                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-2">{event.year}</span>
+                                                <h3 className="text-lg font-bold text-gray-900 mb-2">{event.title}</h3>
+                                                <p className="text-gray-600 text-sm leading-relaxed">{event.desc}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 {/* --- 6. TEAM SECTION --- */}
-                <section className="py-24 bg-white">
+                <section className="py-12 lg:py-20 bg-white">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
+                        <div className="text-center mb-12">
                             <h2 className={`text-3xl font-extrabold ${colors.dark}`}>Đội ngũ chuyên gia</h2>
                             <p className="mt-4 text-gray-500">Những người đứng sau sự thành công của AEGISM</p>
                         </div>
@@ -281,6 +325,9 @@ const AboutPage = () => {
                                         src={member.avatar}
                                         alt={member.name}
                                         className="w-full h-96 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                        loading="lazy"
+                                        width="500"
+                                        height="384"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-90"></div>
                                     <div className="absolute bottom-0 left-0 p-8 w-full">

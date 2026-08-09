@@ -122,7 +122,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.active;
     const Icon = cfg.icon;
     return (
-        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${cfg.color}`}>
+        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${cfg.color}`}>
             <Icon className="w-3.5 h-3.5" /> {cfg.label}
         </span>
     );
@@ -133,7 +133,7 @@ const PlanBadge = ({ plan }: { plan: string }) => {
     if (key === 'FREE') key = 'NONE';
     if (key === 'PRO') key = 'BUSINESS';
     const p = PLANS.find(x => x.value === key) || PLANS[0];
-    return <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-full font-semibold ${p.color}`}>{p.label}</span>;
+    return <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${p.color}`}>{p.label}</span>;
 };
 
 // ─── STAT CARD ────────────────────────────────────────────────────────────────
@@ -608,7 +608,7 @@ const SuperAdminCustomers = () => {
                     <h1 className="text-2xl font-bold text-white">Quản lý khách hàng</h1>
                     <p className="text-gray-400 text-sm mt-1">{customers.length} khách hàng trong hệ thống</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                     <button onClick={load} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 border border-gray-700 hover:border-gray-600 hover:text-white rounded-lg transition-colors">
                         <HiOutlineRefresh className="w-4 h-4" /> Làm mới
                     </button>
@@ -620,7 +620,7 @@ const SuperAdminCustomers = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Tổng khách hàng" value={customers.length} icon={HiOutlineUser} accent="bg-blue-900/40 text-blue-400" />
                 <StatCard label="Đang hoạt động" value={activeCount} sub={`${customers.length ? Math.round(activeCount / customers.length * 100) : 0}% tổng số`} icon={HiOutlineCheckCircle} accent="bg-emerald-900/40 text-emerald-400" />
                 <StatCard label="Sắp hết hạn (30 ngày)" value={expiringCount} icon={HiOutlineClock} accent="bg-orange-900/40 text-orange-400" />
@@ -636,12 +636,12 @@ const SuperAdminCustomers = () => {
                         className="w-full bg-gray-800 border border-gray-700 text-white text-sm rounded-lg pl-9 pr-4 py-2.5 focus:outline-none focus:border-purple-500 placeholder-gray-500" />
                 </div>
                 <select value={filterPlan} onChange={e => { setFilterPlan(e.target.value); setPage(1); }}
-                    className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500">
+                    className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500 w-full sm:w-auto">
                     <option value="">Tất cả gói</option>
                     {PLANS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                 </select>
                 <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1); }}
-                    className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500">
+                    className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500 w-full sm:w-auto">
                     <option value="">Tất cả trạng thái</option>
                     {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
@@ -653,16 +653,16 @@ const SuperAdminCustomers = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
-                                <th className="text-left px-5 py-3.5">Khách hàng</th>
-                                <th className="text-left px-4 py-3.5">Thống kê</th>
-                                <th className="text-left px-4 py-3.5">Gói</th>
-                                <th className="text-left px-4 py-3.5">Giới hạn (User/DA/QR)</th>
-                                <th className="text-left px-4 py-3.5">Trạng thái</th>
-                                <th className="text-left px-4 py-3.5">Ngày tạo</th>
-                                <th className="text-left px-4 py-3.5">Hết hạn</th>
-                                <th className="text-right px-4 py-3.5">Chi tiêu</th>
-                                <th className="text-right px-4 py-3.5">Gia hạn</th>
-                                <th className="text-center px-4 py-3.5">Thao tác</th>
+                                <th className="text-left px-5 py-3.5 whitespace-nowrap">Khách hàng</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Thống kê</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Gói</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Giới hạn (User/DA/QR)</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Trạng thái</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Ngày tạo</th>
+                                <th className="text-left px-4 py-3.5 whitespace-nowrap">Hết hạn</th>
+                                <th className="text-right px-4 py-3.5 whitespace-nowrap">Chi tiêu</th>
+                                <th className="text-right px-4 py-3.5 whitespace-nowrap">Gia hạn</th>
+                                <th className="text-center px-4 py-3.5 whitespace-nowrap">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -678,7 +678,7 @@ const SuperAdminCustomers = () => {
                                 <tr><td colSpan={10} className="text-center py-16 text-gray-600">Không tìm thấy khách hàng nào</td></tr>
                             ) : paginated.map(c => (
                                 <tr key={c.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors group">
-                                    <td className="px-5 py-4">
+                                    <td className="px-5 py-4 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-purple-800/60 flex items-center justify-center text-purple-300 font-semibold text-sm flex-shrink-0">
                                                 {c.name.charAt(0)}
@@ -689,9 +689,9 @@ const SuperAdminCustomers = () => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4 text-gray-400 text-xs">{c.userCount} users / {c.projectCount} projects</td>
-                                    <td className="px-4 py-4"><PlanBadge plan={c.plan} /></td>
-                                    <td className="px-4 py-4 text-xs font-medium text-gray-300">
+                                    <td className="px-4 py-4 text-gray-400 text-xs whitespace-nowrap">{c.userCount} users / {c.projectCount} projects</td>
+                                    <td className="px-4 py-4 whitespace-nowrap"><PlanBadge plan={c.plan} /></td>
+                                    <td className="px-4 py-4 text-xs font-medium text-gray-300 whitespace-nowrap">
                                         <div className="space-y-0.5">
                                             <div className="flex items-center gap-1">
                                                 <span className="text-gray-500">👥 User:</span>
@@ -707,21 +707,21 @@ const SuperAdminCustomers = () => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4"><StatusBadge status={c.status} /></td>
-                                    <td className="px-4 py-4 text-xs text-gray-400">{fmtDate(c.createdAt)}</td>
-                                    <td className="px-4 py-4">
+                                    <td className="px-4 py-4 whitespace-nowrap"><StatusBadge status={c.status} /></td>
+                                    <td className="px-4 py-4 text-xs text-gray-400 whitespace-nowrap">{fmtDate(c.createdAt)}</td>
+                                    <td className="px-4 py-4 whitespace-nowrap">
                                         <div className={`text-sm ${c.subscriptionExpiresAt && isExpiringSoon(c.subscriptionExpiresAt) ? 'text-orange-400 font-medium' : 'text-gray-400'}`}>
                                             {fmtDate(c.subscriptionExpiresAt || '')}
                                         </div>
                                         {c.subscriptionExpiresAt && isExpiringSoon(c.subscriptionExpiresAt) && <div className="text-xs text-orange-500">Sắp hết hạn</div>}
                                     </td>
-                                    <td className="px-4 py-4 text-right">
+                                    <td className="px-4 py-4 text-right whitespace-nowrap">
                                         <div className="text-white font-medium text-sm">{((c.totalSpent || 0) / 1000000).toFixed(1)}M ₫</div>
                                         <div className="text-gray-500 text-xs">{c.renewalCount} lần</div>
                                     </td>
-                                    <td className="px-4 py-4 text-right text-gray-400 text-xs">{c.renewalCount} lần</td>
-                                    <td className="px-4 py-4">
-                                        <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                                    <td className="px-4 py-4 text-right text-gray-400 text-xs whitespace-nowrap">{c.renewalCount} lần</td>
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                        <div className="flex items-center justify-center gap-1 opacity-100 lg:opacity-60 lg:group-hover:opacity-100 transition-opacity">
                                             <button onClick={() => { setSelected(c); setDetailOpen(true); }}
                                                 title="Xem chi tiết" className="p-1.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
                                                 <HiOutlineEye className="w-4 h-4" />

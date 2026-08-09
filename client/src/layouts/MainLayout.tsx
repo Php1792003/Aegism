@@ -267,49 +267,51 @@ const MainLayout = () => {
         <div className="flex h-screen bg-gray-50 overflow-hidden font-sans text-gray-800">
             {sidebarOpen && <div className="fixed inset-0 z-40 bg-black bg-opacity-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-lg lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div>
-                    <div className="relative flex items-center justify-center min-h-[80px] py-4 border-b border-gray-100 px-4">
-                        <Link to="/" className="w-full flex items-center justify-center">
-                            {branding.logo ? (
-                                <img src={branding.logo.startsWith('http') ? branding.logo : `${apiUrl}${branding.logo}`} alt="Logo" className="w-full object-contain" style={{ height: `${branding.logoHeight}px` }} onError={(e) => e.currentTarget.style.display = 'none'} />
-                            ) : (
-                                <div className="flex items-center justify-center space-x-2">
-                                    <img src="/img/aegism_logo_mini.png" alt="Logo" className="w-full object-contain" style={{ height: `${branding.logoHeight}px` }} onError={(e) => e.currentTarget.style.display = 'none'} />
-                                    {branding.appName && branding.appName !== 'AEGISM' && branding.appName !== 'OPSERA' && (
-                                        <span className="font-bold text-lg hidden md:block" style={{ color: branding.primaryColor }}>{branding.appName}</span>
-                                    )}
-                                </div>
-                            )}
-                        </Link>
-                        <button onClick={() => setSidebarOpen(false)} className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition-colors"><HiOutlineX className="w-5 h-5" /></button>
-                    </div>
-                    <nav className="mt-6 px-4 space-y-1 overflow-y-auto max-h-[calc(100vh-160px)] custom-scrollbar">
-                        <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className={getLinkClass('/dashboard')} style={activeLinkStyle('/dashboard')}><HiOutlineHome className="w-5 h-5 mr-3" />Tổng quan</Link>
-                        {hasPermission('VIEW_PROJECTS') && <Link to="/projects" onClick={() => setSidebarOpen(false)} className={getLinkClass('/projects')} style={activeLinkStyle('/projects')}><HiOutlineBriefcase className="w-5 h-5 mr-3" />Quản lý Dự án</Link>}
-                        <Link to="/qrcodes" onClick={() => setSidebarOpen(false)} className={getLinkClass('/qrcodes')} style={activeLinkStyle('/qrcodes')}><HiOutlineQrcode className="w-5 h-5 mr-3" />Mã QR & Điểm quét</Link>
-                        <Link to="/staff" onClick={() => setSidebarOpen(false)} className={getLinkClass('/staff')} style={activeLinkStyle('/staff')}><HiOutlineUsers className="w-5 h-5 mr-3" />Nhân sự & Phân quyền</Link>
-                        <Link to="/tasks" onClick={() => setSidebarOpen(false)} className={getLinkClass('/tasks')} style={activeLinkStyle('/tasks')}><HiOutlineClipboardList className="w-5 h-5 mr-3" />Công việc & Task</Link>
-                        <Link to="/chat" onClick={() => setSidebarOpen(false)} className={getLinkClass('/chat')} style={activeLinkStyle('/chat')}><HiOutlineChatAlt2 className="w-5 h-5 mr-3" />Trò chuyện</Link>
-                        {hasPermission('TICKET_VIEW') && <Link to="/helpdesk" onClick={() => setSidebarOpen(false)} className={getLinkClass('/helpdesk')} style={activeLinkStyle('/helpdesk')}><HiOutlineMail className="w-5 h-5 mr-3" />Hỗ trợ Khách hàng</Link>}
-                        {['business', 'professional', 'enterprise'].includes(currentPlan) && (
-                            <div className="pt-2 mt-2 border-t border-gray-100">
-                                <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nâng cao</p>
-                                <Link to="/reports" onClick={() => setSidebarOpen(false)} className={getLinkClass('/reports', 'purple')}><HiOutlineChartBar className="w-5 h-5 mr-3" />Báo cáo Thống kê</Link>
-                                <Link to="/audit-log" onClick={() => setSidebarOpen(false)} className={getLinkClass('/audit-log', 'purple')}><HiOutlineClipboardCheck className="w-5 h-5 mr-3" />Nhật ký Hoạt động</Link>
+            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out flex flex-col shadow-lg lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                {/* Logo header - fixed at top */}
+                <div className="relative flex items-center justify-center min-h-[80px] py-4 border-b border-gray-100 px-4 flex-shrink-0">
+                    <Link to="/" className="w-full flex items-center justify-center">
+                        {branding.logo ? (
+                            <img src={branding.logo.startsWith('http') ? branding.logo : `${apiUrl}${branding.logo}`} alt="Logo" className="w-full object-contain" style={{ height: `${branding.logoHeight}px` }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                        ) : (
+                            <div className="flex items-center justify-center space-x-2">
+                                <img src="/img/aegism_logo_mini.png" alt="Logo" className="w-full object-contain" style={{ height: `${branding.logoHeight}px` }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                                {branding.appName && branding.appName !== 'AEGISM' && branding.appName !== 'OPSERA' && (
+                                    <span className="font-bold text-lg hidden md:block" style={{ color: branding.primaryColor }}>{branding.appName}</span>
+                                )}
                             </div>
                         )}
-                        {currentPlan === 'enterprise' && (
-                            <div className="pt-2 mt-2 border-t border-gray-100">
-                                <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Doanh nghiệp</p>
-                                <Link to="/api-integration" onClick={() => setSidebarOpen(false)} className={getLinkClass('/api-integration')} style={activeLinkStyle('/api-integration')}><HiOutlineCubeTransparent className="w-5 h-5 mr-3" />Tích hợp API</Link>
-                                <Link to="/branding" onClick={() => setSidebarOpen(false)} className={getLinkClass('/branding')} style={activeLinkStyle('/branding')}><HiOutlineColorSwatch className="w-5 h-5 mr-3" />Tùy chỉnh Thương hiệu</Link>
-                            </div>
-                        )}
-                    </nav>
+                    </Link>
+                    <button onClick={() => setSidebarOpen(false)} className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition-colors"><HiOutlineX className="w-5 h-5" /></button>
                 </div>
-                <div className="p-4 border-t border-gray-200">
-                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-sm text-gray-600 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"><HiOutlineLogout className="w-5 h-5 mr-3" />Đăng xuất</button>
+
+                {/* Scrollable navigation area */}
+                <nav className="flex-1 overflow-y-auto mt-4 px-4 space-y-1 pb-4">
+                    <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className={getLinkClass('/dashboard')} style={activeLinkStyle('/dashboard')}><HiOutlineHome className="w-5 h-5 mr-3" />Tổng quan</Link>
+                    {hasPermission('VIEW_PROJECTS') && <Link to="/projects" onClick={() => setSidebarOpen(false)} className={getLinkClass('/projects')} style={activeLinkStyle('/projects')}><HiOutlineBriefcase className="w-5 h-5 mr-3" />Quản lý Dự án</Link>}
+                    <Link to="/qrcodes" onClick={() => setSidebarOpen(false)} className={getLinkClass('/qrcodes')} style={activeLinkStyle('/qrcodes')}><HiOutlineQrcode className="w-5 h-5 mr-3" />Mã QR & Điểm quét</Link>
+                    <Link to="/staff" onClick={() => setSidebarOpen(false)} className={getLinkClass('/staff')} style={activeLinkStyle('/staff')}><HiOutlineUsers className="w-5 h-5 mr-3" />Nhân sự & Phân quyền</Link>
+                    <Link to="/tasks" onClick={() => setSidebarOpen(false)} className={getLinkClass('/tasks')} style={activeLinkStyle('/tasks')}><HiOutlineClipboardList className="w-5 h-5 mr-3" />Công việc & Task</Link>
+                    <Link to="/chat" onClick={() => setSidebarOpen(false)} className={getLinkClass('/chat')} style={activeLinkStyle('/chat')}><HiOutlineChatAlt2 className="w-5 h-5 mr-3" />Trò chuyện</Link>
+                    {['business', 'professional', 'enterprise'].includes(currentPlan) && (
+                        <div className="pt-2 mt-2 border-t border-gray-100">
+                            <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nâng cao</p>
+                            <Link to="/reports" onClick={() => setSidebarOpen(false)} className={getLinkClass('/reports', 'purple')}><HiOutlineChartBar className="w-5 h-5 mr-3" />Báo cáo Thống kê</Link>
+                            <Link to="/audit-log" onClick={() => setSidebarOpen(false)} className={getLinkClass('/audit-log', 'purple')}><HiOutlineClipboardCheck className="w-5 h-5 mr-3" />Nhật ký Hoạt động</Link>
+                        </div>
+                    )}
+                    {currentPlan === 'enterprise' && (
+                        <div className="pt-2 mt-2 border-t border-gray-100">
+                            <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Doanh nghiệp</p>
+                            <Link to="/api-integration" onClick={() => setSidebarOpen(false)} className={getLinkClass('/api-integration')} style={activeLinkStyle('/api-integration')}><HiOutlineCubeTransparent className="w-5 h-5 mr-3" />Tích hợp API</Link>
+                            <Link to="/branding" onClick={() => setSidebarOpen(false)} className={getLinkClass('/branding')} style={activeLinkStyle('/branding')}><HiOutlineColorSwatch className="w-5 h-5 mr-3" />Tùy chỉnh Thương hiệu</Link>
+                        </div>
+                    )}
+                </nav>
+
+                {/* Logout button - pinned at bottom, always visible */}
+                <div className="p-4 border-t border-gray-200 flex-shrink-0">
+                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"><HiOutlineLogout className="w-5 h-5 mr-3" />Đăng xuất</button>
                 </div>
             </aside>
 
@@ -331,7 +333,7 @@ const MainLayout = () => {
                                 <HiOutlineBell className="text-2xl" />
                             </button>
                             {notifOpen && (
-                                <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-100 z-50">
+                                <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:right-0 top-[72px] sm:top-full mt-2 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-100 z-50">
                                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                                         <h3 className="font-bold text-gray-800">Thông báo</h3>
                                         {unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs text-blue-600 hover:underline">Đánh dấu tất cả đã đọc</button>}
@@ -363,8 +365,8 @@ const MainLayout = () => {
                                 </div>
                                 <img className="h-10 w-10 rounded-full object-cover border-2 border-gray-100 shadow-sm" src={user.avatar} alt="Avatar" />
                             </div>
-                            <div className="absolute right-0 top-full mt-1 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
-                                <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
+                            <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:right-0 top-[72px] sm:top-full mt-1 sm:w-80 bg-white rounded-xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top sm:origin-top-right z-50">
+                                <div className="absolute -top-2 right-6 sm:right-4 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
                                 <div className="p-6 relative bg-white rounded-xl z-20">
                                     <div className="flex items-center space-x-4 mb-4">
                                         <img className="h-14 w-14 rounded-full object-cover border-2 border-blue-500 p-0.5" src={user.avatar} alt="Large Avatar" />
@@ -414,17 +416,10 @@ const MainLayout = () => {
                             <HiOutlineChatAlt2 className="w-6 h-6" />
                             <span className="text-[10px] font-medium leading-tight">Chat</span>
                         </Link>
-                        <button onClick={() => setSidebarOpen(true)}
-                            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 text-gray-400 hover:text-gray-600 transition-colors relative">
-                            <div className="relative">
-                                <HiOutlineMenu className="w-6 h-6" />
-                                {unreadCount > 0 && (
-                                    <span className="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-red-500 rounded-full">
-                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                    </span>
-                                )}
-                            </div>
-                            <span className="text-[10px] font-medium leading-tight">Menu</span>
+                        <button onClick={handleLogout}
+                            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 text-gray-400 hover:text-red-600 transition-colors relative">
+                            <HiOutlineLogout className="w-6 h-6" />
+                            <span className="text-[10px] font-medium leading-tight">Đăng xuất</span>
                         </button>
                     </div>
                 </nav>

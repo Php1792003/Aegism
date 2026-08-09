@@ -29,17 +29,39 @@ const ContactPage = () => {
     // State cho Form
     const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: 'tu-van', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [modalState, setModalState] = useState<{ isOpen: boolean; type: 'success' | 'error'; message: string }>({ isOpen: false, type: 'success', message: '' });
 
-    // Giả lập gửi form
-    const handleSubmit = (e: React.FormEvent) => {
+    // Xử lý gửi form
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            alert("Cảm ơn bạn! Chúng tôi đã nhận được tin nhắn.");
+
+        try {
+            const response = await fetch('https://api.aegism.online/api/emails/webhook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    from: formData.email,
+                    to: 'contact@aegism.online',
+                    subject: `[Lien he từ Website] ${formData.name} - ${formData.subject.toUpperCase()}`,
+                    raw: `Ho ten: ${formData.name}\nEmail: ${formData.email}\nSo dien thoai: ${formData.phone}\nVan de quan tam: ${formData.subject}\n\nNoi dung chi tiet:\n${formData.message}`,
+                }),
+            });
+
+            if (response.ok) {
+                setModalState({ isOpen: true, type: 'success', message: 'Cảm ơn bạn đã liên hệ. Đội ngũ AEGISM sẽ phản hồi trong vòng 2 giờ làm việc.' });
+                setFormData({ name: '', email: '', phone: '', subject: 'tu-van', message: '' });
+            } else {
+                setModalState({ isOpen: true, type: 'error', message: 'Lỗi gửi yêu cầu. Vui lòng thử lại sau!' });
+            }
+        } catch (error) {
+            console.error('Lỗi gửi form:', error);
+            setModalState({ isOpen: true, type: 'error', message: 'Không thể kết nối tới server. Vui lòng kiểm tra lại đường truyền!' });
+        } finally {
             setIsSubmitting(false);
-            setFormData({ name: '', email: '', phone: '', subject: 'tu-van', message: '' });
-        }, 1500);
+        }
     };
 
     return (
@@ -77,7 +99,7 @@ const ContactPage = () => {
                             <div className="lg:col-span-1 space-y-8">
                                 {/* Info Card */}
                                 <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-6">Thông tin liên hệ</h3>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-6">Thông tin liên hệ</h2>
 
                                     <div className="space-y-6">
                                         <div className="flex items-start">
@@ -251,24 +273,59 @@ const ContactPage = () => {
                         <h2 className="text-3xl font-bold text-gray-900 mb-10">Câu hỏi thường gặp</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                             <div className="p-6 bg-gray-50 rounded-xl">
-                                <h4 className="font-bold text-gray-900 mb-2">AEGISM có bản dùng thử không?</h4>
+                                <h3 className="font-bold text-gray-900 mb-2">AEGISM có bản dùng thử không?</h3>
                                 <p className="text-gray-600 text-sm">Có. Chúng tôi cung cấp gói Starter miễn phí trọn đời cho các đội nhóm nhỏ dưới 5 người.</p>
                             </div>
                             <div className="p-6 bg-gray-50 rounded-xl">
-                                <h4 className="font-bold text-gray-900 mb-2">Thời gian triển khai bao lâu?</h4>
+                                <h3 className="font-bold text-gray-900 mb-2">Thời gian triển khai bao lâu?</h3>
                                 <p className="text-gray-600 text-sm">Với hệ thống Cloud, bạn có thể bắt đầu ngay lập tức sau khi đăng ký tài khoản.</p>
                             </div>
                             <div className="p-6 bg-gray-50 rounded-xl">
-                                <h4 className="font-bold text-gray-900 mb-2">Tôi có thể yêu cầu tính năng riêng?</h4>
+                                <h3 className="font-bold text-gray-900 mb-2">Tôi có thể yêu cầu tính năng riêng?</h3>
                                 <p className="text-gray-600 text-sm">Được. Gói Enterprise cho phép tùy chỉnh tính năng và triển khai Server riêng theo nhu cầu.</p>
                             </div>
                             <div className="p-6 bg-gray-50 rounded-xl">
-                                <h4 className="font-bold text-gray-900 mb-2">Hỗ trợ kỹ thuật như thế nào?</h4>
-                                <p className="text-gray-600 text-sm">Chúng tôi hỗ trợ qua Email, Zalo, và Hotline 24/7 đối với gói Business trở lên.</p>
+                                <h3 className="font-bold text-gray-900 mb-2">Hỗ trợ kỹ thuật như thế nào?</h3>
+                                <p className="text-gray-600 text-sm">Chúng tôi hỗ trợ qua Email, Zalo, và Hotline 24/7.</p>
                             </div>
                         </div>
                     </div>
                 </section>
+
+                {/* NOTIFICATION MODAL UI */}
+                {modalState.isOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <div
+                            className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm"
+                            onClick={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+                            aria-hidden="true"
+                        ></div>
+                        <div
+                            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center transform transition-all"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="modal-title"
+                        >
+                            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 ${modalState.type === 'success' ? 'bg-green-100 text-green-500' : 'bg-red-100 text-red-500'}`}>
+                                {modalState.type === 'success' ? (
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                ) : (
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                )}
+                            </div>
+                            <h3 id="modal-title" className="text-2xl font-bold text-gray-900 mb-2">
+                                {modalState.type === 'success' ? 'Gửi thành công!' : 'Có lỗi xảy ra'}
+                            </h3>
+                            <p className="text-gray-600 mb-8">{modalState.message}</p>
+                            <button
+                                onClick={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+                                className={`w-full py-3 px-4 font-bold rounded-xl transition-colors shadow-lg text-white ${modalState.type === 'success' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30' : 'bg-red-600 hover:bg-red-700 shadow-red-500/30'}`}
+                            >
+                                {modalState.type === 'success' ? 'Tuyệt vời' : 'Đóng'}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );

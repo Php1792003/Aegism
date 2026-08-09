@@ -94,7 +94,7 @@ const CampaignModal = ({ campaign, onClose, onSave }: {
                     </div>
 
                     {/* Type & Trigger */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-medium text-gray-400 mb-1.5">Kiểu hiển thị</label>
                             <select value={form.type} onChange={e => set('type', e.target.value)}
@@ -112,7 +112,7 @@ const CampaignModal = ({ campaign, onClose, onSave }: {
                     </div>
 
                     {/* CTA & Discount */}
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-xs font-medium text-gray-400 mb-1.5">Nhãn nút CTA</label>
                             <input value={form.ctaLabel} onChange={e => set('ctaLabel', e.target.value)}
@@ -132,7 +132,7 @@ const CampaignModal = ({ campaign, onClose, onSave }: {
                     </div>
 
                     {/* Voucher & Target Plan */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-medium text-gray-400 mb-1.5">Mã voucher (nếu có)</label>
                             <input value={form.voucherCode} onChange={e => set('voucherCode', e.target.value)}
@@ -156,7 +156,7 @@ const CampaignModal = ({ campaign, onClose, onSave }: {
                     </div>
 
                     {/* Dates & Priority */}
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-xs font-medium text-gray-400 mb-1.5">Bắt đầu *</label>
                             <input type="datetime-local" value={form.startDate} onChange={e => set('startDate', e.target.value)} required
@@ -282,12 +282,12 @@ const SuperAdminPromo = () => {
     return (
         <div className="min-h-screen p-4 md:p-6 lg:p-8 text-white">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-white">🎯 Chiến dịch Quảng bá</h1>
                     <p className="text-sm text-gray-400 mt-1">Quản lý thông báo quảng bá gói dịch vụ</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                     <button onClick={handleAiGenerate} disabled={loading}
                         className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-sm font-semibold transition-colors shadow-lg disabled:opacity-50">
                         <HiOutlineSparkles className="w-4 h-4" /> {loading ? 'Đang phân tích...' : 'AI Tạo chiến lược'}
@@ -344,7 +344,7 @@ const SuperAdminPromo = () => {
             )}
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {[
                     { label: 'Tổng chiến dịch', value: totalCampaigns, icon: <HiOutlineSpeakerphone className="w-5 h-5" />, color: 'purple' },
                     { label: 'Đang chạy', value: activeCampaigns, icon: <HiOutlineLightningBolt className="w-5 h-5" />, color: 'green' },
@@ -366,14 +366,14 @@ const SuperAdminPromo = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-800">
-                                <th className="text-left px-5 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Chiến dịch</th>
-                                <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kiểu</th>
-                                <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Thời gian</th>
-                                <th className="text-center px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Trạng thái</th>
-                                <th className="text-right px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Hiển thị</th>
-                                <th className="text-right px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Nhấp</th>
-                                <th className="text-right px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Nâng cấp</th>
-                                <th className="text-center px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Thao tác</th>
+                                <th className="text-left px-5 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Chiến dịch</th>
+                                <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Kiểu</th>
+                                <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Thời gian</th>
+                                <th className="text-center px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Trạng thái</th>
+                                <th className="text-right px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Hiển thị</th>
+                                <th className="text-right px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Nhấp</th>
+                                <th className="text-right px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Nâng cấp</th>
+                                <th className="text-center px-4 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -392,20 +392,20 @@ const SuperAdminPromo = () => {
                                 const isExpired = new Date(c.endDate) < now;
                                 return (
                                     <tr key={c.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors group">
-                                        <td className="px-5 py-4">
+                                        <td className="px-5 py-4 whitespace-nowrap">
                                             <div className="text-white font-semibold text-sm">{c.title}</div>
-                                            <div className="text-gray-500 text-xs mt-0.5 line-clamp-1">{c.description}</div>
+                                            <div className="text-gray-500 text-xs mt-0.5 line-clamp-1 max-w-[200px]">{c.description}</div>
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-4 whitespace-nowrap">
                                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-800 rounded-lg text-xs text-gray-300">
                                                 {ti.emoji} {ti.label}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4 text-gray-400 text-xs">
+                                        <td className="px-4 py-4 text-gray-400 text-xs whitespace-nowrap">
                                             <div>{fmtDate(c.startDate)}</div>
                                             <div>→ {fmtDate(c.endDate)}</div>
                                         </td>
-                                        <td className="px-4 py-4 text-center">
+                                        <td className="px-4 py-4 text-center whitespace-nowrap">
                                             {isExpired ? (
                                                 <span className="px-2 py-1 bg-gray-800 text-gray-500 rounded-full text-xs">Hết hạn</span>
                                             ) : isRunning ? (
@@ -416,10 +416,10 @@ const SuperAdminPromo = () => {
                                                 <span className="px-2 py-1 bg-gray-800 text-gray-500 rounded-full text-xs">Đã tắt</span>
                                             )}
                                         </td>
-                                        <td className="px-4 py-4 text-right text-gray-300">{fmtNum(c.impressions || 0)}</td>
-                                        <td className="px-4 py-4 text-right text-gray-300">{fmtNum(c.clicks || 0)}</td>
-                                        <td className="px-4 py-4 text-right text-gray-300">{fmtNum(c.conversions || 0)}</td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-4 text-right text-gray-300 whitespace-nowrap">{fmtNum(c.impressions || 0)}</td>
+                                        <td className="px-4 py-4 text-right text-gray-300 whitespace-nowrap">{fmtNum(c.clicks || 0)}</td>
+                                        <td className="px-4 py-4 text-right text-gray-300 whitespace-nowrap">{fmtNum(c.conversions || 0)}</td>
+                                        <td className="px-4 py-4 whitespace-nowrap">
                                             <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => handleToggle(c.id)} title={c.isActive ? 'Tắt' : 'Bật'}
                                                     className={`p-1.5 rounded-lg transition-colors ${c.isActive ? 'hover:bg-yellow-900/50 text-yellow-400' : 'hover:bg-green-900/50 text-green-400'}`}>

@@ -226,7 +226,7 @@ const PricingPage = () => {
                                             }`}>
                                             {isHighlighted && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#4F46E5] to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold uppercase">Khuyên dùng</div>}
                                             <div className="mb-6">
-                                                <h3 className={`text-2xl font-bold ${isHighlighted ? 'text-[#4F46E5]' : 'text-gray-900'}`}>{plan.displayName}</h3>
+                                                <h2 className={`text-2xl font-bold ${isHighlighted ? 'text-[#4F46E5]' : 'text-gray-900'}`}>{plan.displayName}</h2>
                                                 <p className="text-gray-500 text-sm mt-2 min-h-[40px]">
                                                     {plan.maxUsers > 0 && `Tối đa ${plan.maxUsers} người dùng · ${plan.maxProjects} dự án · ${plan.maxQRCodes} QR`}
                                                 </p>
@@ -236,12 +236,20 @@ const PricingPage = () => {
                                                 {isPaid && <span className="ml-1 text-xl text-gray-500">/tháng</span>}
                                             </div>
                                             {cycle === 'yearly' && savingsPerYear > 0 && <p className="text-xs text-green-600 font-semibold mb-6 bg-green-50 w-fit px-2 py-1 rounded">Tiết kiệm {formatMoney(savingsPerYear)} /năm</p>}
-                                            <button
-                                                onClick={() => isPaid ? openModal(plan.planKey) : window.location.href = '/contact'}
-                                                className={`w-full py-3 px-4 rounded-xl font-bold transition-all ${isHighlighted ? 'bg-[#4F46E5] text-white hover:bg-[#4338ca] shadow-md' : 'bg-indigo-50 text-[#4F46E5] hover:bg-indigo-100'
-                                                    }`}>
-                                                {isPaid ? 'Đăng ký ngay' : 'Liên hệ tư vấn'}
-                                            </button>
+                                            {isPaid ? (
+                                                <button
+                                                    onClick={() => openModal(plan.planKey)}
+                                                    className={`w-full py-3 px-4 rounded-xl font-bold transition-all ${isHighlighted ? 'bg-[#4F46E5] text-white hover:bg-[#4338ca] shadow-md' : 'bg-indigo-50 text-[#4F46E5] hover:bg-indigo-100'
+                                                        }`}>
+                                                    Đăng ký ngay
+                                                </button>
+                                            ) : (
+                                                <Link
+                                                    to="/contact"
+                                                    className="w-full block text-center py-3 px-4 rounded-xl font-bold transition-all bg-indigo-50 text-[#4F46E5] hover:bg-indigo-100">
+                                                    Liên hệ tư vấn
+                                                </Link>
+                                            )}
                                             <div className="border-t border-gray-100 my-8"></div>
                                             <ul className="space-y-4 flex-1">
                                                 {(plan.features || []).map((f, i) => (
@@ -267,6 +275,7 @@ const PricingPage = () => {
                         <div className="space-y-4">
                             <FAQItem question="Làm thế nào để nâng cấp gói dịch vụ?" answer="Bạn có thể nâng cấp bất cứ lúc nào, hệ thống sẽ tự động tính phí chênh lệch." colors={colors} />
                             <FAQItem question="Chính sách hoàn tiền?" answer="Chúng tôi hoàn tiền trong 14 ngày đầu nếu bạn không hài lòng." colors={colors} />
+                            <FAQItem question="AEGISM có bản dùng thử không?" answer="Có. Chúng tôi cung cấp dùng thử miễn phí 14 ngày cho tất cả các gói trả phí." colors={colors} />
                         </div>
                     </div>
                 </section>
@@ -378,7 +387,14 @@ const PricingPage = () => {
                                             <h3 className="text-lg font-bold mb-2">Quét mã VietQR để thanh toán</h3>
                                             <p className="text-sm text-gray-500 mb-4">Dùng app ngân hàng quét mã hoặc mở trang PayOS</p>
                                             <div className="border-4 border-[#4F46E5] rounded-2xl p-3 bg-white shadow-lg inline-block mb-4">
-                                                <img src={`https://img.vietqr.io/image/MB-5555517092003-compact2.png?amount=${calculateSubTotal()}&addInfo=AEGISM${selectedPlanKey.toUpperCase()}${orderCode}&accountName=AEGISM`} alt="Mã QR thanh toán VietQR gói phần mềm AEGISM" className="w-48 h-48 object-contain" />
+                                                <img 
+                                                    src={`https://img.vietqr.io/image/MB-5555517092003-compact2.png?amount=${calculateSubTotal()}&addInfo=AEGISM${selectedPlanKey.toUpperCase()}${orderCode}&accountName=AEGISM`} 
+                                                    alt="Mã QR thanh toán VietQR gói phần mềm AEGISM" 
+                                                    className="w-48 h-48 object-contain" 
+                                                    width="192" 
+                                                    height="192" 
+                                                    loading="lazy" 
+                                                />
                                             </div>
                                             {checkoutUrl && (
                                                 <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 bg-[#4F46E5] text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors mb-4">
@@ -456,7 +472,10 @@ const FAQItem: React.FC<FAQProps> = ({ question, answer, colors }) => {
     const [open, setOpen] = useState(false);
     return (
         <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <button onClick={() => setOpen(!open)} className="flex justify-between items-center w-full text-left px-6 py-4 bg-gray-50 hover:bg-gray-100 focus:outline-none">
+            <button 
+                onClick={() => setOpen(!open)} 
+                aria-expanded={open}
+                className="flex justify-between items-center w-full text-left px-6 py-4 bg-gray-50 hover:bg-gray-100 focus:outline-none">
                 <span className={`text-lg font-medium ${colors.dark}`}>{question}</span>
                 <HiChevronDown className={`text-gray-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
             </button>

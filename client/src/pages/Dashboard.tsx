@@ -11,11 +11,11 @@ const apiUrl = (window.location.hostname === 'localhost' || window.location.host
     ? 'http://localhost:3000' : 'https://api.aegism.online';
 
 const PLAN_CONFIG: any = {
-    STARTER:      { label: 'STARTER',      color: 'blue',   price: '499.000 VNĐ' },
-    BUSINESS:     { label: 'BUSINESS',     color: 'purple', price: '999.000 VNĐ' },
-    PRO:          { label: 'BUSINESS',     color: 'purple', price: '999.000 VNĐ' },
-    PROFESSIONAL: { label: 'BUSINESS',     color: 'purple', price: '999.000 VNĐ' },
-    ENTERPRISE:   { label: 'ENTERPRISE',   color: 'indigo', price: 'Liên hệ' },
+    STARTER: { label: 'STARTER', color: 'blue', price: '499.000 VNĐ' },
+    BUSINESS: { label: 'BUSINESS', color: 'purple', price: '999.000 VNĐ' },
+    PRO: { label: 'BUSINESS', color: 'purple', price: '999.000 VNĐ' },
+    PROFESSIONAL: { label: 'BUSINESS', color: 'purple', price: '999.000 VNĐ' },
+    ENTERPRISE: { label: 'ENTERPRISE', color: 'indigo', price: 'Liên hệ' },
 };
 
 const Dashboard = () => {
@@ -48,32 +48,52 @@ const Dashboard = () => {
     const chart = data?.chart;
 
     const chartData = {
-        labels: chart?.labels || ['T2','T3','T4','T5','T6','T7','CN'],
+        labels: chart?.labels || ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
         datasets: [
             {
                 label: 'Lượt quét QR Code',
-                data: chart?.scanData || [0,0,0,0,0,0,0],
+                data: chart?.scanData || [0, 0, 0, 0, 0, 0, 0],
                 borderColor: '#2563EB',
-                backgroundColor: 'rgba(37,99,235,0.06)',
-                borderWidth: 2, tension: 0.4, fill: true, pointRadius: 4,
+                backgroundColor: 'rgba(37,99,235,0.08)',
+                borderWidth: 2, tension: 0.4, fill: true, pointRadius: 3, pointHoverRadius: 6, pointHitRadius: 10,
             },
             {
                 label: 'Sự cố báo cáo',
-                data: chart?.incidentData || [0,0,0,0,0,0,0],
+                data: chart?.incidentData || [0, 0, 0, 0, 0, 0, 0],
                 borderColor: '#EF4444',
                 backgroundColor: 'transparent',
-                borderWidth: 2, tension: 0.4, borderDash: [5,5], pointRadius: 3,
+                borderWidth: 2, tension: 0.4, borderDash: [4, 4], pointRadius: 3, pointHoverRadius: 6, pointHitRadius: 10,
             }
         ],
     };
 
     const chartOptions = {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'top' as const, align: 'end' as const } },
+        plugins: {
+            legend: { display: false }, // Ẩn legend mặc định để dùng Custom HTML
+            tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#1f2937',
+                bodyColor: '#4b5563',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 10,
+                boxPadding: 4,
+                usePointStyle: true,
+            }
+        },
         scales: {
-            y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
-            x: { grid: { display: false } }
-        }
+            y: {
+                beginAtZero: true,
+                grid: { color: '#f3f4f6' },
+                border: { display: false }
+            },
+            x: {
+                grid: { display: false },
+                border: { display: false }
+            }
+        },
+        interaction: { mode: 'index' as const, intersect: false },
     };
 
     const statCards = [
@@ -138,8 +158,8 @@ const Dashboard = () => {
 
             {/* Skeleton loader */}
             {isLoading && (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-pulse">
-                    {[1,2,3,4].map(i => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-pulse">
+                    {[1, 2, 3, 4].map(i => (
                         <div key={i} className="bg-white rounded-lg p-6 h-28 border border-gray-100">
                             <div className="h-3 bg-gray-200 rounded w-1/2 mb-3"></div>
                             <div className="h-7 bg-gray-200 rounded w-1/3"></div>
@@ -151,9 +171,9 @@ const Dashboard = () => {
             {!isLoading && (
                 <>
                     {/* Stat cards row */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         {/* Gói dịch vụ */}
-                        <div className={`bg-white rounded-lg p-5 shadow-sm border border-gray-100 relative overflow-hidden col-span-2 lg:col-span-1`}>
+                        <div className={`bg-white rounded-lg p-5 shadow-sm border border-gray-100 relative overflow-hidden col-span-1 sm:col-span-2 lg:col-span-1`}>
                             <div className={`absolute top-0 right-0 w-16 h-16 transform translate-x-4 -translate-y-4 rotate-45 opacity-10 bg-${plan.color}-500`}></div>
                             <div className="flex justify-between items-start">
                                 <div>
@@ -188,7 +208,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Task progress row */}
-                    <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                         {[
                             { label: 'Chờ xử lý', value: stats.tasks?.pending ?? 0, color: 'text-gray-600', bg: 'bg-gray-100', dot: 'bg-gray-400' },
                             { label: 'Đang thực hiện', value: stats.tasks?.inProgress ?? 0, color: 'text-blue-600', bg: 'bg-blue-50', dot: 'bg-blue-500' },
@@ -206,11 +226,22 @@ const Dashboard = () => {
 
                     {/* Chart + Shortcuts */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                        <div className="bg-white rounded-lg shadow-sm p-6 lg:col-span-2 border border-gray-100">
-                            <div className="flex justify-between items-center mb-4">
+                        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 lg:col-span-2 border border-gray-100 flex flex-col">
+                            {/* Custom HTML Legend for perfect Mobile UI */}
+                            <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 border-b border-gray-50 pb-4 gap-3 sm:gap-0">
                                 <h4 className="text-base font-bold text-gray-800">Lưu lượng quét QR (7 ngày qua)</h4>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-blue-100"></span>
+                                        <span className="text-xs font-medium text-gray-600">Lượt quét</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-red-100"></span>
+                                        <span className="text-xs font-medium text-gray-600">Sự cố</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="relative h-72 w-full">
+                            <div className="relative flex-1 w-full min-h-[260px] sm:min-h-[300px]">
                                 <Line data={chartData} options={chartOptions} />
                             </div>
                         </div>
