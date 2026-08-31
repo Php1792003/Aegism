@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    sourcemap: false,
+    chunkSizeWarningLimit: 1600,
+  },
+  base: './',
   server: {
     host: '0.0.0.0',
     port: 3001,

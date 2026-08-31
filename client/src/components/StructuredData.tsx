@@ -1,12 +1,25 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import type { WithContext, Organization, SoftwareApplication, LocalBusiness, FAQPage, BreadcrumbList, WebSite, WebPage } from 'schema-dts';
 import { SITE_URL, SITE_NAME } from './SEO';
+
+// ============================================================
+// Helper: Render JSON-LD safely inside Helmet
+// Type safety is enforced at call sites via WithContext<T> typed variables.
+// ============================================================
+function JsonLd({ data }: { data: unknown }) {
+  return (
+    <Helmet>
+      <script type="application/ld+json">{JSON.stringify(data)}</script>
+    </Helmet>
+  );
+}
 
 // ============================================================
 // Organization Schema
 // ============================================================
 export function OrganizationSchema() {
-  const schema = {
+  const schema: WithContext<Organization> = {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": SITE_NAME,
@@ -30,18 +43,14 @@ export function OrganizationSchema() {
     "sameAs": []
   };
 
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
-    </Helmet>
-  );
+  return <JsonLd data={schema} />;
 }
 
 // ============================================================
 // SoftwareApplication Schema
 // ============================================================
 export function SoftwareApplicationSchema() {
-  const schema = {
+  const schema: WithContext<SoftwareApplication> = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "AEGISM",
@@ -54,28 +63,24 @@ export function SoftwareApplicationSchema() {
       "lowPrice": "499000",
       "highPrice": "999000",
       "priceCurrency": "VND",
-      "offerCount": "3"
+      "offerCount": 3
     },
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.8",
-      "ratingCount": "50",
+      "ratingCount": 50,
       "bestRating": "5"
     }
   };
 
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
-    </Helmet>
-  );
+  return <JsonLd data={schema} />;
 }
 
 // ============================================================
 // LocalBusiness Schema
 // ============================================================
 export function LocalBusinessSchema() {
-  const schema = {
+  const schema: WithContext<LocalBusiness> = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "AEGISM - Công ty Công nghệ An ninh",
@@ -108,11 +113,7 @@ export function LocalBusinessSchema() {
     "priceRange": "₫₫"
   };
 
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
-    </Helmet>
-  );
+  return <JsonLd data={schema} />;
 }
 
 // ============================================================
@@ -124,24 +125,20 @@ interface FAQItem {
 }
 
 export function FAQSchema({ items }: { items: FAQItem[] }) {
-  const schema = {
+  const schema: WithContext<FAQPage> = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": items.map(item => ({
-      "@type": "Question",
+      "@type": "Question" as const,
       "name": item.question,
       "acceptedAnswer": {
-        "@type": "Answer",
+        "@type": "Answer" as const,
         "text": item.answer
       }
     }))
   };
 
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
-    </Helmet>
-  );
+  return <JsonLd data={schema} />;
 }
 
 // ============================================================
@@ -153,29 +150,25 @@ interface BreadcrumbItem {
 }
 
 export function BreadcrumbSchema({ items }: { items: BreadcrumbItem[] }) {
-  const schema = {
+  const schema: WithContext<BreadcrumbList> = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": items.map((item, index) => ({
-      "@type": "ListItem",
+      "@type": "ListItem" as const,
       "position": index + 1,
       "name": item.name,
       "item": item.url.startsWith('http') ? item.url : `${SITE_URL}${item.url}`
     }))
   };
 
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
-    </Helmet>
-  );
+  return <JsonLd data={schema} />;
 }
 
 // ============================================================
 // WebSite Schema (for sitelinks search box)
 // ============================================================
 export function WebSiteSchema() {
-  const schema = {
+  const schema: WithContext<WebSite> = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": SITE_NAME,
@@ -191,9 +184,40 @@ export function WebSiteSchema() {
     }
   };
 
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
-    </Helmet>
-  );
+  return <JsonLd data={schema} />;
+}
+
+// ============================================================
+// WebPage Schema (per-page SEO context)
+// ============================================================
+interface WebPageSchemaProps {
+  name: string;
+  description: string;
+  url: string;
+}
+
+export function WebPageSchema({ name, description, url }: WebPageSchemaProps) {
+  const fullUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
+  const schema: WithContext<WebPage> = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": name,
+    "description": description,
+    "url": fullUrl,
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": SITE_NAME,
+      "url": SITE_URL
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": SITE_NAME,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${SITE_URL}/img/logo_header.png`
+      }
+    }
+  };
+
+  return <JsonLd data={schema} />;
 }

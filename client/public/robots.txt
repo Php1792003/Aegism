@@ -1,3 +1,26 @@
+# Googlebot (prioritized)
+User-agent: Googlebot
+Allow: /
+Disallow: /dashboard/
+Disallow: /super-admin/
+Disallow: /scan/
+Disallow: /api-integration/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /profile
+Disallow: /branding
+Disallow: /projects
+Disallow: /qrcodes
+Disallow: /staff
+Disallow: /tasks
+Disallow: /chat
+Disallow: /reports
+Disallow: /audit-log
+Disallow: /helpdesk
+Disallow: /500
+
+# All other bots
 User-agent: *
 Allow: /
 Disallow: /dashboard/
@@ -16,6 +39,7 @@ Disallow: /tasks
 Disallow: /chat
 Disallow: /reports
 Disallow: /audit-log
+Disallow: /helpdesk
 Disallow: /500
 
 # Crawl-delay

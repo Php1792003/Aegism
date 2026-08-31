@@ -38,6 +38,7 @@ import SuperAdminSecurity from './pages/SuperAdminSecurity';
 import SuperAdminPromo from './pages/SuperAdminPromo';
 import SuperAdminApiKeys from './pages/SuperAdminApiKeys';
 import Helpdesk from './pages/Helpdesk';
+import DownloadPage from './pages/DownloadPage';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('accessToken');
@@ -66,6 +67,7 @@ function App() {
             <Route path='/request-demo' element={<RequestDemoPage />} />
             <Route path="/policy" element={<PolicyPage />} />
             <Route path="/terms" element={<TermsPage />} />
+            <Route path="/download" element={<DownloadPage />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
