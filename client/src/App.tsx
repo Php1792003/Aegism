@@ -1,7 +1,8 @@
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import SuperAdminLayout from './layouts/SuperAdminLayout';
 import { PromoProvider } from './components/PromoSystem';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+// 1. Đổi BrowserRouter sang HashRouter
+import { HashRouter, BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ScanRedirect from './pages/Scanredirect';
 import NotFound from './components/NotFound';
 import ServerError from './components/ServerError';
@@ -53,9 +54,13 @@ const SuperAdminRoute = ({ children }: { children: JSX.Element }) => {
   return children;
 };
 
+// 2. Tự động kiểm tra nếu đang chạy trong môi trường Electron thì dùng HashRouter
+const isElectron = typeof window !== 'undefined' && window.navigator.userAgent.toLowerCase().includes('electron');
+const Router = isElectron ? HashRouter : BrowserRouter;
+
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <PromoProvider>
         <Routes>
           <Route element={<PublicLayout />}>
@@ -108,7 +113,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PromoProvider>
-    </BrowserRouter>
+    </Router>
   );
 }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HiOutlineOfficeBuilding, HiOutlineUserGroup, HiOutlineExclamation, HiOutlineClock } from 'react-icons/hi';
+import Swal from 'sweetalert2';
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000' : 'https://api.aegism.online';
@@ -52,15 +53,13 @@ export default function SuperAdminDashboard() {
 
             if (sRes.status === 429 || tRes.status === 429) {
                 if (manual) {
-                    import('sweetalert2').then(({ default: Swal }) => {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'warning',
-                            title: 'Thao tác quá nhanh, vui lòng thử lại sau',
-                            showConfirmButton: false,
-                            timer: 3000
-                        });
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'Thao tác quá nhanh, vui lòng thử lại sau',
+                        showConfirmButton: false,
+                        timer: 3000
                     });
                 }
             } else {
