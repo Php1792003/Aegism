@@ -69,6 +69,32 @@ export class AuthController {
     return req.user;
   }
 
+  /**
+   * POST /api/auth/refresh
+   * Accepts { refreshToken } and returns new { accessToken, refreshToken, user }
+   */
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  async refresh(@Body() body: { refreshToken: string; deviceInfo?: string }) {
+    if (!body.refreshToken) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
+    return this.authService.refreshAccessToken(body.refreshToken, body.deviceInfo);
+  }
+
+  /**
+   * POST /api/auth/logout
+   * Revokes all refresh tokens for the authenticated user.
+   */
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async logout(@Request() req: RequestWithUser) {
+    await this.authService.revokeAllRefreshTokens(req.user.userId);
+    return { message: 'Logged out successfully' };
+  }
+
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @Post('forgot-password')

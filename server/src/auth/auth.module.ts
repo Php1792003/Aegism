@@ -13,7 +13,7 @@ import { AppMailerModule } from 'src/mailer/mailer.module';
     AppMailerModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '7d' },
+      signOptions: { expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any },
     }),
     AuditModule,
   ],

@@ -1,0 +1,14 @@
+# Build output
+dist/
+
+# Junction symlink to client/dist — don't track build artifacts
+client/
+
+# Dependencies
+node_modules/
+
+# Release builds
+release/
+
+# Logs
+*.log

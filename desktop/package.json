@@ -1,0 +1,48 @@
+{
+  "name": "aegism-desktop",
+  "version": "1.0.0",
+  "description": "AEGISM Desktop Application",
+  "main": "dist/main.js",
+  "scripts": {
+    "build:electron": "tsc",
+    "start": "npm run build:electron && electron .",
+    "build:win": "npm run build:electron && electron-builder --win"
+  },
+  "keywords": [],
+  "author": "Opsera",
+  "license": "ISC",
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "electron": "^29.1.4",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.4.2"
+  },
+  "build": {
+    "appId": "com.opsera.aegism.desktop",
+    "productName": "AEGISM",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      {
+        "from": "../client/dist",
+        "to": "client"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "../client/public/favicon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  }
+}

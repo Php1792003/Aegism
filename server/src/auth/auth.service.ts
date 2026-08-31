@@ -9,7 +9,9 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResult } from '../types/prisma.types';
@@ -18,12 +20,20 @@ import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
+  private readonly refreshTokenExpiryDays: number;
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
     private auditService: AuditService,
     private mailerService: MailerService,
-  ) { }
+  ) {
+    this.refreshTokenExpiryDays = parseInt(
+      this.configService.get('REFRESH_TOKEN_EXPIRES_DAYS') || '30',
+      10,
+    );
+  }
 
   async register(dto: RegisterDto): Promise<AuthResult> {
     // 1. Kiểm tra Email trùng
@@ -109,7 +119,7 @@ export class AuthService {
     } catch (e) { console.log('Audit log error ignored'); }
 
     // 5. Trả về kết quả đăng nhập luôn
-    return this.signToken(
+    return this.signTokens(
       result.user.id,
       result.tenant.id,
       result.user.isTenantAdmin,
@@ -147,23 +157,148 @@ export class AuthService {
     }
 
     // ... audit log ...
-    return this.signToken(user.id, user.tenantId, user.isTenantAdmin, user.isSuperAdmin, user.email, user.fullName, user.role);
+    return this.signTokens(user.id, user.tenantId, user.isTenantAdmin, user.isSuperAdmin, user.email, user.fullName, user.role);
   }
 
-  public async signToken(userId: string, tenantId: string, isTenantAdmin: boolean, isSuperAdmin: boolean, email?: string, fullName?: string, role?: any): Promise<{ accessToken: string; user?: any }> {
+  /**
+   * Issue both accessToken (short-lived JWT) and refreshToken (long-lived, stored in DB).
+   * Replaces the old signToken method.
+   */
+  public async signTokens(
+    userId: string,
+    tenantId: string,
+    isTenantAdmin: boolean,
+    isSuperAdmin: boolean,
+    email?: string,
+    fullName?: string,
+    role?: any,
+    deviceInfo?: string,
+  ): Promise<{ accessToken: string; refreshToken: string; user?: any }> {
     const payload = { sub: userId, tenantId, isSuperAdmin, roleId: role?.id };
     const accessToken = await this.jwtService.signAsync(payload);
+
+    // Generate refresh token
+    const refreshToken = await this.createRefreshToken(userId, deviceInfo);
 
     // Lấy lại info tenant để trả về frontend
     const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId }, select: { subscriptionPlan: true, name: true } });
 
     return {
       accessToken,
+      refreshToken,
       user: {
         id: userId, email, fullName, tenantId, isTenantAdmin, isSuperAdmin, tenant,
         role: role ? { id: role.id, name: role.name, permissions: role.permissions } : null,
       },
     };
+  }
+
+  /**
+   * Creates a refresh token, stores a SHA-256 hash in the database, returns the raw token.
+   */
+  private async createRefreshToken(userId: string, deviceInfo?: string): Promise<string> {
+    const rawToken = crypto.randomUUID() + '-' + crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + this.refreshTokenExpiryDays);
+
+    await this.prisma.refreshToken.create({
+      data: {
+        tokenHash,
+        userId,
+        expiresAt,
+        deviceInfo: deviceInfo || null,
+      },
+    });
+
+    return rawToken;
+  }
+
+  /**
+   * POST /api/auth/refresh
+   * Accepts a refresh token, validates it, revokes it (rotation), and issues new token pair.
+   */
+  async refreshAccessToken(refreshTokenRaw: string, deviceInfo?: string): Promise<AuthResult> {
+    const tokenHash = crypto.createHash('sha256').update(refreshTokenRaw).digest('hex');
+
+    const storedToken = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash },
+      include: {
+        user: {
+          include: { role: true },
+        },
+      },
+    });
+
+    if (!storedToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    if (storedToken.isRevoked) {
+      // Potential token reuse attack — revoke all tokens for this user
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: storedToken.userId },
+        data: { isRevoked: true },
+      });
+      throw new UnauthorizedException('Refresh token has been revoked. Please login again.');
+    }
+
+    if (storedToken.expiresAt < new Date()) {
+      // Clean up expired token
+      await this.prisma.refreshToken.delete({ where: { id: storedToken.id } });
+      throw new UnauthorizedException('Refresh token has expired. Please login again.');
+    }
+
+    const user = storedToken.user;
+
+    // Check user status
+    if (user.status === 'suspended' || user.status === 'inactive') {
+      throw new ForbiddenException('USER_SUSPENDED');
+    }
+
+    // Revoke the used token (rotation)
+    await this.prisma.refreshToken.update({
+      where: { id: storedToken.id },
+      data: { isRevoked: true },
+    });
+
+    // Issue new token pair
+    return this.signTokens(
+      user.id,
+      user.tenantId,
+      user.isTenantAdmin,
+      user.isSuperAdmin,
+      user.email,
+      user.fullName,
+      user.role,
+      deviceInfo,
+    );
+  }
+
+  /**
+   * Revoke all refresh tokens for a user (used on logout).
+   */
+  async revokeAllRefreshTokens(userId: string): Promise<void> {
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, isRevoked: false },
+      data: { isRevoked: true },
+    });
+  }
+
+  /**
+   * Clean up expired refresh tokens (called by cron or manually).
+   */
+  async cleanupExpiredTokens(): Promise<number> {
+    const result = await this.prisma.refreshToken.deleteMany({
+      where: {
+        OR: [
+          { expiresAt: { lt: new Date() } },
+          { isRevoked: true, createdAt: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+        ],
+      },
+    });
+    return result.count;
   }
 
   async forgotPassword(email: string): Promise<{ message: string }> {
@@ -227,6 +362,9 @@ export class AuthService {
         resetPasswordOtpExpiry: null,
       },
     });
+
+    // Revoke all refresh tokens when password changes
+    await this.revokeAllRefreshTokens(user.id);
 
     return { message: 'Đặt lại mật khẩu thành công.' };
   }

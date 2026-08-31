@@ -237,7 +237,7 @@ export class MasterAdminService {
       throw new NotFoundException('User not found');
     }
 
-    return this.authService.signToken(
+    return this.authService.signTokens(
       user.id,
       user.tenantId,
       user.isTenantAdmin,

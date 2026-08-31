@@ -9,11 +9,11 @@ export class ImapSyncService implements OnModuleInit, OnModuleDestroy {
   private client: ImapFlow;
   private isShuttingDown = false;
 
-  constructor(private readonly helpdeskService: HelpdeskService) {}
+  constructor(private readonly helpdeskService: HelpdeskService) { }
 
   async onModuleInit() {
     this.logger.log('Initializing IMAP Sync Service...');
-    
+
     if (!process.env.IMAP_HOST || !process.env.IMAP_USER || !process.env.IMAP_PASS) {
       this.logger.warn('IMAP credentials not found in environment variables. IMAP Sync disabled.');
       return;
@@ -31,7 +31,7 @@ export class ImapSyncService implements OnModuleInit, OnModuleDestroy {
     this.isShuttingDown = true;
     if (this.client) {
       this.logger.log('Closing IMAP connection...');
-      await this.client.logout().catch(() => {});
+      await this.client.logout().catch(() => { });
     }
   }
 
@@ -98,7 +98,7 @@ export class ImapSyncService implements OnModuleInit, OnModuleDestroy {
 
   private async fetchNewEmails(prevCount: number, currentCount: number) {
     if (currentCount <= prevCount) return;
-    
+
     const seqRange = `${prevCount + 1}:*`;
     this.logger.log(`Fetching new emails in sequence range: ${seqRange}`);
 
@@ -110,14 +110,14 @@ export class ImapSyncService implements OnModuleInit, OnModuleDestroy {
 
         try {
           const parsed = await simpleParser(message.source);
-          
+
           const from = parsed.from?.text || 'unknown';
-          const to = parsed.to?.text || process.env.IMAP_USER || 'unknown';
+          const to = (parsed.to as any)?.text || (Array.isArray(parsed.to) ? parsed.to[0]?.value[0]?.address : null) || process.env.IMAP_USER || 'unknown';
           const subject = parsed.subject || 'Không có tiêu đề';
           const html = parsed.html || null;
           const text = parsed.text || null;
           const messageId = parsed.messageId || null;
-          
+
           await this.helpdeskService.handleInboundEmail({
             from,
             to,
@@ -145,7 +145,7 @@ export class ImapSyncService implements OnModuleInit, OnModuleDestroy {
     setTimeout(async () => {
       try {
         if (this.client) {
-          await this.client.logout().catch(() => {});
+          await this.client.logout().catch(() => { });
         }
         await this.connectAndListen();
       } catch (err) {

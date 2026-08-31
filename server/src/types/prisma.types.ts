@@ -132,6 +132,7 @@ export interface RegisterResult {
 
 export interface AuthResult {
   accessToken: string;
+  refreshToken?: string;
 }
 
 export interface DeleteResult {

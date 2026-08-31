@@ -32,6 +32,7 @@ import { PromotionModule } from './promotion/promotion.module';
 import { ApiIntegrationModule } from './api-integration/api-integration.module';
 import { BrandingModule } from './branding/branding.module';
 import { HelpdeskModule } from './helpdesk/helpdesk.module';
+import { MobileModule } from './mobile/mobile.module';
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { AuditInterceptor } from './security/audit.interceptor';
 
@@ -82,6 +83,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
     ApiIntegrationModule,
     BrandingModule,
     HelpdeskModule,
+    MobileModule,
   ],
   controllers: [AppController],
   providers: [

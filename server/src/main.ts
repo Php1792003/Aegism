@@ -19,7 +19,13 @@ async function bootstrap() {
     origin: [
       'https://aegism.online',
       'https://www.aegism.online',
-      'http://localhost:3001'
+      'http://localhost:3001',
+      // Mobile development origins
+      'http://localhost:8081',
+      'http://localhost:19000',
+      'http://localhost:19006',
+      // Desktop development origin
+      'http://localhost:5173',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
