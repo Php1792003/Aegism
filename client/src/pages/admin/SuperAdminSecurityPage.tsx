@@ -108,7 +108,7 @@ function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label
     );
 }
 
-export default function SuperAdminSecurity() {
+export default function SuperAdminSecurityPage() {
     const [activeTab, setActiveTab] = useState<'audit' | 'blacklist'>('audit');
     const [logs, setLogs] = useState<any[]>([]);
     const [ips, setIps] = useState<any[]>([]);

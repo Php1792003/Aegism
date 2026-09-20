@@ -217,7 +217,7 @@ const TenantHistoryModal = ({ tenantId, tenantName, onClose }: { tenantId: strin
 };
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
-const SuperAdminPlans = () => {
+const SuperAdminPlansPage = () => {
     const [plans, setPlans] = useState<any[]>([]);
     const [tenants, setTenants] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -480,4 +480,4 @@ const SuperAdminPlans = () => {
     );
 };
 
-export default SuperAdminPlans;
+export default SuperAdminPlansPage;

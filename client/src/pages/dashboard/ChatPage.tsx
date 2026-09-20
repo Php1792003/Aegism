@@ -47,7 +47,7 @@ interface Conversation {
     type?: string; members?: any[];
 }
 
-const Chat: React.FC = () => {
+const ChatPage: React.FC = () => {
     const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'chat' | 'members'>('chat');
     const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
@@ -1356,4 +1356,4 @@ const MessageOptions = ({ onEdit, onDelete }: { onEdit: () => void, onDelete: ()
     );
 };
 
-export default Chat;
+export default ChatPage;

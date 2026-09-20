@@ -500,7 +500,7 @@ const DetailDrawer = ({ customer, onClose, onEdit, onRenew }: { customer: Custom
 };
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
-const SuperAdminCustomers = () => {
+const SuperAdminCustomersPage = () => {
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [planConfigs, setPlanConfigs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -789,4 +789,4 @@ const SuperAdminCustomers = () => {
     );
 };
 
-export default SuperAdminCustomers;
+export default SuperAdminCustomersPage;

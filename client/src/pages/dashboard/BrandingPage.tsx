@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 const API_URL = 'https://api.aegism.online';
 
-const Branding: React.FC = () => {
+const BrandingPage: React.FC = () => {
     const [appName, setAppName] = useState('OPSERA');
     const [primaryColor, setPrimaryColor] = useState('#2563EB');
     const [logo, setLogo] = useState<string | null>(null);
@@ -322,4 +322,4 @@ const Branding: React.FC = () => {
     );
 };
 
-export default Branding;
+export default BrandingPage;

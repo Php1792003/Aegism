@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ServerError: React.FC = () => {
+const ServerErrorPage: React.FC = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken');
 
@@ -142,4 +142,4 @@ const ServerError: React.FC = () => {
     );
 };
 
-export default ServerError;
+export default ServerErrorPage;

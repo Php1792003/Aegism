@@ -219,7 +219,7 @@ const VoucherManagerModal = ({ onClose }: { onClose: () => void }) => {
     );
 };
 
-const SuperAdminRevenue = () => {
+const SuperAdminRevenuePage = () => {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [tenants, setTenants] = useState<any[]>([]);
@@ -564,4 +564,4 @@ const SuperAdminRevenue = () => {
     );
 };
 
-export default SuperAdminRevenue;
+export default SuperAdminRevenuePage;

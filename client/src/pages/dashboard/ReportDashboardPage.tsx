@@ -30,7 +30,7 @@ interface Project {
     name: string;
 }
 
-const ReportDashboard: React.FC = () => {
+const ReportDashboardPage: React.FC = () => {
     // --- State Management (Tương đương x-data) ---
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:3000' : 'https://api.aegism.online';
@@ -486,4 +486,4 @@ const ReportDashboard: React.FC = () => {
     );
 };
 
-export default ReportDashboard;
+export default ReportDashboardPage;

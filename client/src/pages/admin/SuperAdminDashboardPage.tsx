@@ -34,7 +34,7 @@ const planBadge: any = {
     starter: 'bg-blue-900 text-blue-300 border border-blue-700',
 };
 
-export default function SuperAdminDashboard() {
+export default function SuperAdminDashboardPage() {
     const [stats, setStats] = useState<any>(null);
     const [tenants, setTenants] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);

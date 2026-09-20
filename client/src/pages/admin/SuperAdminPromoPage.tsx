@@ -198,7 +198,7 @@ const CampaignModal = ({ campaign, onClose, onSave }: {
 };
 
 
-const SuperAdminPromo = () => {
+const SuperAdminPromoPage = () => {
     const [campaigns, setCampaigns] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalData, setModalData] = useState<{ open: boolean; campaign: any | null }>({ open: false, campaign: null });
@@ -455,4 +455,4 @@ const SuperAdminPromo = () => {
     );
 };
 
-export default SuperAdminPromo;
+export default SuperAdminPromoPage;

@@ -110,7 +110,7 @@ const PermissionGroup = ({ group, selectedPerms, onChange }: {
 };
 
 // ─── Staff component ──────────────────────────────────────────────────
-const Staff = () => {
+const StaffPage = () => {
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:3000' : 'https://api.aegism.online';
     const [activeTab, setActiveTab] = useState('staff');
@@ -911,4 +911,4 @@ const Staff = () => {
     );
 };
 
-export default Staff;
+export default StaffPage;

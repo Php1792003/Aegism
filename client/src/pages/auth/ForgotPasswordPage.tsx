@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
-const ForgotPassword = () => {
+const ForgotPasswordPage = () => {
     const [step, setStep] = useState<1 | 2>(1);
     
     // Step 1 states
@@ -248,4 +248,4 @@ const ForgotPassword = () => {
     );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordPage;

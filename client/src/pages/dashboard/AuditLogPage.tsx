@@ -27,7 +27,7 @@ interface Log {
     createdAt: string;
 }
 
-const AuditLog: React.FC = () => {
+const AuditLogPage: React.FC = () => {
     // --- State Management ---
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [currentPlan, setCurrentPlan] = useState('starter');
@@ -384,4 +384,4 @@ const AuditLog: React.FC = () => {
     );
 };
 
-export default AuditLog;
+export default AuditLogPage;

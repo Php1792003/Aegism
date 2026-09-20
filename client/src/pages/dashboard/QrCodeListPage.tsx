@@ -106,7 +106,7 @@ const calculate3DDistance = (
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const QrCodes = () => {
+const QrCodeListPage = () => {
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:3000' : 'https://api.aegism.online';
 
@@ -1504,4 +1504,4 @@ const QrCodes = () => {
     );
 };
 
-export default QrCodes;
+export default QrCodeListPage;

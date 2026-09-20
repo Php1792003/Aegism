@@ -19,7 +19,7 @@ interface Webhook {
     createdAt: string;
 }
 
-const ApiIntegration: React.FC = () => {
+const ApiIntegrationPage: React.FC = () => {
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:3000' : 'https://api.aegism.online';
 
@@ -504,4 +504,4 @@ const ApiIntegration: React.FC = () => {
     );
 };
 
-export default ApiIntegration;
+export default ApiIntegrationPage;

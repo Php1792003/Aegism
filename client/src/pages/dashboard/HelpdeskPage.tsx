@@ -70,7 +70,7 @@ const priorityConfig: Record<TicketPriority, { label: string; color: string; bg:
     URGENT: { label: 'Khẩn cấp', color: 'text-red-400', bg: 'bg-red-900/30' },
 };
 
-const Helpdesk = () => {
+const HelpdeskPage = () => {
     const [stats, setStats] = useState<Stats>({ total: 0, open: 0, inProgress: 0, resolved: 0, closed: 0, todayCount: 0 });
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [selectedTicket, setSelectedTicket] = useState<TicketDetail | null>(null);
@@ -413,4 +413,4 @@ const Helpdesk = () => {
     );
 };
 
-export default Helpdesk;
+export default HelpdeskPage;

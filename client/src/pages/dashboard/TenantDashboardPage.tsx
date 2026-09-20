@@ -18,7 +18,7 @@ const PLAN_CONFIG: any = {
     ENTERPRISE: { label: 'ENTERPRISE', color: 'indigo', price: 'Liên hệ' },
 };
 
-const Dashboard = () => {
+const TenantDashboardPage = () => {
     const [user] = useState<any>(() => {
         const s = localStorage.getItem('user');
         return s ? JSON.parse(s) : { fullName: 'Người dùng', tenant: { name: '...' } };
@@ -341,4 +341,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default TenantDashboardPage;

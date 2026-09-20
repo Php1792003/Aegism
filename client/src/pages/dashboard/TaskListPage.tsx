@@ -6,7 +6,7 @@ import {
     FaTriangleExclamation, FaBell, FaCircleNotch, FaChevronUp
 } from 'react-icons/fa6';
 import { FaRegClock } from 'react-icons/fa';
-const Tasks = () => {
+const TaskListPage = () => {
     // --- Config ---
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:3000' : 'https://api.aegism.online';
@@ -796,4 +796,4 @@ const Tasks = () => {
         </div>
     );
 };
-export default Tasks;
+export default TaskListPage;

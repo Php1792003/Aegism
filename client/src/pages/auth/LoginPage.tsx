@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { HiOutlineExclamationCircle, HiOutlineX } from 'react-icons/hi';
 
-const Login = () => {
+const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPass, setShowPass] = useState(false);
@@ -235,4 +235,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginPage;

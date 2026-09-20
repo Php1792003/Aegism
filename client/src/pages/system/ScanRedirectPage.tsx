@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 // Trang này xử lý khi nhân viên quét QR bằng camera điện thoại (ngoài app)
 // URL: https://aegism.online/scan?id=QR_POINT_ID
 
-const ScanRedirect = () => {
+const ScanRedirectPage = () => {
     const [searchParams] = useSearchParams();
     const [status, setStatus] = useState<'checking' | 'login' | 'checkin' | 'success' | 'error'>('checking');
     const [message, setMessage] = useState('');
@@ -122,4 +122,4 @@ const ScanRedirect = () => {
     );
 };
 
-export default ScanRedirect;
+export default ScanRedirectPage;

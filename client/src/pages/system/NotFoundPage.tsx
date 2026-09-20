@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const NotFound: React.FC = () => {
+const NotFoundPage: React.FC = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken');
 
@@ -120,4 +120,4 @@ const NotFound: React.FC = () => {
     );
 };
 
-export default NotFound;
+export default NotFoundPage;

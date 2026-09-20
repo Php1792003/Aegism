@@ -338,7 +338,7 @@ const AddModal = ({ tenants, onClose, onSave }: { tenants: any[]; onClose: () =>
 };
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-const SuperAdminUsers = () => {
+const SuperAdminUsersPage = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [tenants, setTenants] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -651,4 +651,4 @@ const SuperAdminUsers = () => {
     );
 };
 
-export default SuperAdminUsers;
+export default SuperAdminUsersPage;
