@@ -112,7 +112,7 @@ const EditPlanModal = ({ plan, isNew = false, onClose, onSave }: { plan: any; is
                         <div className="col-span-1">
                             <label className="text-xs text-gray-400 mb-1.5 block">Giảm giá năm (%)</label>
                             <input type="number" min={0} max={100} value={discountPercent} onChange={e => updateDiscountPercent(Number(e.target.value))}
-                                className="w-full bg-gray-800 border border-gray-700 text-white text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500 text-emerald-400 font-bold" />
+                                className="w-full bg-gray-800 border border-gray-700 text-white text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-purple-500 font-bold" />
                         </div>
                         <div className="col-span-1">
                             <label className="text-xs text-gray-400 mb-1.5 block">Giá năm/tháng (VND)</label>
