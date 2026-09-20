@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Swal from 'sweetalert2';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import { getAvatar } from '../utils/helpers';
-import { useTenantLimits } from '../utils/useTenantLimits';
+import { getAvatar } from '@/utils/formatters';
+import { useTenantLimits } from '@/hooks/useTenantLimits';
 
 // Import các icon tương ứng từ FontAwesome 6 trong React Icons
 import {

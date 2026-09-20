@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Swal from 'sweetalert2';
-import { getAvatar } from '../utils/helpers';
+import { getAvatar } from '@/utils/formatters';
 import {
     HiOutlineSearch, HiOutlinePencil, HiOutlineRefresh,
     HiOutlineLockClosed, HiOutlineLockOpen, HiOutlineUsers,

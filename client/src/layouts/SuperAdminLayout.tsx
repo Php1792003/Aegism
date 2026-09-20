@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { getAvatar } from '../utils/helpers';
+import { getAvatar } from '@/utils/formatters';
 import {
     HiOutlineChartBar, HiOutlineOfficeBuilding, HiOutlineUsers,
     HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX,

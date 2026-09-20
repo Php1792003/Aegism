@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Html5Qrcode } from 'html5-qrcode';
 import { QRCodeCanvas } from 'qrcode.react';
-import { useTenantLimits } from '../utils/useTenantLimits';
+import { useTenantLimits } from '@/hooks/useTenantLimits';
 import {
     FaPlus, FaTrashCan, FaCamera, FaSatelliteDish, FaTriangleExclamation,
     FaRotate, FaLocationDot, FaCheck, FaLocationCrosshairs, FaCircleNotch,

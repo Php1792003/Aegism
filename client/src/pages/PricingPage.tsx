@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { HiCheck, HiXMark, HiChevronDown, HiCheckCircle } from 'react-icons/hi2';
-import SEO from '../components/SEO';
-import { BreadcrumbSchema, FAQSchema } from '../components/StructuredData';
+import SEO from '@/components/seo/SEO';
+import { BreadcrumbSchema, FAQSchema } from '@/components/seo/StructuredData';
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000' : 'https://api.aegism.online';

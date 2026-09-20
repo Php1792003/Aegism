@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Swal from 'sweetalert2';
-import { getAvatar } from '../utils/helpers';
-import { useTenantLimits } from '../utils/useTenantLimits';
+import { getAvatar } from '@/utils/formatters';
+import { useTenantLimits } from '@/hooks/useTenantLimits';
 import {
     FaUsers, FaUserPlus, FaMagnifyingGlass, FaShieldHalved, FaPlus,
     FaPen, FaTrash, FaPenToSquare, FaEllipsisVertical, FaCrown,

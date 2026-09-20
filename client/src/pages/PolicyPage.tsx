@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiShieldCheck, HiLockClosed, HiEye, HiChevronRight } from 'react-icons/hi2';
-import SEO from '../components/SEO';
-import { BreadcrumbSchema } from '../components/StructuredData';
+import SEO from '@/components/seo/SEO';
+import { BreadcrumbSchema } from '@/components/seo/StructuredData';
 
 const PolicyPage = () => {
     return (

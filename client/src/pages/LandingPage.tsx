@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import SEO from '../components/SEO';
-import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema, FAQSchema, BreadcrumbSchema } from '../components/StructuredData';
+import SEO from '@/components/seo/SEO';
+import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema, FAQSchema, BreadcrumbSchema } from '@/components/seo/StructuredData';
 import {
     HiBars3,
     HiXMark,

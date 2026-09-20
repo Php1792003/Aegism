@@ -1,6 +1,6 @@
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import SuperAdminLayout from './layouts/SuperAdminLayout';
-import { PromoProvider } from './components/PromoSystem';
+import { PromoProvider } from '@/components/promo/PromoSystem';
 // 1. Đổi BrowserRouter sang HashRouter
 import { HashRouter, BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ScanRedirect from './pages/Scanredirect';

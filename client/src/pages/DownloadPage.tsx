@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Download as DownloadIcon, Smartphone as PhoneIcon, Monitor as MonitorIcon, CheckCircle2 as CheckIcon, Package as PackageIcon } from 'lucide-react';
 import axios from 'axios';
-import SEO from '../components/SEO';
-import { BreadcrumbSchema, SoftwareApplicationSchema } from '../components/StructuredData';
+import SEO from '@/components/seo/SEO';
+import { BreadcrumbSchema, SoftwareApplicationSchema } from '@/components/seo/StructuredData';
 
 interface AppVersion {
   version: string;

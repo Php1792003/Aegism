@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HiBars3, HiXMark } from 'react-icons/hi2';
 import Swal from 'sweetalert2';
-import { getAvatar } from '../utils/helpers';
+import { getAvatar } from '@/utils/formatters';
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000' : 'https://api.aegism.online';
