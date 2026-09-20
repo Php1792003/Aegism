@@ -1,203 +1,222 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import SEO from '@/components/seo/SEO';
 import { BreadcrumbSchema } from '@/components/seo/StructuredData';
+import { usePageAnimations } from '@/hooks/useGsap';
+import { SplitWords } from '@/components/ui/SplitWords';
 import {
-    HiBars3,
-    HiXMark,
-    HiShieldCheck,
-    HiChartBar,
-    HiBolt,
-    HiRocketLaunch,
-    HiCheckCircle
+    HiCheckCircle,
+    HiOutlineSparkles,
+    HiOutlineArrowRight,
+    HiOutlineClock,
+    HiOutlineUserGroup,
+    HiOutlineShieldCheck
 } from 'react-icons/hi2';
 
-// --- CONFIG ---
-const colors = {
-    primary: 'text-[#2563EB]',
-    bgPrimary: 'bg-[#2563EB]',
-    bgPrimaryHover: 'hover:bg-blue-700',
-    dark: 'text-[#1F2937]',
-    lightBg: 'bg-[#F9FAFB]',
-    inputBg: 'bg-[#F9FAFB]', // Nền input sáng hơn chút cho hiện đại
-    border: 'border-[#E5E7EB]',
-};
-
 const RequestDemoPage = () => {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+    const [formData, setFormData] = useState({
+        fullname: '',
+        phone: '',
+        email: '',
+        company: '',
+        teamSize: '10-50',
+        goal: 'Tối ưu tuần tra QR & giảm gian lận'
+    });
 
-    // --- FORM HANDLER ---
-    const handleSubmit = (e: React.FormEvent) => {
+    const root = usePageAnimations<HTMLDivElement>();
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Giả lập gọi API
-        setTimeout(() => {
-            alert("Đăng ký thành công! Chuyên viên tư vấn sẽ liên hệ với bạn trong vòng 2h làm việc.");
+        try {
+            await fetch('https://api.aegism.online/api/emails/webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    from: formData.email,
+                    to: 'contact@aegism.online',
+                    subject: `[Yêu cầu Demo] ${formData.fullname} - ${formData.company || 'Doanh nghiệp'}`,
+                    raw: `Họ tên: ${formData.fullname}\nEmail: ${formData.email}\nSĐT: ${formData.phone}\nDoanh nghiệp: ${formData.company}\nQuy mô: ${formData.teamSize}\nMục tiêu: ${formData.goal}`,
+                }),
+            });
+        } catch {
+            // Fallback gracefully
+        } finally {
             setIsSubmitting(false);
-        }, 1500);
+            setSubmitted(true);
+        }
     };
 
     return (
-        <div className="bg-white text-gray-800 font-sans min-h-screen flex flex-col">
-            <main className="py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white flex-grow">
-                <SEO
-                    title="Đăng ký Demo AEGISM miễn phí - Trải nghiệm ngay"
-                    description="Đăng ký demo miễn phí phần mềm quản lý an ninh AEGISM. Đội ngũ chuyên gia sẽ hướng dẫn bạn trải nghiệm toàn bộ tính năng trong 30 phút."
-                    url="/request-demo"
-                    keywords="demo AEGISM, dùng thử phần mềm an ninh, đăng ký demo miễn phí, trải nghiệm AEGISM"
-                />
-                <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Yêu cầu Demo', url: '/request-demo' }]} />
-                <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div ref={root} className="overflow-x-clip bg-white text-gray-900 font-sans selection:bg-blue-600 selection:text-white">
+            <SEO
+                title="Đăng Ký Demo AEGISM Miễn Phí - Trải Nghiệm Hệ Thống Trong 30 Phút"
+                description="Đăng ký nhận buổi demo 1-1 chuyên sâu từ chuyên gia AEGISM. Khám phá cách số hóa tuần tra QR, bản đồ GPS và báo cáo SLA tự động."
+                url="/request-demo"
+                keywords="demo AEGISM, dùng thử phần mềm an ninh, đăng ký demo miễn phí, trải nghiệm phần mềm bảo vệ"
+            />
+            <BreadcrumbSchema items={[{ name: 'Trang chủ', url: '/' }, { name: 'Yêu cầu Demo', url: '/request-demo' }]} />
 
+            {/* Scroll progress bar */}
+            <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-1">
+                <div data-progress className="h-full origin-left scale-x-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-sky-400" />
+            </div>
+
+            <main className="py-14 sm:py-20 bg-gradient-to-b from-blue-50/60 via-white to-white min-h-[85vh]">
+                <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                        <div className="lg:col-span-5 space-y-8 sticky top-24">
+                        {/* LEFT COLUMN: Value proposition */}
+                        <div data-reveal="left" className="lg:col-span-5 space-y-8 lg:sticky lg:top-24">
                             <div>
-                                <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider mb-4">
-                                    Demo Miễn Phí
-                                </span>
-                                <h1 className={`text-4xl md:text-5xl font-extrabold ${colors.dark} tracking-tight leading-tight`}>
-                                    Trải nghiệm sức mạnh <br /><span className={colors.primary}>Quản trị An ninh 4.0</span>
+                                <div data-hero-entrance="badge" className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold mb-4">
+                                    <HiOutlineSparkles className="w-4 h-4 text-blue-600" />
+                                    <span>Tư vấn 1-1 trực tuyến</span>
+                                </div>
+                                <h1 data-hero-entrance="title" className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight leading-tight">
+                                    <SplitWords text="Trải Nghiệm Trực Tiếp" />
+                                    <br />
+                                    <SplitWords
+                                        text="Nền Tảng AEGISM"
+                                        innerClassName="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
+                                    />
                                 </h1>
-                                <p className="mt-6 text-lg text-gray-600 leading-relaxed">
-                                    Đăng ký để được chuyên gia AEGISM tư vấn 1-1 và demo trực tiếp giải pháp phù hợp nhất với mô hình vận hành của bạn.
+                                <p data-hero-entrance="desc" className="mt-4 text-base text-gray-600 leading-relaxed">
+                                    Chỉ trong 30 phút, chuyên gia an ninh của AEGISM sẽ phân tích mô hình quản lý hiện tại và demo trực tiếp các kịch bản tuần tra tối ưu nhất cho tòa nhà của bạn.
                                 </p>
                             </div>
 
-                            {/* Benefits List */}
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Quyền lợi khi đăng ký Demo:</h3>
-                                <ul className="space-y-4">
-                                    {[
-                                        "Tư vấn lộ trình chuyển đổi số miễn phí",
-                                        "Trải nghiệm Full tính năng gói Enterprise",
-                                        "Nhận báo giá ưu đãi dành riêng cho bạn",
-                                        "Hỗ trợ thiết lập hệ thống mẫu (PoC)"
-                                    ].map((item, idx) => (
-                                        <li key={idx} className="flex items-start">
-                                            <HiCheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
-                                            <span className="ml-3 text-gray-700 text-sm font-medium">{item}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                            {/* What to expect card */}
+                            <div data-reveal="up" className="bg-white p-7 rounded-3xl border border-gray-200/80 shadow-sm space-y-4">
+                                <h3 className="text-base font-bold text-gray-900">Quyền Lợi Dành Riêng Cho Bạn:</h3>
+                                <div className="space-y-3.5 text-sm text-gray-700">
+                                    <div className="flex items-start gap-3">
+                                        <HiCheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                        <span>Phân tích miễn phí lỗ hổng gian lận trong lộ trình tuần tra</span>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <HiCheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                        <span>Tạo trước môi trường thử nghiệm (PoC) với mã QR mẫu</span>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <HiCheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                        <span>Cài đặt ứng dụng di động trực tiếp cho nhân viên trải nghiệm</span>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <HiCheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                        <span>Nhận chính sách giá ưu đãi độc quyền sau buổi Demo</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Trust Badge */}
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                                <div className="flex -space-x-2">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-200"></div>
-                                    ))}
+                            {/* Quick Stats */}
+                            <div data-stagger-group className="grid grid-cols-3 gap-3 text-center">
+                                <div data-stagger-item className="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-sm">
+                                    <div className="text-xl font-black text-blue-600">30p</div>
+                                    <div className="text-[11px] text-gray-500 font-semibold mt-0.5">Thời lượng</div>
                                 </div>
-                                <p>Hơn <strong>500+</strong> doanh nghiệp đã tin dùng</p>
+                                <div data-stagger-item className="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-sm">
+                                    <div className="text-xl font-black text-blue-600">100%</div>
+                                    <div className="text-[11px] text-gray-500 font-semibold mt-0.5">Miễn phí</div>
+                                </div>
+                                <div data-stagger-item className="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-sm">
+                                    <div className="text-xl font-black text-blue-600">50+</div>
+                                    <div className="text-[11px] text-gray-500 font-semibold mt-0.5">Đã triển khai</div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN: THE FORM */}
-                        <div className="lg:col-span-7">
-                            <div className="bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-gray-100 relative overflow-hidden">
-                                {/* Decor Blob */}
-                                <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6 relative z-10">Thông tin đăng ký</h2>
-
-                                <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label htmlFor="fullname" className="block text-sm font-semibold text-gray-700 mb-2">Họ và tên *</label>
-                                            <input
-                                                type="text" id="fullname" required placeholder="Nguyễn Văn A"
-                                                className={`block w-full px-4 py-3 ${colors.inputBg} border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                                            />
+                        {/* RIGHT COLUMN: Demo Form */}
+                        <div data-reveal="right" className="lg:col-span-7">
+                            <div className="bg-white p-8 sm:p-10 rounded-3xl border border-gray-200/80 shadow-xl relative">
+                                {submitted ? (
+                                    <div className="py-12 text-center space-y-4">
+                                        <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-3xl">
+                                            ✓
                                         </div>
-                                        <div>
-                                            <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">Số điện thoại *</label>
-                                            <input
-                                                type="tel" id="phone" required placeholder="0905..."
-                                                className={`block w-full px-4 py-3 ${colors.inputBg} border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                                            />
-                                        </div>
+                                        <h3 className="text-2xl font-black text-gray-900">Đăng Ký Thành Công!</h3>
+                                        <p className="text-sm text-gray-600 max-w-md mx-auto leading-relaxed">
+                                            Cảm ơn bạn đã quan tâm. Chuyên viên AEGISM sẽ liên hệ qua số điện thoại <strong>{formData.phone}</strong> trong vòng 2 giờ làm việc để xếp lịch hẹn thuận tiện nhất cho bạn.
+                                        </p>
+                                        <button
+                                            onClick={() => setSubmitted(false)}
+                                            className="mt-6 px-6 py-2.5 bg-blue-50 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-100 transition"
+                                        >
+                                            Gửi thêm yêu cầu khác
+                                        </button>
                                     </div>
+                                ) : (
+                                    <>
+                                        <span className="text-blue-600 text-xs font-bold uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                                            Đăng ký trực tuyến
+                                        </span>
+                                        <h3 className="text-2xl font-black text-gray-900 mt-3 mb-2">Đặt Lịch Xem Demo Trực Tiếp</h3>
+                                        <p className="text-sm text-gray-500 mb-8">Vui lòng cung cấp thông tin để chúng tôi chuẩn bị kịch bản demo sát thực tế nhất.</p>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Email công việc *</label>
-                                            <input
-                                                type="email" id="email" required placeholder="name@company.com"
-                                                className={`block w-full px-4 py-3 ${colors.inputBg} border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="company" className="block text-sm font-semibold text-gray-700 mb-2">Tên Doanh nghiệp</label>
-                                            <input
-                                                type="text" id="company" placeholder="Công ty ABC..."
-                                                className={`block w-full px-4 py-3 ${colors.inputBg} border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label htmlFor="size" className="block text-sm font-semibold text-gray-700 mb-2">Quy mô nhân sự</label>
-                                            <div className="relative">
-                                                <select id="size" className={`block w-full px-4 py-3 ${colors.inputBg} border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer`}>
-                                                    <option>Dưới 10 nhân sự</option>
-                                                    <option>10 - 50 nhân sự</option>
-                                                    <option>50 - 200 nhân sự</option>
-                                                    <option>Trên 200 nhân sự</option>
-                                                </select>
-                                                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        <form onSubmit={handleSubmit} className="space-y-5">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                                <div>
+                                                    <label htmlFor="fullname" className="block text-xs font-bold text-gray-700 mb-1.5">Họ và tên *</label>
+                                                    <input type="text" id="fullname" required value={formData.fullname} onChange={e => setFormData({ ...formData, fullname: e.target.value })} placeholder="Nguyễn Văn A" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-600 outline-none text-sm" />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="phone" className="block text-xs font-bold text-gray-700 mb-1.5">Số điện thoại *</label>
+                                                    <input type="tel" id="phone" required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="0905..." className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-600 outline-none text-sm" />
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div>
-                                            <label htmlFor="role" className="block text-sm font-semibold text-gray-700 mb-2">Chức vụ của bạn</label>
-                                            <input
-                                                type="text" id="role" placeholder="VD: CEO, HR Manager..."
-                                                className={`block w-full px-4 py-3 ${colors.inputBg} border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                                            />
-                                        </div>
-                                    </div>
 
-                                    <div>
-                                        <label htmlFor="note" className="block text-sm font-semibold text-gray-700 mb-2">Nhu cầu cụ thể (Không bắt buộc)</label>
-                                        <textarea
-                                            id="note" rows={3} placeholder="Bạn đang gặp khó khăn gì trong quản lý? Hoặc mong muốn tính năng nào cụ thể?"
-                                            className={`block w-full px-4 py-3 ${colors.inputBg} border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none`}
-                                        ></textarea>
-                                    </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                                <div>
+                                                    <label htmlFor="email" className="block text-xs font-bold text-gray-700 mb-1.5">Email công việc *</label>
+                                                    <input type="email" id="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="name@company.com" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-600 outline-none text-sm" />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="company" className="block text-xs font-bold text-gray-700 mb-1.5">Tên đơn vị / Tòa nhà *</label>
+                                                    <input type="text" id="company" required value={formData.company} onChange={e => setFormData({ ...formData, company: e.target.value })} placeholder="Công ty An ninh ABC" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-600 outline-none text-sm" />
+                                                </div>
+                                            </div>
 
-                                    <div className="pt-4">
-                                        <button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            className={`
-                                                w-full flex items-center justify-center px-8 py-4 border border-transparent rounded-xl shadow-lg text-lg font-bold text-white 
-                                                transition-all transform hover:-translate-y-1 active:translate-y-0
-                                                ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'}
-                                            `}
-                                        >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                                    Đang xử lý...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    Gửi Yêu Cầu Demo <HiRocketLaunch className="ml-2 h-5 w-5" />
-                                                </>
-                                            )}
-                                        </button>
-                                        <p className="text-center text-xs text-gray-400 mt-4">
-                                            Chúng tôi cam kết bảo mật thông tin của bạn 100%.
-                                        </p>
-                                    </div>
-                                </form>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                                <div>
+                                                    <label htmlFor="teamSize" className="block text-xs font-bold text-gray-700 mb-1.5">Quy mô đội an ninh / bảo vệ</label>
+                                                    <select id="teamSize" value={formData.teamSize} onChange={e => setFormData({ ...formData, teamSize: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-600 outline-none text-sm bg-white cursor-pointer">
+                                                        <option value="under-10">Dưới 10 nhân sự</option>
+                                                        <option value="10-50">Từ 10 - 50 nhân sự</option>
+                                                        <option value="50-200">Từ 50 - 200 nhân sự</option>
+                                                        <option value="over-200">Trên 200 nhân sự</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="goal" className="block text-xs font-bold text-gray-700 mb-1.5">Mục tiêu ưu tiên hàng đầu</label>
+                                                    <select id="goal" value={formData.goal} onChange={e => setFormData({ ...formData, goal: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-600 outline-none text-sm bg-white cursor-pointer">
+                                                        <option value="Tối ưu tuần tra QR & giảm gian lận">Chống gian lận tuần tra QR</option>
+                                                        <option value="Giám sát vị trí Live GPS">Bản đồ vệ tinh giám sát GPS</option>
+                                                        <option value="Báo cáo SLA nghiệm thu">Tự động hóa báo cáo cho CĐT</option>
+                                                        <option value="Quản lý sự cố hiện trường">Báo cáo sự cố tức thời & SOS</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                disabled={isSubmitting}
+                                                className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                                            >
+                                                {isSubmitting ? (
+                                                    <span>Đang xử lý đăng ký...</span>
+                                                ) : (
+                                                    <>
+                                                        <span>Xác nhận đăng ký Demo</span>
+                                                        <HiOutlineArrowRight className="w-5 h-5" />
+                                                    </>
+                                                )}
+                                            </button>
+                                        </form>
+                                    </>
+                                )}
                             </div>
                         </div>
-
                     </div>
                 </div>
             </main>

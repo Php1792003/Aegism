@@ -20,9 +20,9 @@ const Footer = () => {
                             Giải pháp toàn diện cho vận hành và giám sát an ninh bằng công nghệ tiên tiến.
                         </p>
                         <div className="flex items-center gap-x-4">
-                            <Link to="/terms" className="text-sm text-gray-400 hover:text-[#4F46E5] transition-colors font-medium">Điều khoản</Link>
+                            <Link to="/terms" className="text-sm text-gray-400 hover:text-[#2563EB] transition-colors font-medium">Điều khoản</Link>
                             <span className="text-gray-300">|</span>
-                            <Link to="/policy" className="text-sm text-gray-400 hover:text-[#4F46E5] transition-colors font-medium">Bảo mật</Link>
+                            <Link to="/policy" className="text-sm text-gray-400 hover:text-[#2563EB] transition-colors font-medium">Bảo mật</Link>
                         </div>
                     </div>
                     
@@ -31,27 +31,27 @@ const Footer = () => {
                         <div>
                             <h4 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Nền tảng</h4>
                             <ul className="mt-6 space-y-4">
-                                <li><Link to="/features" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Vận hành</Link></li>
-                                <li><Link to="/features" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Giám sát</Link></li>
-                                <li><Link to="/features" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">An ninh</Link></li>
-                                <li><Link to="/pricing" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Bảng giá</Link></li>
+                                <li><Link to="/features" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Vận hành</Link></li>
+                                <li><Link to="/features" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Giám sát</Link></li>
+                                <li><Link to="/features" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">An ninh</Link></li>
+                                <li><Link to="/pricing" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Bảng giá</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Công ty</h4>
                             <ul className="mt-6 space-y-4">
-                                <li><Link to="/about" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Về chúng tôi</Link></li>
-                                <li><Link to="/careers" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Tuyển dụng</Link></li>
-                                <li><Link to="/blog" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Blog</Link></li>
-                                <li><Link to="/partners" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Đối tác</Link></li>
+                                <li><Link to="/about" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Về chúng tôi</Link></li>
+                                <li><Link to="/careers" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Tuyển dụng</Link></li>
+                                <li><Link to="/blog" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Blog</Link></li>
+                                <li><Link to="/partners" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Đối tác</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Liên hệ</h4>
                             <ul className="mt-6 space-y-4">
-                                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Hỗ trợ</Link></li>
-                                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Bán hàng</Link></li>
-                                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-[#4F46E5] transition-colors">Liên hệ báo chí</Link></li>
+                                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Hỗ trợ</Link></li>
+                                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Bán hàng</Link></li>
+                                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-[#2563EB] transition-colors">Liên hệ báo chí</Link></li>
                             </ul>
                         </div>
                     </div>
