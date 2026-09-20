@@ -163,7 +163,7 @@ const SplitWords: React.FC<{ text: string; innerClassName?: string }> = ({ text,
             <span key={wIdx} className="inline-block whitespace-nowrap overflow-visible">
                 <span className={`inline-block pb-[0.28em] -mb-[0.28em] pt-[0.1em] -mt-[0.1em] overflow-visible ${innerClassName}`}>
                     {word.split('').map((char, cIdx) => (
-                        <span key={cIdx} className="split-char inline-block opacity-0">{char}</span>
+                        <span key={cIdx} className="split-char inline-block">{char}</span>
                     ))}
                 </span>
                 <span className="inline-block">&nbsp;</span>
@@ -312,7 +312,10 @@ const LandingPage: React.FC = () => {
             })
             .then((configs: Plan[]) => {
                 const active = configs.filter((c) => c.isActive && c.planKey !== 'NONE');
-                if (active.length) setPlans(active);
+                if (active.length) {
+                    setPlans(active);
+                    setTimeout(() => ScrollTrigger.refresh(), 50);
+                }
             })
             .catch(() => {
                 /* giữ nguyên fallbackPlans */
@@ -553,24 +556,6 @@ const LandingPage: React.FC = () => {
         return () => ctx.revert();
     }, [activeTab]);
 
-    /* ---------- Bảng giá: thẻ trồi lên khi cuộn tới ---------- */
-    useEffect(() => {
-        const el = root.current;
-        if (!el || prefersReducedMotion()) return;
-        const ctx = gsap.context(() => {
-            gsap.from('[data-plan]', {
-                y: 70,
-                autoAlpha: 0,
-                duration: 1,
-                stagger: 0.15,
-                ease: 'power3.out',
-                scrollTrigger: { trigger: '[data-plans]', start: 'top 82%', once: true },
-            });
-        }, el);
-        ScrollTrigger.refresh();
-        return () => ctx.revert();
-    }, [plans.length]);
-
     /* ---------- Đổi chu kỳ thanh toán: giá lật lên ---------- */
     useEffect(() => {
         if (cycleFirst.current) {
@@ -755,8 +740,8 @@ const LandingPage: React.FC = () => {
                 </section>
 
                 {/* ================= KHÁCH HÀNG (MARQUEE) ================= */}
-                <section aria-labelledby="clients-title" className="border-b border-gray-100 bg-white py-12">
-                    <h2 id="clients-title" className="mb-8 px-4 text-center text-base font-semibold text-gray-500">
+                <section aria-labelledby="clients-title" className="border-b border-gray-100 dark:border-slate-800/80 bg-white dark:bg-[#070d18] py-12 transition-colors">
+                    <h2 id="clients-title" className="mb-8 px-4 text-center text-base font-semibold text-gray-500 dark:text-gray-400">
                         Được các đơn vị quản trị an ninh và tòa nhà tin dùng
                     </h2>
                     <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
@@ -764,8 +749,8 @@ const LandingPage: React.FC = () => {
                             {[0, 1].map((copy) => (
                                 <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
                                     {[...logos, ...logos].map(({ name, Icon }, i) => (
-                                        <li key={`${copy}-${i}`} className="mx-8 flex items-center gap-3 text-lg font-bold text-gray-400 md:mx-12">
-                                            <Icon className="h-7 w-7 text-blue-500" aria-hidden="true" />
+                                        <li key={`${copy}-${i}`} className="mx-8 flex items-center gap-3 text-lg font-bold text-gray-400 dark:text-gray-400 md:mx-12">
+                                            <Icon className="h-7 w-7 text-blue-500 dark:text-blue-400" aria-hidden="true" />
                                             <span className="whitespace-nowrap">{name}</span>
                                         </li>
                                     ))}
@@ -776,7 +761,7 @@ const LandingPage: React.FC = () => {
                 </section>
 
                 {/* ================= 4 TRỤ CỘT (BENTO) ================= */}
-                <section id="tinh-nang" aria-labelledby="pillars-title" className="bg-white py-24">
+                <section id="tinh-nang" aria-labelledby="pillars-title" className="bg-white dark:bg-[#070d18] py-24 transition-colors">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <SectionHeading
                             id="pillars-title"
@@ -786,7 +771,7 @@ const LandingPage: React.FC = () => {
 
                         <div className="mt-16 grid grid-cols-1 gap-5 lg:grid-cols-6">
                             {/* QR */}
-                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-sky-700 p-8 text-white lg:col-span-4 lg:p-10">
+                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-sky-700 p-8 text-white lg:col-span-4 lg:p-10 shadow-lg shadow-blue-900/20">
                                 <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
                                     <div className="max-w-md">
                                         <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-semibold">
@@ -805,17 +790,17 @@ const LandingPage: React.FC = () => {
                             </article>
 
                             {/* GPS */}
-                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-8 lg:col-span-2">
-                                <span className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/90 p-8 lg:col-span-2 shadow-sm">
+                                <span className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-950/60 px-3 py-1 text-sm font-semibold text-blue-700 dark:text-blue-300">
                                     <HiMap className="h-4 w-4" aria-hidden="true" /> Thời gian thực
                                 </span>
-                                <h3 className="mt-5 text-2xl font-black text-gray-950">Giám sát live GPS</h3>
-                                <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                                <h3 className="mt-5 text-2xl font-black text-gray-950 dark:text-white">Giám sát live GPS</h3>
+                                <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-slate-300">
                                     Xem vị trí nhân sự trên bản đồ vệ tinh, biết ngay khi có người rời khu vực trực.
                                 </p>
                                 <div aria-hidden="true" className="relative mx-auto mt-6 grid h-32 w-32 place-items-center">
                                     {[0, 1, 2].map((i) => (
-                                        <span key={i} data-ping className="absolute inset-0 rounded-full border-2 border-blue-400" />
+                                        <span key={i} data-ping className="absolute inset-0 rounded-full border-2 border-blue-400 dark:border-blue-500/60" />
                                     ))}
                                     <span className="relative grid h-12 w-12 place-items-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-500/40">
                                         <HiMap className="h-6 w-6" />
@@ -824,17 +809,17 @@ const LandingPage: React.FC = () => {
                             </article>
 
                             {/* SOS */}
-                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl border border-red-100 bg-red-50/60 p-8 lg:col-span-2">
-                                <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-700">
+                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl border border-red-100 dark:border-red-900/40 bg-red-50/60 dark:bg-red-950/25 p-8 lg:col-span-2 shadow-sm">
+                                <span className="inline-flex items-center gap-2 rounded-full bg-red-100 dark:bg-red-950/60 px-3 py-1 text-sm font-semibold text-red-700 dark:text-red-300">
                                     <HiBolt className="h-4 w-4" aria-hidden="true" /> Ứng cứu tức thời
                                 </span>
-                                <h3 className="mt-5 text-2xl font-black text-gray-950">Báo cáo sự cố và SOS</h3>
-                                <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                                <h3 className="mt-5 text-2xl font-black text-gray-950 dark:text-white">Báo cáo sự cố và SOS</h3>
+                                <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-slate-300">
                                     Phát hiện cháy nổ, cửa mở, hư hỏng thiết bị và gửi cảnh báo khẩn đến ban quản lý trong 3 giây.
                                 </p>
                                 <div aria-hidden="true" className="relative mx-auto mt-6 grid h-28 w-28 place-items-center">
                                     {[0, 1, 2].map((i) => (
-                                        <span key={i} data-ping className="absolute inset-0 rounded-full border-2 border-red-400" />
+                                        <span key={i} data-ping className="absolute inset-0 rounded-full border-2 border-red-400 dark:border-red-500/60" />
                                     ))}
                                     <span className="relative grid h-12 w-12 place-items-center rounded-full bg-red-500 text-white shadow-lg shadow-red-500/40">
                                         <HiOutlineBellAlert className="h-6 w-6" />
@@ -843,7 +828,7 @@ const LandingPage: React.FC = () => {
                             </article>
 
                             {/* SLA */}
-                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl bg-[#071328] p-8 text-white lg:col-span-4 lg:p-10">
+                            <article data-reveal="up" className="relative overflow-hidden rounded-3xl bg-[#071328] dark:bg-[#0c1628] border border-blue-900/30 p-8 text-white lg:col-span-4 lg:p-10 shadow-lg shadow-blue-950/40">
                                 <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
                                     <div className="max-w-md">
                                         <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-emerald-300">
@@ -869,7 +854,7 @@ const LandingPage: React.FC = () => {
                         </div>
 
                         <p data-reveal="up" className="mt-10 text-center">
-                            <Link to="/features" className={`inline-flex items-center rounded-md text-base font-bold text-blue-600 hover:text-blue-800 ${focusRing}`}>
+                            <Link to="/features" className={`inline-flex items-center rounded-md text-base font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 ${focusRing}`}>
                                 Xem đầy đủ tính năng của AEGISM
                                 <HiOutlineArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                             </Link>
@@ -878,7 +863,7 @@ const LandingPage: React.FC = () => {
                 </section>
 
                 {/* ================= XEM HỆ THỐNG (TABS DỌC) ================= */}
-                <section id="he-thong" aria-labelledby="preview-title" className="border-y border-gray-100 bg-gray-50 py-24">
+                <section id="he-thong" aria-labelledby="preview-title" className="border-y border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-[#0b1220] py-24 transition-colors">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <SectionHeading
                             id="preview-title"
@@ -909,15 +894,15 @@ const LandingPage: React.FC = () => {
                                             onKeyDown={onTabKeyDown}
                                             className={`flex min-w-[15rem] items-center gap-4 rounded-2xl border p-4 text-left transition lg:min-w-0 ${focusRing} ${selected
                                                     ? 'border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300'
+                                                    : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-200 hover:border-blue-300 dark:hover:border-blue-500'
                                                 }`}
                                         >
-                                            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${selected ? 'bg-white/15' : 'bg-blue-50 text-blue-600'}`}>
+                                            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${selected ? 'bg-white/15 text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'}`}>
                                                 {tab.icon}
                                             </span>
                                             <span>
                                                 <span className="block font-bold">{tab.title}</span>
-                                                <span className={`block text-sm ${selected ? 'text-blue-100' : 'text-gray-500'}`}>{tab.short}</span>
+                                                <span className={`block text-sm ${selected ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>{tab.short}</span>
                                             </span>
                                         </button>
                                     );
@@ -934,8 +919,8 @@ const LandingPage: React.FC = () => {
                                         data-tab-panel
                                         hidden={activeTab !== idx}
                                     >
-                                        <div className="rounded-3xl border border-gray-200 bg-white p-4 shadow-xl sm:p-6">
-                                            <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-100">
+                                        <div className="rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xl sm:p-6">
+                                            <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-100 dark:bg-slate-800/60">
                                                 <img
                                                     data-tab-img
                                                     src={tab.image}
@@ -949,13 +934,13 @@ const LandingPage: React.FC = () => {
                                             </div>
                                             <div className="mt-6 grid gap-6 md:grid-cols-2">
                                                 <div>
-                                                    <h3 data-tab-anim className="text-2xl font-black text-gray-950">{tab.title}</h3>
-                                                    <p data-tab-anim className="mt-3 leading-relaxed text-gray-600">{tab.desc}</p>
+                                                    <h3 data-tab-anim className="text-2xl font-black text-gray-950 dark:text-white">{tab.title}</h3>
+                                                    <p data-tab-anim className="mt-3 leading-relaxed text-gray-600 dark:text-slate-300">{tab.desc}</p>
                                                 </div>
                                                 <ul className="space-y-3">
                                                     {tab.bullets.map((b) => (
-                                                        <li key={b} data-tab-anim className="flex items-start gap-3 text-sm font-semibold text-gray-700">
-                                                            <HiOutlineCheckBadge className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" aria-hidden="true" />
+                                                        <li key={b} data-tab-anim className="flex items-start gap-3 text-sm font-semibold text-gray-700 dark:text-slate-200">
+                                                            <HiOutlineCheckBadge className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" aria-hidden="true" />
                                                             <span>{b}</span>
                                                         </li>
                                                     ))}
@@ -974,7 +959,7 @@ const LandingPage: React.FC = () => {
                     data-how
                     id="quy-trinh"
                     aria-labelledby="how-title"
-                    className="bg-white py-24 lg:flex lg:min-h-screen lg:items-center lg:py-0"
+                    className="bg-white dark:bg-[#070d18] py-24 lg:flex lg:min-h-screen lg:items-center lg:py-0 transition-colors"
                 >
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <SectionHeading
@@ -984,19 +969,19 @@ const LandingPage: React.FC = () => {
                         />
 
                         <ol className="relative mt-20 grid gap-12 lg:grid-cols-4 lg:gap-8">
-                            <div aria-hidden="true" className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-0.5 bg-gray-200 lg:block">
+                            <div aria-hidden="true" className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-0.5 bg-gray-200 dark:bg-slate-800 lg:block">
                                 <div data-how-line className="h-full origin-left bg-gradient-to-r from-blue-600 to-cyan-500" />
                             </div>
                             {steps.map((s, i) => (
                                 <li key={s.title} data-step className="relative text-center">
                                     <span
                                         data-step-dot
-                                        className="relative z-10 mx-auto grid h-14 w-14 place-items-center rounded-full border-2 border-blue-200 bg-white text-xl font-black text-blue-600"
+                                        className="relative z-10 mx-auto grid h-14 w-14 place-items-center rounded-full border-2 border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-900 text-xl font-black text-blue-600 dark:text-blue-400 shadow-md"
                                     >
                                         {i + 1}
                                     </span>
-                                    <h3 className="mt-6 text-xl font-bold text-gray-950">{s.title}</h3>
-                                    <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-gray-600">{s.desc}</p>
+                                    <h3 className="mt-6 text-xl font-bold text-gray-950 dark:text-white">{s.title}</h3>
+                                    <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-gray-600 dark:text-slate-300">{s.desc}</p>
                                 </li>
                             ))}
                         </ol>
@@ -1004,7 +989,7 @@ const LandingPage: React.FC = () => {
                 </section>
 
                 {/* ================= BẢNG GIÁ ================= */}
-                <section id="bang-gia" aria-labelledby="pricing-title" className="border-t border-gray-100 bg-gray-50 py-24">
+                <section id="bang-gia" aria-labelledby="pricing-title" className="border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-[#0b1220] py-24 transition-colors">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <SectionHeading
                             id="pricing-title"
@@ -1013,7 +998,7 @@ const LandingPage: React.FC = () => {
                         />
 
                         <div data-reveal="up" className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                            <span className={`text-sm font-semibold ${cycle === 'monthly' ? 'text-gray-950' : 'text-gray-400'}`}>Thanh toán hàng tháng</span>
+                            <span className={`text-sm font-semibold ${cycle === 'monthly' ? 'text-gray-950 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>Thanh toán hàng tháng</span>
                             <button
                                 type="button"
                                 role="switch"
@@ -1024,13 +1009,13 @@ const LandingPage: React.FC = () => {
                             >
                                 <span className={`block h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${cycle === 'yearly' ? 'translate-x-6' : ''}`} />
                             </button>
-                            <span className={`flex items-center gap-2 text-sm font-semibold ${cycle === 'yearly' ? 'text-blue-600' : 'text-gray-400'}`}>
+                            <span className={`flex items-center gap-2 text-sm font-semibold ${cycle === 'yearly' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}>
                                 Thanh toán hàng năm
-                                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">Tiết kiệm 20%</span>
+                                <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">Tiết kiệm 20%</span>
                             </span>
                         </div>
 
-                        <div data-plans className="mx-auto mt-14 grid max-w-6xl grid-cols-1 items-stretch gap-6 md:grid-cols-3">
+                        <div data-reveal="up" className="mx-auto mt-14 grid max-w-6xl grid-cols-1 items-stretch gap-6 md:grid-cols-3">
                             {plans.map((plan) => {
                                 const isEnterprise = plan.planKey === 'ENTERPRISE' || (plan.monthlyPrice === 0 && plan.yearlyPrice === 0);
                                 const highlight = plan.planKey === 'BUSINESS';
@@ -1041,10 +1026,9 @@ const LandingPage: React.FC = () => {
                                 return (
                                     <article
                                         key={plan.planKey}
-                                        data-plan
-                                        className={`relative flex flex-col rounded-3xl bg-white p-8 ${highlight
+                                        className={`relative flex flex-col rounded-3xl bg-white dark:bg-slate-900 p-8 transition shadow-sm hover:shadow-md ${highlight
                                                 ? 'border-2 border-blue-600 shadow-2xl shadow-blue-500/15 md:py-12'
-                                                : 'border border-gray-200 shadow-md'
+                                                : 'border border-gray-200 dark:border-slate-800'
                                             }`}
                                     >
                                         {highlight && (
@@ -1052,28 +1036,28 @@ const LandingPage: React.FC = () => {
                                                 Được chọn nhiều nhất
                                             </span>
                                         )}
-                                        <h3 className={`text-2xl font-black ${highlight ? 'text-blue-600' : 'text-gray-950'}`}>{plan.displayName}</h3>
-                                        <p className="mt-2 min-h-[40px] text-sm text-gray-500">{planDescriptions[plan.planKey] ?? ''}</p>
+                                        <h3 className={`text-2xl font-black ${highlight ? 'text-blue-600 dark:text-blue-400' : 'text-gray-950 dark:text-white'}`}>{plan.displayName}</h3>
+                                        <p className="mt-2 min-h-[40px] text-sm text-gray-500 dark:text-gray-400">{planDescriptions[plan.planKey] ?? ''}</p>
 
                                         <p className="mb-6 mt-5 flex items-baseline">
-                                            <span data-price className="text-3xl font-black text-gray-950 sm:text-4xl">{price}</span>
-                                            {!isEnterprise && <span className="ml-1.5 text-sm font-medium text-gray-500">/tháng</span>}
+                                            <span data-price className="text-3xl font-black text-gray-950 dark:text-white sm:text-4xl">{price}</span>
+                                            {!isEnterprise && <span className="ml-1.5 text-sm font-medium text-gray-500 dark:text-gray-400">/tháng</span>}
                                         </p>
 
-                                        <ul className="mb-8 flex-1 space-y-3.5 border-t border-gray-100 pt-6">
+                                        <ul className="mb-8 flex-1 space-y-3.5 border-t border-gray-100 dark:border-slate-800 pt-6">
                                             {[
                                                 `Tối đa ${plan.maxUsers} người dùng`,
                                                 `Tối đa ${plan.maxProjects} dự án mục tiêu`,
                                                 `Tối đa ${plan.maxQRCodes} điểm quét QR`,
                                             ].map((t) => (
-                                                <li key={t} className="flex items-center text-sm font-semibold text-gray-700">
-                                                    <HiCheck className="mr-3 h-5 w-5 shrink-0 text-blue-600" aria-hidden="true" />
+                                                <li key={t} className="flex items-center text-sm font-semibold text-gray-700 dark:text-slate-200">
+                                                    <HiCheck className="mr-3 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" aria-hidden="true" />
                                                     {t}
                                                 </li>
                                             ))}
                                             {extra.map((f) => (
-                                                <li key={f} className="flex items-center text-sm text-gray-600">
-                                                    <HiCheck className="mr-3 h-5 w-5 shrink-0 text-emerald-500" aria-hidden="true" />
+                                                <li key={f} className="flex items-center text-sm text-gray-600 dark:text-slate-300">
+                                                    <HiCheck className="mr-3 h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                                                     {f}
                                                 </li>
                                             ))}
@@ -1083,7 +1067,7 @@ const LandingPage: React.FC = () => {
                                             to={ctaLink}
                                             className={`block w-full rounded-xl py-3.5 text-center text-sm font-bold transition ${focusRing} ${highlight
                                                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700'
-                                                    : 'bg-gray-100 text-gray-800 hover:bg-blue-50 hover:text-blue-600'
+                                                    : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/50 hover:text-blue-600 dark:hover:text-blue-400'
                                                 }`}
                                         >
                                             {isEnterprise ? 'Liên hệ tư vấn' : `Đăng ký gói ${plan.displayName}`}
@@ -1096,35 +1080,35 @@ const LandingPage: React.FC = () => {
                 </section>
 
                 {/* ================= NHẬN XÉT ================= */}
-                <section aria-labelledby="reviews-title" className="border-b border-gray-100 bg-white py-24">
+                <section aria-labelledby="reviews-title" className="border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-[#070d18] py-24 transition-colors">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <SectionHeading id="reviews-title" title="Các nhà quản lý nói gì về AEGISM" />
 
                         <div className="mx-auto mt-14 grid max-w-5xl gap-8 md:grid-cols-2">
-                            <figure data-reveal="left" className="relative rounded-3xl border border-gray-200 bg-gradient-to-br from-blue-50/60 to-white p-8">
-                                <span aria-hidden="true" className="absolute right-6 top-2 text-8xl font-black leading-none text-blue-200">&rdquo;</span>
-                                <blockquote className="relative text-base italic leading-relaxed text-gray-700">
+                            <figure data-reveal="left" className="relative rounded-3xl border border-gray-200 dark:border-slate-800 bg-gradient-to-br from-blue-50/60 to-white dark:from-slate-900/90 dark:to-slate-950/90 p-8 shadow-sm transition hover:shadow-md">
+                                <span aria-hidden="true" className="absolute right-6 top-2 text-8xl font-black leading-none text-blue-200 dark:text-blue-900/30">&rdquo;</span>
+                                <blockquote className="relative text-base italic leading-relaxed text-gray-700 dark:text-slate-200">
                                     Từ khi áp dụng AEGISM, tình trạng bảo vệ bỏ chốt hoặc tuần tra đối phó đã giảm về 0. Tỷ lệ hoàn thành nhiệm vụ theo ca trực hiển thị minh bạch giúp chúng tôi dễ dàng nghiệm thu với chủ đầu tư.
                                 </blockquote>
                                 <figcaption className="mt-6 flex items-center gap-3">
-                                    <span aria-hidden="true" className="grid h-11 w-11 place-items-center rounded-full bg-blue-600 text-sm font-bold text-white">TM</span>
+                                    <span aria-hidden="true" className="grid h-11 w-11 place-items-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-md">TM</span>
                                     <span>
-                                        <span className="block text-sm font-bold text-gray-950">Anh Trần Minh</span>
-                                        <span className="text-xs text-gray-500">Giám đốc Vận hành, Tập đoàn Đại Sơn Long</span>
+                                        <span className="block text-sm font-bold text-gray-950 dark:text-white">Anh Trần Minh</span>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">Giám đốc Vận hành, Tập đoàn Đại Sơn Long</span>
                                     </span>
                                 </figcaption>
                             </figure>
 
-                            <figure data-reveal="right" className="relative rounded-3xl border border-gray-200 bg-gradient-to-br from-sky-50/60 to-white p-8">
-                                <span aria-hidden="true" className="absolute right-6 top-2 text-8xl font-black leading-none text-sky-200">&rdquo;</span>
-                                <blockquote className="relative text-base italic leading-relaxed text-gray-700">
+                            <figure data-reveal="right" className="relative rounded-3xl border border-gray-200 dark:border-slate-800 bg-gradient-to-br from-sky-50/60 to-white dark:from-slate-900/90 dark:to-slate-950/90 p-8 shadow-sm transition hover:shadow-md">
+                                <span aria-hidden="true" className="absolute right-6 top-2 text-8xl font-black leading-none text-sky-200 dark:text-sky-900/30">&rdquo;</span>
+                                <blockquote className="relative text-base italic leading-relaxed text-gray-700 dark:text-slate-200">
                                     Giao diện app di động rất dễ dùng, ngay cả các chú bảo vệ lớn tuổi cũng chỉ mất 15 phút là quen thao tác quét QR và chụp ảnh báo cáo sự cố. Rất đáng đồng tiền.
                                 </blockquote>
                                 <figcaption className="mt-6 flex items-center gap-3">
-                                    <span aria-hidden="true" className="grid h-11 w-11 place-items-center rounded-full bg-sky-600 text-sm font-bold text-white">LH</span>
+                                    <span aria-hidden="true" className="grid h-11 w-11 place-items-center rounded-full bg-sky-600 text-sm font-bold text-white shadow-md">LH</span>
                                     <span>
-                                        <span className="block text-sm font-bold text-gray-950">Chị Lê Hoàng</span>
-                                        <span className="text-xs text-gray-500">Trưởng ban Quản lý Tòa nhà TechPark Đà Nẵng</span>
+                                        <span className="block text-sm font-bold text-gray-950 dark:text-white">Chị Lê Hoàng</span>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">Trưởng ban Quản lý Tòa nhà TechPark Đà Nẵng</span>
                                     </span>
                                 </figcaption>
                             </figure>
@@ -1133,15 +1117,15 @@ const LandingPage: React.FC = () => {
                 </section>
 
                 {/* ================= FAQ ================= */}
-                <section id="cau-hoi" aria-labelledby="faq-title" className="bg-gray-50 py-24">
+                <section id="cau-hoi" aria-labelledby="faq-title" className="bg-gray-50 dark:bg-[#0b1220] py-24 transition-colors">
                     <div className="container mx-auto max-w-6xl px-4 sm:px-6">
                         <div className="grid gap-12 lg:grid-cols-12">
                             <div className="lg:col-span-4">
                                 <div className="lg:sticky lg:top-28">
                                     <SectionHeading id="faq-title" title="Câu hỏi thường gặp" center={false} />
-                                    <p data-reveal="up" className="mt-6 text-gray-600">
+                                    <p data-reveal="up" className="mt-6 text-gray-600 dark:text-slate-300">
                                         Chưa thấy câu trả lời bạn cần?{' '}
-                                        <Link to="/contact" className={`rounded font-bold text-blue-600 underline-offset-4 hover:underline ${focusRing}`}>
+                                        <Link to="/contact" className={`rounded font-bold text-blue-600 dark:text-blue-400 underline-offset-4 hover:underline ${focusRing}`}>
                                             Liên hệ chuyên viên tư vấn
                                         </Link>
                                         .
@@ -1153,7 +1137,7 @@ const LandingPage: React.FC = () => {
                                 {faqItems.map((faq, idx) => {
                                     const isOpen = openFaq === idx;
                                     return (
-                                        <div key={faq.question} data-reveal="up" className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                                        <div key={faq.question} data-reveal="up" className="overflow-hidden rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                                             <h3>
                                                 <button
                                                     type="button"
@@ -1161,17 +1145,17 @@ const LandingPage: React.FC = () => {
                                                     aria-expanded={isOpen}
                                                     aria-controls={`faq-a-${idx}`}
                                                     onClick={() => setOpenFaq(isOpen ? null : idx)}
-                                                    className={`flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold text-gray-950 transition hover:text-blue-600 ${focusRing}`}
+                                                    className={`flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold text-gray-950 dark:text-white transition hover:text-blue-600 dark:hover:text-blue-400 ${focusRing}`}
                                                 >
                                                     <span className="text-base">{faq.question}</span>
                                                     <HiChevronDown
                                                         aria-hidden="true"
-                                                        className={`h-5 w-5 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600' : 'text-gray-400'}`}
+                                                        className={`h-5 w-5 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}
                                                     />
                                                 </button>
                                             </h3>
                                             <div id={`faq-a-${idx}`} role="region" aria-labelledby={`faq-q-${idx}`} data-faq-answer className="h-0 overflow-hidden opacity-0">
-                                                <p className="border-t border-gray-100 px-6 pb-6 pt-4 text-sm leading-relaxed text-gray-600">{faq.answer}</p>
+                                                <p className="border-t border-gray-100 dark:border-slate-800 px-6 pb-6 pt-4 text-sm leading-relaxed text-gray-600 dark:text-slate-300">{faq.answer}</p>
                                             </div>
                                         </div>
                                     );

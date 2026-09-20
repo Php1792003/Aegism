@@ -5,7 +5,9 @@ import { HashRouter, BrowserRouter, Routes, Route, Navigate } from 'react-router
 import PublicLayout from '@/layouts/PublicLayout';
 import MainLayout from '@/layouts/MainLayout';
 import SuperAdminLayout from '@/layouts/SuperAdminLayout';
+import ScrollToTop from '@/components/navigation/ScrollToTop';
 import { PromoProvider } from '@/components/promo/PromoSystem';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // Public Pages
 import LandingPage from '@/pages/public/LandingPage';
@@ -71,60 +73,63 @@ const Router = isElectron ? HashRouter : BrowserRouter;
 
 function App() {
   return (
-    <Router>
-      <PromoProvider>
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/features" element={<FeaturesPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/request-demo" element={<RequestDemoPage />} />
-            <Route path="/policy" element={<PolicyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/download" element={<DownloadPage />} />
-          </Route>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+    <ThemeProvider>
+      <Router>
+        <ScrollToTop />
+        <PromoProvider>
+          <Routes>
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/request-demo" element={<RequestDemoPage />} />
+              <Route path="/policy" element={<PolicyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/download" element={<DownloadPage />} />
+            </Route>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          {/* User routes */}
-          <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-            <Route path="/dashboard" element={<TenantDashboardPage />} />
-            <Route path="projects" element={<ProjectListPage />} />
-            <Route path="qrcodes" element={<QrCodeListPage />} />
-            <Route path="staff" element={<StaffPage />} />
-            <Route path="tasks" element={<TaskListPage />} />
-            <Route path="chat" element={<ChatPage />} />
-            <Route path="reports" element={<ReportDashboardPage />} />
-            <Route path="audit-log" element={<AuditLogPage />} />
-            <Route path="/branding" element={<BrandingPage />} />
-            <Route path="/api-integration" element={<ApiIntegrationPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="helpdesk" element={<HelpdeskPage />} />
-          </Route>
+            {/* User routes */}
+            <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+              <Route path="/dashboard" element={<TenantDashboardPage />} />
+              <Route path="projects" element={<ProjectListPage />} />
+              <Route path="qrcodes" element={<QrCodeListPage />} />
+              <Route path="staff" element={<StaffPage />} />
+              <Route path="tasks" element={<TaskListPage />} />
+              <Route path="chat" element={<ChatPage />} />
+              <Route path="reports" element={<ReportDashboardPage />} />
+              <Route path="audit-log" element={<AuditLogPage />} />
+              <Route path="/branding" element={<BrandingPage />} />
+              <Route path="/api-integration" element={<ApiIntegrationPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="helpdesk" element={<HelpdeskPage />} />
+            </Route>
 
-          {/* Super Admin routes */}
-          <Route element={<SuperAdminRoute><SuperAdminLayout /></SuperAdminRoute>}>
-            <Route path="/super-admin/dashboard" element={<SuperAdminDashboardPage />} />
-            <Route path="/super-admin/customers" element={<SuperAdminCustomersPage />} />
-            <Route path="/super-admin/users" element={<SuperAdminUsersPage />} />
-            <Route path="/super-admin/revenue" element={<SuperAdminRevenuePage />} />
-            <Route path="/super-admin/plans" element={<SuperAdminPlansPage />} />
-            <Route path="/super-admin/promotions" element={<SuperAdminPromoPage />} />
-            <Route path="/super-admin/helpdesk" element={<HelpdeskPage />} />
-            <Route path="/super-admin/security" element={<SuperAdminSecurityPage />} />
-            <Route path="/super-admin/api-keys" element={<SuperAdminApiKeysPage />} />
-          </Route>
+            {/* Super Admin routes */}
+            <Route element={<SuperAdminRoute><SuperAdminLayout /></SuperAdminRoute>}>
+              <Route path="/super-admin/dashboard" element={<SuperAdminDashboardPage />} />
+              <Route path="/super-admin/customers" element={<SuperAdminCustomersPage />} />
+              <Route path="/super-admin/users" element={<SuperAdminUsersPage />} />
+              <Route path="/super-admin/revenue" element={<SuperAdminRevenuePage />} />
+              <Route path="/super-admin/plans" element={<SuperAdminPlansPage />} />
+              <Route path="/super-admin/promotions" element={<SuperAdminPromoPage />} />
+              <Route path="/super-admin/helpdesk" element={<HelpdeskPage />} />
+              <Route path="/super-admin/security" element={<SuperAdminSecurityPage />} />
+              <Route path="/super-admin/api-keys" element={<SuperAdminApiKeysPage />} />
+            </Route>
 
-          {/* Scan redirect & Errors */}
-          <Route path="/scan" element={<ScanRedirectPage />} />
-          <Route path="/500" element={<ServerErrorPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </PromoProvider>
-    </Router>
+            {/* Scan redirect & Errors */}
+            <Route path="/scan" element={<ScanRedirectPage />} />
+            <Route path="/500" element={<ServerErrorPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </PromoProvider>
+      </Router>
+    </ThemeProvider>
   );
 }
 

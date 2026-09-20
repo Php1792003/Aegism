@@ -109,39 +109,39 @@ const FeaturesPage = () => {
 
             <main>
                 {/* --- HERO SECTION --- */}
-                <section className="relative bg-gradient-to-b from-blue-50/60 via-white to-white pt-14 pb-20 overflow-hidden">
+                <section className="relative bg-gradient-to-b from-blue-50/60 via-white to-white dark:from-slate-900/60 dark:via-[#070d18] dark:to-[#070d18] pt-14 pb-20 overflow-hidden transition-colors">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                        <div data-hero-entrance="badge" className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold mb-6">
-                            <HiOutlineSparkles className="w-4 h-4 text-blue-600" />
+                        <div data-hero-entrance="badge" className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-6">
+                            <HiOutlineSparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             <span>Khám phá công nghệ lõi</span>
                         </div>
 
-                        <h1 data-hero-entrance="title" className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-[1.15]">
+                        <h1 data-hero-entrance="title" className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.15]">
                             <SplitWords text="Công Nghệ Hóa Toàn Diện" />
                             <br />
                             <SplitWords
                                 text="Quy Trình Giám Sát An Ninh"
-                                innerClassName="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 bg-clip-text text-transparent"
+                                innerClassName="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 dark:from-blue-400 dark:via-cyan-300 dark:to-sky-300 bg-clip-text text-transparent"
                             />
                         </h1>
 
-                        <p data-hero-entrance="desc" className="mt-6 text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        <p data-hero-entrance="desc" className="mt-6 text-lg sm:text-xl text-gray-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
                             Trang bị cho đội ngũ của bạn công nghệ hiện đại nhất: chuyển từ quản lý bị động sang kiểm soát chủ động và minh bạch theo thời gian thực.
                         </p>
 
                         {/* Quick Jump Pills */}
-                        <div data-hero-entrance="pills" data-stagger-group className="mt-10 flex flex-wrap justify-center gap-3">
-                            <a data-stagger-item href="#feature-management" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white shadow-sm text-xs font-bold text-gray-700 hover:text-blue-600 hover:shadow-md transition border border-gray-200">
-                                <HiMap className="mr-2 text-blue-600 w-4 h-4" /> Trung tâm chỉ huy
+                        <div data-hero-entrance="pills" className="mt-10 flex flex-wrap justify-center gap-3">
+                            <a href="#feature-management" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm text-xs font-bold text-gray-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition border border-gray-200 dark:border-slate-800">
+                                <HiMap className="mr-2 text-blue-600 dark:text-blue-400 w-4 h-4" /> Trung tâm chỉ huy
                             </a>
-                            <a data-stagger-item href="#feature-qr" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white shadow-sm text-xs font-bold text-gray-700 hover:text-blue-600 hover:shadow-md transition border border-gray-200">
-                                <HiOutlineQrCode className="mr-2 text-emerald-600 w-4 h-4" /> Tuần tra QR Code
+                            <a href="#feature-qr" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm text-xs font-bold text-gray-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition border border-gray-200 dark:border-slate-800">
+                                <HiOutlineQrCode className="mr-2 text-emerald-600 dark:text-emerald-400 w-4 h-4" /> Tuần tra QR Code
                             </a>
-                            <a data-stagger-item href="#feature-incident" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white shadow-sm text-xs font-bold text-gray-700 hover:text-blue-600 hover:shadow-md transition border border-gray-200">
-                                <HiShieldCheck className="mr-2 text-rose-600 w-4 h-4" /> Xử lý sự cố SOS
+                            <a href="#feature-incident" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm text-xs font-bold text-gray-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition border border-gray-200 dark:border-slate-800">
+                                <HiShieldCheck className="mr-2 text-rose-600 dark:text-rose-400 w-4 h-4" /> Xử lý sự cố SOS
                             </a>
-                            <a data-stagger-item href="#feature-analytics" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white shadow-sm text-xs font-bold text-gray-700 hover:text-blue-600 hover:shadow-md transition border border-gray-200">
-                                <HiBolt className="mr-2 text-amber-500 w-4 h-4" /> Báo cáo SLA
+                            <a href="#feature-analytics" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm text-xs font-bold text-gray-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition border border-gray-200 dark:border-slate-800">
+                                <HiBolt className="mr-2 text-amber-500 dark:text-amber-400 w-4 h-4" /> Báo cáo SLA
                             </a>
                         </div>
                     </div>
@@ -152,13 +152,13 @@ const FeaturesPage = () => {
                     <section
                         key={feature.id}
                         id={feature.id}
-                        className={`py-20 border-t border-gray-100 ${feature.bgGray ? 'bg-gray-50/70' : 'bg-white'}`}
+                        className={`py-20 border-t border-gray-100 dark:border-slate-800 transition-colors ${feature.bgGray ? 'bg-gray-50/70 dark:bg-[#0b1220]' : 'bg-white dark:bg-[#070d18]'}`}
                     >
                         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
                                 {/* Visual Mockup */}
                                 <div data-reveal={feature.reverse ? 'right' : 'left'} className={`lg:col-span-6 ${feature.reverse ? 'lg:order-2' : 'lg:order-1'}`}>
-                                    <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200/80 bg-white">
+                                    <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
                                         <img
                                             src={feature.image}
                                             alt={feature.title}
@@ -170,27 +170,27 @@ const FeaturesPage = () => {
 
                                 {/* Content Details */}
                                 <div data-reveal={feature.reverse ? 'left' : 'right'} className={`lg:col-span-6 ${feature.reverse ? 'lg:order-1' : 'lg:order-2'}`}>
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider mb-4">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-wider mb-4">
                                         <span>{feature.badge}</span>
                                     </div>
 
-                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
+                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white leading-tight">
                                         {feature.title}
                                     </h2>
 
-                                    <p className="mt-4 text-base text-gray-600 leading-relaxed">
+                                    <p className="mt-4 text-base text-gray-600 dark:text-slate-300 leading-relaxed">
                                         {feature.description}
                                     </p>
 
                                     <div className="mt-8 space-y-5">
                                         {feature.subFeatures.map((sub, idx) => (
                                             <div key={idx} className="flex items-start gap-4">
-                                                <div className="p-1 rounded-full bg-blue-50 text-blue-600 mt-1 flex-shrink-0">
+                                                <div className="p-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0">
                                                     <HiCheckCircle className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-base font-bold text-gray-900">{sub.title}</h3>
-                                                    <p className="mt-1 text-sm text-gray-600 leading-relaxed">{sub.desc}</p>
+                                                    <h3 className="text-base font-bold text-gray-900 dark:text-white">{sub.title}</h3>
+                                                    <p className="mt-1 text-sm text-gray-600 dark:text-slate-300 leading-relaxed">{sub.desc}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -202,42 +202,42 @@ const FeaturesPage = () => {
                 ))}
 
                 {/* --- COMPARISON TABLE SECTION --- */}
-                <section className="py-20 bg-gray-50 border-t border-gray-100">
+                <section className="py-20 bg-gray-50 dark:bg-[#0b1220] border-t border-gray-100 dark:border-slate-800 transition-colors">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div data-reveal="up" className="text-center max-w-3xl mx-auto mb-16">
-                            <span className="text-blue-600 text-xs font-bold uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                            <span className="text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-100 dark:border-blue-800">
                                 So sánh hiệu quả
                             </span>
-                            <h2 data-split className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900">
+                            <h2 data-split className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">
                                 <SplitWords text="Phương Pháp Truyền Thống vs Nền Tảng AEGISM" />
                             </h2>
-                            <p className="mt-3 text-gray-600">
+                            <p className="mt-3 text-gray-600 dark:text-slate-300">
                                 Nhìn rõ sự khác biệt giữa phương thức quản lý cơ học cũ và công nghệ số hóa thế hệ mới.
                             </p>
                         </div>
 
-                        <div data-reveal="scale" className="overflow-x-auto bg-white rounded-3xl border border-gray-200 shadow-lg">
+                        <div data-reveal="scale" className="overflow-x-auto bg-white dark:bg-slate-900 rounded-3xl border border-gray-200 dark:border-slate-800 shadow-lg">
                             <table className="w-full text-left border-collapse min-w-[640px]">
                                 <thead>
-                                    <tr className="border-b border-gray-100 bg-gray-50/50">
-                                        <th className="p-6 text-sm font-bold text-gray-900 w-1/3">Tiêu chí so sánh</th>
-                                        <th className="p-6 text-sm font-bold text-rose-600 w-1/3">Cách làm truyền thống</th>
-                                        <th className="p-6 text-sm font-bold text-blue-600 w-1/3 bg-blue-50/50">Giải pháp AEGISM</th>
+                                    <tr className="border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/60">
+                                        <th className="p-6 text-sm font-bold text-gray-900 dark:text-white w-1/3">Tiêu chí so sánh</th>
+                                        <th className="p-6 text-sm font-bold text-rose-600 dark:text-rose-400 w-1/3">Cách làm truyền thống</th>
+                                        <th className="p-6 text-sm font-bold text-blue-600 dark:text-blue-400 w-1/3 bg-blue-50/50 dark:bg-blue-950/30">Giải pháp AEGISM</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100 text-sm">
+                                <tbody className="divide-y divide-gray-100 dark:divide-slate-800 text-sm">
                                     {comparisonData.map((row, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50/60 transition-colors">
-                                            <td className="p-6 font-bold text-gray-900">{row.feature}</td>
-                                            <td className="p-6 text-gray-600">
+                                        <tr key={idx} className="hover:bg-gray-50/60 dark:hover:bg-slate-800/50 transition-colors">
+                                            <td className="p-6 font-bold text-gray-900 dark:text-white">{row.feature}</td>
+                                            <td className="p-6 text-gray-600 dark:text-slate-300">
                                                 <div className="flex items-start gap-2.5">
-                                                    <HiXCircle className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
+                                                    <HiXCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 flex-shrink-0 mt-0.5" />
                                                     <span>{row.traditional}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-6 text-gray-800 font-semibold bg-blue-50/20">
+                                            <td className="p-6 text-gray-800 dark:text-slate-100 font-semibold bg-blue-50/20 dark:bg-blue-950/20">
                                                 <div className="flex items-start gap-2.5">
-                                                    <HiCheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                                                    <HiCheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
                                                     <span>{row.aegism}</span>
                                                 </div>
                                             </td>
@@ -250,27 +250,38 @@ const FeaturesPage = () => {
                 </section>
 
                 {/* --- BOTTOM CTA --- */}
-                <section className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-700 text-white py-16">
-                    <div data-reveal="up" className="container mx-auto max-w-4xl px-4 text-center">
-                        <h2 data-split className="text-3xl sm:text-4xl font-black">
-                            <SplitWords text="Sẵn Sàng Trải Nghiệm Các Tính Năng Này?" />
-                        </h2>
-                        <p className="mt-4 text-blue-100 text-base max-w-xl mx-auto">
-                            Đội ngũ chuyên gia của chúng tôi sẵn sàng đồng hành hướng dẫn trực tiếp quy trình triển khai cho doanh nghiệp của bạn.
-                        </p>
-                        <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-                            <Link
-                                to="/request-demo"
-                                className="px-8 py-3.5 bg-white text-blue-700 rounded-xl font-bold shadow-lg hover:bg-blue-50 transition"
-                            >
-                                Đăng ký Demo trực tiếp
-                            </Link>
-                            <Link
-                                to="/pricing"
-                                className="px-8 py-3.5 border border-white/80 text-white rounded-xl font-bold hover:bg-white/10 transition"
-                            >
-                                Xem bảng giá chi tiết
-                            </Link>
+                <section className="py-16 sm:py-20 bg-gray-50/60 dark:bg-[#070d18] transition-colors">
+                    <div className="container mx-auto max-w-5xl px-4 sm:px-6">
+                        <div data-reveal="up" className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 dark:from-[#132347] dark:via-[#1e3264] dark:to-[#0f1d3d] p-10 sm:p-14 text-center text-white shadow-2xl border border-blue-400/30 dark:border-blue-500/40">
+                            {/* Ambient Background Glows */}
+                            <div aria-hidden="true" className="absolute -left-12 -top-12 w-64 h-64 rounded-full bg-cyan-400/25 dark:bg-cyan-400/20 blur-3xl pointer-events-none" />
+                            <div aria-hidden="true" className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-blue-400/30 dark:bg-blue-400/25 blur-3xl pointer-events-none" />
+
+                            <div className="relative z-10 max-w-3xl mx-auto space-y-4">
+                                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/15 dark:bg-white/10 backdrop-blur-md text-blue-100 dark:text-blue-200 text-xs font-bold uppercase tracking-wider border border-white/20">
+                                    ⚡ Nâng tầm quản trị vận hành
+                                </span>
+                                <h2 data-split className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                                    <SplitWords text="Sẵn Sàng Trải Nghiệm Các Tính Năng Này?" />
+                                </h2>
+                                <p className="text-blue-100 dark:text-blue-100/90 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                                    Đội ngũ chuyên gia của chúng tôi sẵn sàng đồng hành hướng dẫn trực tiếp quy trình triển khai số hóa tuần tra cho doanh nghiệp của bạn.
+                                </p>
+                                <div className="pt-4 flex flex-col sm:flex-row justify-center gap-4">
+                                    <Link
+                                        to="/request-demo"
+                                        className="px-8 py-4 bg-white text-blue-700 font-bold rounded-xl shadow-xl hover:bg-blue-50 transition transform hover:-translate-y-0.5 text-sm"
+                                    >
+                                        Đăng ký Demo trực tiếp
+                                    </Link>
+                                    <Link
+                                        to="/pricing"
+                                        className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-white/30 backdrop-blur-md transition text-sm"
+                                    >
+                                        Xem bảng giá chi tiết
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

@@ -13,7 +13,7 @@ export const SplitWords: React.FC<{ text: string; innerClassName?: string }> = (
             <span key={wIdx} className="inline-block whitespace-nowrap overflow-visible">
                 <span className={`inline-block pb-[0.28em] -mb-[0.28em] pt-[0.1em] -mt-[0.1em] overflow-visible ${innerClassName}`}>
                     {word.split('').map((char, cIdx) => (
-                        <span key={cIdx} className="split-char inline-block opacity-0">
+                        <span key={cIdx} className="split-char inline-block">
                             {char}
                         </span>
                     ))}
