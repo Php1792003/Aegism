@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import * as fs from 'fs';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { json, urlencoded } from 'express';
@@ -8,7 +9,14 @@ import { json, urlencoded } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+  const uploadsPath = [
+    join(__dirname, '..', '..', 'uploads'),
+    join(__dirname, '..', 'uploads'),
+    join(process.cwd(), 'server', 'uploads'),
+    join(process.cwd(), 'uploads'),
+  ].find(p => fs.existsSync(p)) || join(process.cwd(), 'uploads');
+
+  app.useStaticAssets(uploadsPath, {
     prefix: '/uploads/',
   });
 

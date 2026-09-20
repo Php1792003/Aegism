@@ -1,8 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
+  },
   build: {
     sourcemap: false,
     chunkSizeWarningLimit: 1600,
@@ -20,6 +26,12 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3001,
+    proxy: {
+      '/uploads': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
     allowedHosts: ['aegism.online', 'www.aegism.online'],
     fs: {
       allow: ['..']
