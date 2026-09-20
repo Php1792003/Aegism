@@ -285,7 +285,7 @@ export function animateHeroEntrance(container: HTMLElement) {
     if (!heroEls.length) return;
 
     // Animate hero entrance elements with stagger
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
     // First, animate the split-char title if present (typewriter effect)
     const titleChars = container.querySelectorAll('[data-hero-entrance="title"] .split-char');
@@ -295,8 +295,8 @@ export function animateHeroEntrance(container: HTMLElement) {
             { opacity: 0 },
             {
                 opacity: 1,
-                duration: 0.2,
-                stagger: 0.02,
+                duration: 0.15,
+                stagger: 0.015,
                 ease: 'none'
             }
         );
@@ -306,10 +306,11 @@ export function animateHeroEntrance(container: HTMLElement) {
     heroEls.forEach((el) => {
         const role = (el as HTMLElement).dataset.heroEntrance;
         if (role === 'title') return; // already handled
-        tl.from(
+        tl.fromTo(
             el,
-            { y: 24, autoAlpha: 0, duration: 0.8 },
-            role === 'badge' ? 0 : '-=0.5'
+            { y: 20, autoAlpha: 0 },
+            { y: 0, autoAlpha: 1, duration: 0.6, overwrite: 'auto' },
+            role === 'badge' ? 0 : '-=0.4'
         );
     });
 }

@@ -15,25 +15,25 @@ const ServerErrorPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-red-50 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-b from-white to-red-50 dark:from-slate-950 dark:via-[#070d18] dark:to-slate-900 flex items-center justify-center px-4 transition-colors">
             <div className="max-w-4xl w-full flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
 
                 {/* Illustration */}
                 <div className="w-full lg:w-1/2 flex justify-center animate-[float_6s_ease-in-out_infinite]">
                     <svg className="w-72 h-72 lg:w-80 lg:h-80" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
                         {/* Background circle */}
-                        <circle cx="200" cy="200" r="160" fill="#FEF2F2" />
-                        <circle cx="200" cy="200" r="120" fill="#FEE2E2" />
+                        <circle cx="200" cy="200" r="160" fill="#FEF2F2" className="dark:opacity-10" />
+                        <circle cx="200" cy="200" r="120" fill="#FEE2E2" className="dark:opacity-10" />
 
                         {/* Server box */}
-                        <rect x="130" y="100" width="140" height="200" rx="10" fill="#F3F4F6" stroke="#D1D5DB" strokeWidth="2" />
+                        <rect x="130" y="100" width="140" height="200" rx="10" fill="#F3F4F6" stroke="#D1D5DB" strokeWidth="2" className="dark:fill-slate-800 dark:stroke-slate-700" />
 
                         {/* Server slots */}
-                        <rect x="150" y="125" width="100" height="22" rx="4" fill="#DBEAFE" />
-                        <rect x="150" y="157" width="100" height="22" rx="4" fill="#DBEAFE" />
-                        <rect x="150" y="189" width="100" height="22" rx="4" fill="#FEE2E2" />
-                        <rect x="150" y="221" width="100" height="22" rx="4" fill="#DBEAFE" />
-                        <rect x="150" y="253" width="100" height="22" rx="4" fill="#DBEAFE" />
+                        <rect x="150" y="125" width="100" height="22" rx="4" fill="#DBEAFE" className="dark:fill-slate-700" />
+                        <rect x="150" y="157" width="100" height="22" rx="4" fill="#DBEAFE" className="dark:fill-slate-700" />
+                        <rect x="150" y="189" width="100" height="22" rx="4" fill="#FEE2E2" className="dark:fill-red-950/60" />
+                        <rect x="150" y="221" width="100" height="22" rx="4" fill="#DBEAFE" className="dark:fill-slate-700" />
+                        <rect x="150" y="253" width="100" height="22" rx="4" fill="#DBEAFE" className="dark:fill-slate-700" />
 
                         {/* Status LEDs - green */}
                         <circle cx="162" cy="136" r="3.5" fill="#34D399" />
@@ -98,23 +98,23 @@ const ServerErrorPage: React.FC = () => {
 
                 {/* Text Content */}
                 <div className="w-full lg:w-1/2 text-center lg:text-left space-y-5">
-                    <div className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-red-600 uppercase bg-red-100 rounded-full">
+                    <div className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-red-600 dark:text-red-400 uppercase bg-red-100 dark:bg-red-950/60 rounded-full border border-red-200 dark:border-red-800">
                         Lỗi máy chủ
                     </div>
 
-                    <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                    <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
                         Xin lỗi, có sự cố<br />
-                        <span className="text-blue-600">từ phía chúng tôi.</span>
+                        <span className="text-blue-600 dark:text-blue-400">từ phía chúng tôi.</span>
                     </h1>
 
-                    <p className="text-gray-500 text-base lg:text-lg max-w-md mx-auto lg:mx-0 leading-relaxed">
+                    <p className="text-gray-500 dark:text-slate-400 text-base lg:text-lg max-w-md mx-auto lg:mx-0 leading-relaxed">
                         Máy chủ đang gặp trục trặc kỹ thuật. Đội ngũ kỹ thuật của chúng tôi đã được thông báo và đang nỗ lực khắc phục. Vui lòng thử lại sau ít phút.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
                         <button
                             onClick={reloadPage}
-                            className="w-full sm:w-auto px-7 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center"
+                            className="w-full sm:w-auto px-7 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-200 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center border border-transparent dark:border-slate-700"
                         >
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -133,7 +133,7 @@ const ServerErrorPage: React.FC = () => {
                         </button>
                     </div>
 
-                    <p className="pt-4 text-xs text-gray-400 font-medium tracking-widest uppercase">
+                    <p className="pt-4 text-xs text-gray-400 dark:text-gray-500 font-medium tracking-widest uppercase">
                         Powered by AEGISM Platform
                     </p>
                 </div>

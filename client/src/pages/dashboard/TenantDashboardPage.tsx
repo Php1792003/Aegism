@@ -5,6 +5,7 @@ import {
     LineElement, Title, Tooltip, Legend, Filler
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { useTheme } from '@/contexts/ThemeContext';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -19,6 +20,7 @@ const PLAN_CONFIG: any = {
 };
 
 const TenantDashboardPage = () => {
+    const { isDark } = useTheme();
     const [user] = useState<any>(() => {
         const s = localStorage.getItem('user');
         return s ? JSON.parse(s) : { fullName: 'Người dùng', tenant: { name: '...' } };
@@ -54,7 +56,7 @@ const TenantDashboardPage = () => {
                 label: 'Lượt quét QR Code',
                 data: chart?.scanData || [0, 0, 0, 0, 0, 0, 0],
                 borderColor: '#2563EB',
-                backgroundColor: 'rgba(37,99,235,0.08)',
+                backgroundColor: isDark ? 'rgba(37,99,235,0.18)' : 'rgba(37,99,235,0.08)',
                 borderWidth: 2, tension: 0.4, fill: true, pointRadius: 3, pointHoverRadius: 6, pointHitRadius: 10,
             },
             {
@@ -70,12 +72,12 @@ const TenantDashboardPage = () => {
     const chartOptions = {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-            legend: { display: false }, // Ẩn legend mặc định để dùng Custom HTML
+            legend: { display: false },
             tooltip: {
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                titleColor: '#1f2937',
-                bodyColor: '#4b5563',
-                borderColor: '#e5e7eb',
+                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                titleColor: isDark ? '#f8fafc' : '#1f2937',
+                bodyColor: isDark ? '#cbd5e1' : '#4b5563',
+                borderColor: isDark ? '#334155' : '#e5e7eb',
                 borderWidth: 1,
                 padding: 10,
                 boxPadding: 4,
@@ -85,11 +87,13 @@ const TenantDashboardPage = () => {
         scales: {
             y: {
                 beginAtZero: true,
-                grid: { color: '#f3f4f6' },
+                grid: { color: isDark ? 'rgba(51, 65, 85, 0.35)' : '#f3f4f6' },
+                ticks: { color: isDark ? '#94a3b8' : '#64748b' },
                 border: { display: false }
             },
             x: {
                 grid: { display: false },
+                ticks: { color: isDark ? '#94a3b8' : '#64748b' },
                 border: { display: false }
             }
         },

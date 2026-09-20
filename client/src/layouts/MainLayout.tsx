@@ -8,6 +8,7 @@ import {
     HiOutlineClipboardCheck, HiOutlineCubeTransparent, HiOutlineColorSwatch,
     HiOutlineBell, HiOutlineMenu, HiOutlineLogout, HiOutlineX, HiOutlineMail
 } from 'react-icons/hi';
+import ThemeToggle from '../components/ThemeToggle';
 
 const notifSound = new Audio('/sound/notification.mp3');
 
@@ -239,13 +240,10 @@ const MainLayout = () => {
     const getLinkClass = (path: string, colorType: 'blue' | 'purple' = 'blue') => {
         const isActive = location.pathname === path;
 
-        if (isActive) {
-            // Nếu có custom color và là 'blue' (màu chính) thì override inline style, còn không thì dùng tailwind classes.
-            // Để đơn giản, ta chỉ đổi màu style nếu người dùng không dùng mặc định.
-        }
-
-        const activeClasses = colorType === 'purple' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600';
-        return `flex items-center px-4 py-3 rounded-lg transition-colors font-medium mb-1 ${isActive ? activeClasses : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'}`;
+        const activeClasses = colorType === 'purple'
+            ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 font-bold shadow-sm'
+            : 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold shadow-sm';
+        return `flex items-center px-4 py-3 rounded-lg transition-colors font-medium mb-1 ${isActive ? activeClasses : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400'}`;
     };
 
     const activeLinkStyle = (path: string, colorType: 'blue' | 'purple' = 'blue') => {
@@ -264,12 +262,12 @@ const MainLayout = () => {
     const planStyle = getPlanStyle(currentPlan);
 
     return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden font-sans text-gray-800">
-            {sidebarOpen && <div className="fixed inset-0 z-40 bg-black bg-opacity-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+        <div className="flex h-screen bg-gray-50 dark:bg-[#070d18] overflow-hidden font-sans text-gray-800 dark:text-gray-100 transition-colors duration-200">
+            {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out flex flex-col shadow-lg lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#0d1527] border-r border-gray-200 dark:border-slate-800 transition-transform duration-300 ease-in-out flex flex-col shadow-lg lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 {/* Logo header - fixed at top */}
-                <div className="relative flex items-center justify-center min-h-[80px] py-4 border-b border-gray-100 px-4 flex-shrink-0">
+                <div className="relative flex items-center justify-center min-h-[80px] py-4 border-b border-gray-100 dark:border-slate-800 px-4 flex-shrink-0">
                     <Link to="/" className="w-full flex items-center justify-center">
                         {branding.logo ? (
                             <img src={branding.logo.startsWith('http') ? branding.logo : `${apiUrl}${branding.logo}`} alt="Logo" className="w-full object-contain" style={{ height: `${branding.logoHeight}px` }} onError={(e) => e.currentTarget.style.display = 'none'} />
@@ -282,7 +280,7 @@ const MainLayout = () => {
                             </div>
                         )}
                     </Link>
-                    <button onClick={() => setSidebarOpen(false)} className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition-colors"><HiOutlineX className="w-5 h-5" /></button>
+                    <button onClick={() => setSidebarOpen(false)} className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-500 text-gray-400 transition-colors"><HiOutlineX className="w-5 h-5" /></button>
                 </div>
 
                 {/* Scrollable navigation area */}
@@ -294,15 +292,15 @@ const MainLayout = () => {
                     <Link to="/tasks" onClick={() => setSidebarOpen(false)} className={getLinkClass('/tasks')} style={activeLinkStyle('/tasks')}><HiOutlineClipboardList className="w-5 h-5 mr-3" />Công việc & Task</Link>
                     <Link to="/chat" onClick={() => setSidebarOpen(false)} className={getLinkClass('/chat')} style={activeLinkStyle('/chat')}><HiOutlineChatAlt2 className="w-5 h-5 mr-3" />Trò chuyện</Link>
                     {['business', 'professional', 'enterprise'].includes(currentPlan) && (
-                        <div className="pt-2 mt-2 border-t border-gray-100">
-                            <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nâng cao</p>
+                        <div className="pt-2 mt-2 border-t border-gray-100 dark:border-slate-800">
+                            <p className="px-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Nâng cao</p>
                             <Link to="/reports" onClick={() => setSidebarOpen(false)} className={getLinkClass('/reports', 'purple')}><HiOutlineChartBar className="w-5 h-5 mr-3" />Báo cáo Thống kê</Link>
                             <Link to="/audit-log" onClick={() => setSidebarOpen(false)} className={getLinkClass('/audit-log', 'purple')}><HiOutlineClipboardCheck className="w-5 h-5 mr-3" />Nhật ký Hoạt động</Link>
                         </div>
                     )}
                     {currentPlan === 'enterprise' && (
-                        <div className="pt-2 mt-2 border-t border-gray-100">
-                            <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Doanh nghiệp</p>
+                        <div className="pt-2 mt-2 border-t border-gray-100 dark:border-slate-800">
+                            <p className="px-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Doanh nghiệp</p>
                             <Link to="/api-integration" onClick={() => setSidebarOpen(false)} className={getLinkClass('/api-integration')} style={activeLinkStyle('/api-integration')}><HiOutlineCubeTransparent className="w-5 h-5 mr-3" />Tích hợp API</Link>
                             <Link to="/branding" onClick={() => setSidebarOpen(false)} className={getLinkClass('/branding')} style={activeLinkStyle('/branding')}><HiOutlineColorSwatch className="w-5 h-5 mr-3" />Tùy chỉnh Thương hiệu</Link>
                         </div>
@@ -310,44 +308,45 @@ const MainLayout = () => {
                 </nav>
 
                 {/* Logout button - pinned at bottom, always visible */}
-                <div className="p-4 border-t border-gray-200 flex-shrink-0">
-                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"><HiOutlineLogout className="w-5 h-5 mr-3" />Đăng xuất</button>
+                <div className="p-4 border-t border-gray-200 dark:border-slate-800 flex-shrink-0">
+                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40"><HiOutlineLogout className="w-5 h-5 mr-3" />Đăng xuất</button>
                 </div>
             </aside>
 
             <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="flex justify-between items-center py-4 px-6 bg-white border-b border-gray-200 shadow-sm relative z-40 h-20">
+                <header className="flex justify-between items-center py-4 px-6 bg-white dark:bg-[#0d1527] border-b border-gray-200 dark:border-slate-800 shadow-sm relative z-40 h-20 transition-colors duration-200">
                     <div className="flex items-center">
-                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-500 focus:outline-none lg:hidden mr-4 hover:bg-gray-100 p-2 rounded-md"><HiOutlineMenu className="text-2xl" /></button>
-                        <h2 className="text-xl font-bold text-gray-800 hidden sm:block">{getPageTitle(location.pathname)}</h2>
+                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-500 dark:text-gray-400 focus:outline-none lg:hidden mr-4 hover:bg-gray-100 dark:hover:bg-slate-800 p-2 rounded-md"><HiOutlineMenu className="text-2xl" /></button>
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white hidden sm:block">{getPageTitle(location.pathname)}</h2>
                     </div>
-                    <div className="flex items-center space-x-6">
+                    <div className="flex items-center space-x-4 sm:space-x-6">
+                        <ThemeToggle compact />
                         <div className={`hidden md:flex items-center rounded-lg p-1.5 border ${planStyle.bg}`}>
-                            <span className="text-xs font-medium text-gray-500 px-2">Gói:</span>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Gói:</span>
                             <span className={`text-sm font-bold uppercase px-2 ${planStyle.text}`}>{planStyle.label}</span>
                         </div>
 
                         <div className="relative" ref={notifRef}>
-                            <button onClick={() => { setNotifOpen(prev => !prev); fetchNotifications(); }} className="relative p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none">
+                            <button onClick={() => { setNotifOpen(prev => !prev); fetchNotifications(); }} className="relative p-2 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none">
                                 {unreadCount > 0 && <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">{unreadCount > 99 ? '99+' : unreadCount}</span>}
                                 <HiOutlineBell className="text-2xl" />
                             </button>
                             {notifOpen && (
-                                <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:right-0 top-[72px] sm:top-full mt-2 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-100 z-50">
-                                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                                        <h3 className="font-bold text-gray-800">Thông báo</h3>
-                                        {unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs text-blue-600 hover:underline">Đánh dấu tất cả đã đọc</button>}
+                                <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:right-0 top-[72px] sm:top-full mt-2 sm:w-96 bg-white dark:bg-[#0d1527] rounded-xl shadow-2xl border border-gray-100 dark:border-slate-800 z-50">
+                                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-slate-800">
+                                        <h3 className="font-bold text-gray-800 dark:text-white">Thông báo</h3>
+                                        {unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">Đánh dấu tất cả đã đọc</button>}
                                     </div>
                                     <div className="max-h-96 overflow-y-auto">
                                         {notifications.length === 0
-                                            ? <div className="p-6 text-center text-gray-400 text-sm">Không có thông báo nào</div>
+                                            ? <div className="p-6 text-center text-gray-400 dark:text-gray-500 text-sm">Không có thông báo nào</div>
                                             : notifications.map(n => (
-                                                <div key={n.id} onClick={() => handleNotifClick(n)} className={`flex items-start gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${!n.isRead ? 'bg-blue-50' : ''}`}>
+                                                <div key={n.id} onClick={() => handleNotifClick(n)} className={`flex items-start gap-3 px-4 py-3 border-b border-gray-50 dark:border-slate-800/60 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors ${!n.isRead ? 'bg-blue-50/70 dark:bg-blue-950/40' : ''}`}>
                                                     <span className="text-lg flex-shrink-0 mt-0.5">{getNotifIcon(n.type)}</span>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className={`text-sm ${!n.isRead ? 'font-semibold text-gray-800' : 'text-gray-600'}`}>{n.title}</p>
-                                                        <p className="text-xs text-gray-500 mt-0.5">{n.message}</p>
-                                                        <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleString('vi-VN')}</p>
+                                                        <p className={`text-sm ${!n.isRead ? 'font-semibold text-gray-800 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{n.title}</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{n.message}</p>
+                                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(n.createdAt).toLocaleString('vi-VN')}</p>
                                                     </div>
                                                     {!n.isRead && <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />}
                                                 </div>
@@ -360,11 +359,11 @@ const MainLayout = () => {
                         <div className="relative group h-full flex items-center">
                             <div className="flex items-center cursor-pointer py-2 gap-3">
                                 <div className="text-right hidden sm:block">
-                                    <div className="text-sm font-bold text-gray-800 leading-tight">{user.name}</div>
-                                    <div className="text-[11px] uppercase font-bold text-blue-600 mt-0.5 tracking-wide">{user.roleName}</div>
+                                    <div className="text-sm font-bold text-gray-800 dark:text-white leading-tight">{user.name}</div>
+                                    <div className="text-[11px] uppercase font-bold text-blue-600 dark:text-blue-400 mt-0.5 tracking-wide">{user.roleName}</div>
                                 </div>
                                 <img
-                                    className="h-10 w-10 rounded-full object-cover border-2 border-gray-100 shadow-sm"
+                                    className="h-10 w-10 rounded-full object-cover border-2 border-gray-100 dark:border-slate-700 shadow-sm"
                                     src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=4F46E5&color=fff&bold=true&size=128`}
                                     onError={(e) => {
                                         const target = e.currentTarget;
@@ -374,9 +373,9 @@ const MainLayout = () => {
                                     alt="Avatar"
                                 />
                             </div>
-                            <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:right-0 top-[72px] sm:top-full mt-1 sm:w-80 bg-white rounded-xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top sm:origin-top-right z-50">
-                                <div className="absolute -top-2 right-6 sm:right-4 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
-                                <div className="p-6 relative bg-white rounded-xl z-20">
+                            <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:right-0 top-[72px] sm:top-full mt-1 sm:w-80 bg-white dark:bg-[#0d1527] rounded-xl shadow-2xl border border-gray-100 dark:border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top sm:origin-top-right z-50">
+                                <div className="absolute -top-2 right-6 sm:right-4 w-4 h-4 bg-white dark:bg-[#0d1527] border-t border-l border-gray-100 dark:border-slate-800 transform rotate-45"></div>
+                                <div className="p-6 relative bg-white dark:bg-[#0d1527] rounded-xl z-20">
                                     <div className="flex items-center space-x-4 mb-4">
                                         <img
                                             className="h-14 w-14 rounded-full object-cover border-2 border-blue-500 p-0.5"

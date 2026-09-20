@@ -5,7 +5,7 @@ import Footer from '@/components/navigation/Footer';
 
 const PublicLayout = () => {
     return (
-        <div className="bg-white text-gray-800 font-sans min-h-screen flex flex-col">
+        <div className="bg-white dark:bg-[#070d18] text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col transition-colors duration-200">
             {/* Header luôn hiển thị ở trên cùng */}
             <Header />
 

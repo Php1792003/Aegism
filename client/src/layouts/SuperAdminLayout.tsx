@@ -4,13 +4,16 @@ import Swal from 'sweetalert2';
 import { getAvatar } from '@/utils/formatters';
 import {
     HiOutlineChartBar, HiOutlineOfficeBuilding, HiOutlineUsers,
-    HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX,
+    HiOutlineLogout, HiOutlineMenu,
     HiOutlineShieldCheck, HiOutlineCurrencyDollar, HiOutlineDocumentReport,
     HiOutlineChevronLeft, HiOutlineChevronRight, HiOutlineSpeakerphone,
     HiOutlineKey, HiOutlineMail
 } from 'react-icons/hi';
+import ThemeToggle from '../components/ThemeToggle';
+import { useTheme } from '../contexts/ThemeContext';
 
 const SuperAdminLayout = () => {
+    const { isDark } = useTheme();
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [user, setUser] = useState<any>({ name: 'Super Admin', avatar: '' });
@@ -68,55 +71,54 @@ const SuperAdminLayout = () => {
         { path: '/super-admin/security', icon: <HiOutlineShieldCheck className="w-5 h-5 flex-shrink-0" />, label: 'Bảo mật & Nhật ký', shortLabel: 'Bảo mật' },
     ];
 
-
     const getLinkClass = (path: string) => {
         const isActive = location.pathname === path;
+        if (isDark) {
+            return `flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200 mb-1 border ${isActive
+                ? 'bg-[#8b5cf6]/15 text-[#a78bfa] border-[#8b5cf6]/30 shadow-[0_0_15px_rgba(139,92,246,0.15)] font-semibold'
+                : 'text-gray-400 hover:bg-white/5 hover:text-[#e5e7eb] border-transparent'}`;
+        }
         return `flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200 mb-1 border ${isActive
-            ? 'bg-[#8b5cf6]/10 text-[#8b5cf6] border-[#8b5cf6]/30 shadow-[0_0_15px_rgba(139,92,246,0.1)]'
-            : 'text-gray-400 hover:bg-white/5 hover:text-[#e5e7eb] border-transparent'}`;
+            ? 'bg-purple-50 text-purple-700 border-purple-200 shadow-sm font-bold'
+            : 'text-slate-600 hover:bg-slate-100 hover:text-purple-700 border-transparent'}`;
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: '#080810', color: '#e5e7eb', fontFamily: "'Inter', 'SF Pro Display', sans-serif" }} className="flex h-screen overflow-hidden">
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
-                * { box-sizing: border-box; }
-                ::-webkit-scrollbar { width: 4px; height: 4px; }
-                ::-webkit-scrollbar-track { background: transparent; }
-                ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 4px; }
-            `}</style>
+        <div className={`flex h-screen overflow-hidden font-sans transition-colors duration-200 ${isDark ? 'bg-[#080810] text-[#e5e7eb]' : 'bg-[#f8fafc] text-[#0f172a]'}`}>
             {mobileSidebarOpen && (
-                <div className="fixed inset-0 z-40 bg-black bg-opacity-60 lg:hidden" onClick={() => setMobileSidebarOpen(false)} />
+                <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setMobileSidebarOpen(false)} />
             )}
 
             {/* SIDEBAR */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 border-r border-[rgba(255,255,255,0.05)] flex flex-col justify-between transition-all duration-300 pb-16 lg:pb-0
-                lg:static
+                fixed inset-y-0 left-0 z-50 flex flex-col justify-between transition-all duration-300 pb-16 lg:pb-0 lg:static
                 ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 ${sidebarOpen ? 'w-64' : 'w-16'}
-            `} style={{ background: 'rgba(17,17,27,0.8)', backdropFilter: 'blur(12px)' }}>
+                ${isDark ? 'bg-[#0f0f1c]/95 border-r border-white/5 backdrop-blur-md' : 'bg-white border-r border-slate-200 shadow-sm'}
+            `}>
                 <div className="overflow-hidden">
-                    <div className={`flex items-center h-16 px-3 border-b border-[rgba(255,255,255,0.05)] ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
+                    <div className={`flex items-center h-16 px-3 border-b ${isDark ? 'border-white/5' : 'border-slate-100'} ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
                         {sidebarOpen && (
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-purple-500/20">
                                     <HiOutlineShieldCheck className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <div className="text-white font-bold text-sm">AEGISM</div>
-                                    <div className="text-purple-400 text-xs">Super Admin</div>
+                                    <div className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>AEGISM</div>
+                                    <div className="text-purple-600 dark:text-purple-400 text-xs font-semibold">Super Admin</div>
                                 </div>
                             </div>
                         )}
                         {!sidebarOpen && (
-                            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center shadow-md shadow-purple-500/20">
                                 <HiOutlineShieldCheck className="w-5 h-5 text-white" />
                             </div>
                         )}
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="hidden lg:flex items-center justify-center w-6 h-6 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-colors flex-shrink-0"
+                            className={`hidden lg:flex items-center justify-center w-6 h-6 rounded-full transition-colors flex-shrink-0 ${
+                                isDark ? 'bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white' : 'bg-slate-100 hover:bg-purple-100 text-slate-500 hover:text-purple-700'
+                            }`}
                         >
                             {sidebarOpen ? <HiOutlineChevronLeft className="w-3.5 h-3.5" /> : <HiOutlineChevronRight className="w-3.5 h-3.5" />}
                         </button>
@@ -124,7 +126,7 @@ const SuperAdminLayout = () => {
 
                     <nav className="mt-4 px-2">
                         {sidebarOpen && (
-                            <p className="px-3 text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Quản trị</p>
+                            <p className="px-3 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-3">Quản trị</p>
                         )}
                         {navItems.map(item => (
                             <Link
@@ -141,26 +143,28 @@ const SuperAdminLayout = () => {
                     </nav>
                 </div>
 
-                <div className={`p-3 border-t border-[rgba(255,255,255,0.05)] ${!sidebarOpen ? 'flex flex-col items-center gap-2' : ''}`}>
+                <div className={`p-3 border-t ${isDark ? 'border-white/5' : 'border-slate-100'} ${!sidebarOpen ? 'flex flex-col items-center gap-2' : ''}`}>
                     {sidebarOpen ? (
                         <>
                             <div className="flex items-center gap-3 mb-3 px-1">
                                 <img
-                                    src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`}
+                                    src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=7C3AED&color=fff&bold=true&size=128`}
                                     onError={(e) => {
                                         const target = e.currentTarget;
                                         target.onerror = null;
-                                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`;
+                                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=7C3AED&color=fff&bold=true&size=128`;
                                     }}
                                     className="w-9 h-9 rounded-full border-2 border-purple-500 flex-shrink-0 object-cover"
                                     alt="avatar"
                                 />
-                                <div>
-                                    <div className="text-white text-sm font-semibold truncate">{user.name}</div>
-                                    <div className="text-purple-400 text-xs truncate">Super Administrator</div>
+                                <div className="min-w-0 flex-1">
+                                    <div className={`text-sm font-semibold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{user.name}</div>
+                                    <div className="text-purple-600 dark:text-purple-400 text-xs truncate font-medium">Super Administrator</div>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+                            <button onClick={handleLogout} className={`flex items-center gap-2 w-full px-3 py-2 text-sm rounded-lg transition-colors ${
+                                isDark ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-slate-600 hover:text-red-600 hover:bg-red-50'
+                            }`}>
                                 <HiOutlineLogout className="w-4 h-4" />
                                 Đăng xuất
                             </button>
@@ -168,17 +172,19 @@ const SuperAdminLayout = () => {
                     ) : (
                         <>
                             <img
-                                src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`}
+                                src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=7C3AED&color=fff&bold=true&size=128`}
                                 onError={(e) => {
                                     const target = e.currentTarget;
                                     target.onerror = null;
-                                    target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`;
+                                    target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=7C3AED&color=fff&bold=true&size=128`;
                                 }}
                                 className="w-8 h-8 rounded-full border-2 border-purple-500 object-cover"
                                 alt="avatar"
                                 title={user.name}
                             />
-                            <button onClick={handleLogout} className="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors" title="Đăng xuất">
+                            <button onClick={handleLogout} className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+                                isDark ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-slate-500 hover:text-red-600 hover:bg-red-50'
+                            }`} title="Đăng xuất">
                                 <HiOutlineLogout className="w-4 h-4" />
                             </button>
                         </>
@@ -188,22 +194,27 @@ const SuperAdminLayout = () => {
 
             {/* MAIN */}
             <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-                <header className="h-16 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between px-4 flex-shrink-0 relative z-40" style={{ background: 'rgba(17,17,27,0.8)', backdropFilter: 'blur(12px)' }}>
+                <header className={`h-16 border-b flex items-center justify-between px-4 sm:px-6 flex-shrink-0 relative z-40 transition-colors ${
+                    isDark ? 'bg-[#0f0f1c]/95 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200 shadow-sm'
+                }`}>
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-                            className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                            className={`lg:hidden p-2 rounded-lg transition-colors ${
+                                isDark ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-slate-600 hover:bg-slate-100'
+                            }`}
                         >
                             <HiOutlineMenu className="w-5 h-5" />
                         </button>
-                        <span className="text-gray-500 text-xs uppercase tracking-widest font-medium">Super Admin Panel</span>
+                        <span className="text-slate-500 dark:text-gray-500 text-xs uppercase tracking-widest font-bold">Super Admin Panel</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="hidden sm:flex items-center gap-1.5 bg-green-950 text-green-400 text-xs px-3 py-1.5 rounded-full font-medium border border-green-900">
-                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                        <ThemeToggle compact />
+                        <span className="hidden sm:flex items-center gap-1.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400 text-xs px-3 py-1.5 rounded-full font-semibold border border-emerald-200 dark:border-emerald-800/80">
+                            <span className="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-pulse"></span>
                             Hệ thống hoạt động
                         </span>
-                        <Link to="/dashboard" className="text-xs text-purple-400 hover:text-purple-300 border border-gray-700 hover:border-purple-600 px-3 py-1.5 rounded-lg transition-colors">
+                        <Link to="/dashboard" className="text-xs text-purple-700 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 border border-purple-200 dark:border-gray-700 hover:border-purple-400 dark:hover:border-purple-500 bg-purple-50/60 dark:bg-purple-950/30 px-3 py-1.5 rounded-lg transition-colors font-medium">
                             ← Về Dashboard
                         </Link>
                     </div>
@@ -213,26 +224,31 @@ const SuperAdminLayout = () => {
                 </main>
 
                 {/* Mobile Bottom Navigation */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[rgba(255,255,255,0.05)] shadow-lg" style={{ background: 'rgba(17,17,27,0.85)', backdropFilter: 'blur(12px)' }}>
+                <nav className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t shadow-lg ${
+                    isDark ? 'bg-[#0f0f1c]/95 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200'
+                }`}>
                     <div className="flex items-center justify-around h-16 px-1">
                         {navItems.slice(0, 4).map(item => (
                             <Link
                                 key={item.path}
                                 to={item.path}
                                 onClick={() => setMobileSidebarOpen(false)}
-                                className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${location.pathname === item.path ? 'text-purple-400' : 'text-gray-500 hover:text-gray-300'
-                                    }`}
+                                className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 transition-colors ${
+                                    location.pathname === item.path
+                                        ? 'text-purple-600 dark:text-purple-400 font-bold'
+                                        : 'text-slate-500 dark:text-gray-500 hover:text-slate-800 dark:hover:text-gray-300'
+                                }`}
                             >
-                                <span className="w-6 h-6">{item.icon}</span>
-                                <span className="text-[9px] font-medium leading-tight text-center">{item.shortLabel}</span>
+                                <span className="w-5 h-5">{item.icon}</span>
+                                <span className="text-[10px] font-medium leading-tight text-center">{item.shortLabel}</span>
                             </Link>
                         ))}
                         <button
                             onClick={() => setMobileSidebarOpen(true)}
-                            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 text-gray-500 hover:text-gray-300 transition-colors"
+                            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full px-1 text-slate-500 dark:text-gray-500 hover:text-slate-800 dark:hover:text-gray-300 transition-colors"
                         >
-                            <HiOutlineMenu className="w-6 h-6" />
-                            <span className="text-[9px] font-medium leading-tight">Thêm</span>
+                            <HiOutlineMenu className="w-5 h-5" />
+                            <span className="text-[10px] font-medium leading-tight">Thêm</span>
                         </button>
                     </div>
                 </nav>

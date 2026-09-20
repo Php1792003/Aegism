@@ -59,6 +59,12 @@ const faqItems = [
     }
 ];
 
+const fallbackPlans: PlanConfig[] = [
+    { planKey: 'STARTER', displayName: 'Starter', monthlyPrice: 499000, yearlyPrice: 399000, maxUsers: 10, maxProjects: 3, maxQRCodes: 100, features: ['Tối đa 10 người dùng', 'Tối đa 3 dự án', '100 mã QR', 'Hỗ trợ email 24/7'], isActive: true },
+    { planKey: 'BUSINESS', displayName: 'Business', monthlyPrice: 999000, yearlyPrice: 799000, maxUsers: 50, maxProjects: 20, maxQRCodes: 500, features: ['Tối đa 50 người dùng', 'Dự án không giới hạn', '500 mã QR', 'Hỗ trợ ưu tiên 24/7', 'Bản đồ số GPS', 'Báo cáo SLA Excel/PDF'], isActive: true },
+    { planKey: 'ENTERPRISE', displayName: 'Enterprise', monthlyPrice: 0, yearlyPrice: 0, maxUsers: 999, maxProjects: 999, maxQRCodes: 9999, features: ['Không giới hạn User', 'Server riêng On-premise', 'Tùy chỉnh tính năng', 'Tích hợp API hệ thống', 'Đào tạo nhân viên tận nơi'], isActive: true },
+];
+
 const PricingPage = () => {
     const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,7 +81,7 @@ const PricingPage = () => {
     const [userInfo, setUserInfo] = useState<UserInfo>({ fullName: '', email: '', phone: '', company: '' });
     const pollingRef = useRef<any>(null);
     const countdownRef = useRef<any>(null);
-    const [dynamicPlans, setDynamicPlans] = useState<PlanConfig[]>([]);
+    const [dynamicPlans, setDynamicPlans] = useState<PlanConfig[]>(fallbackPlans);
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
     const containerRef = usePageAnimations<HTMLDivElement>();
@@ -93,16 +99,14 @@ const PricingPage = () => {
             .then(r => r.json())
             .then((configs: PlanConfig[]) => {
                 const active = configs.filter(c => c.isActive);
-                setDynamicPlans(active);
-                const firstPaid = active.find(c => c.monthlyPrice > 0);
-                if (firstPaid) setSelectedPlanKey(firstPaid.planKey);
+                if (active.length) {
+                    setDynamicPlans(active);
+                    const firstPaid = active.find(c => c.monthlyPrice > 0);
+                    if (firstPaid) setSelectedPlanKey(firstPaid.planKey);
+                }
             })
             .catch(() => {
-                setDynamicPlans([
-                    { planKey: 'STARTER', displayName: 'Starter', monthlyPrice: 499000, yearlyPrice: 399000, maxUsers: 10, maxProjects: 3, maxQRCodes: 100, features: ['Tối đa 10 người dùng', 'Tối đa 3 dự án', '100 mã QR', 'Hỗ trợ email 24/7'], isActive: true },
-                    { planKey: 'BUSINESS', displayName: 'Business', monthlyPrice: 999000, yearlyPrice: 799000, maxUsers: 50, maxProjects: 20, maxQRCodes: 500, features: ['Tối đa 50 người dùng', 'Dự án không giới hạn', '500 mã QR', 'Hỗ trợ ưu tiên 24/7', 'Bản đồ số GPS', 'Báo cáo SLA Excel/PDF'], isActive: true },
-                    { planKey: 'ENTERPRISE', displayName: 'Enterprise', monthlyPrice: 0, yearlyPrice: 0, maxUsers: 999, maxProjects: 999, maxQRCodes: 9999, features: ['Không giới hạn User', 'Server riêng On-premise', 'Tùy chỉnh tính năng', 'Tích hợp API hệ thống', 'Đào tạo nhân viên tận nơi'], isActive: true },
-                ]);
+                /* giữ nguyên fallbackPlans */
             });
         return () => { clearInterval(pollingRef.current); clearInterval(countdownRef.current); };
     }, []);
@@ -204,29 +208,29 @@ const PricingPage = () => {
 
             <main>
                 {/* --- HERO & BILLING TOGGLE --- */}
-                <section className="pt-14 pb-16 bg-gradient-to-b from-blue-50/60 via-white to-white">
+                <section className="pt-14 pb-16 bg-gradient-to-b from-blue-50/60 via-white to-white dark:from-slate-900/60 dark:via-[#070d18] dark:to-[#070d18] transition-colors">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-                        <div data-hero-entrance="badge" className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold mb-6">
-                            <HiOutlineSparkles className="w-4 h-4 text-blue-600" />
+                        <div data-hero-entrance="badge" className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-6">
+                            <HiOutlineSparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             <span>Đầu tư hiệu quả cho an ninh bền vững</span>
                         </div>
 
-                        <h1 data-hero-entrance="title" className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-[1.15]">
+                        <h1 data-hero-entrance="title" className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.15]">
                             <SplitWords text="Bảng Giá Dịch Vụ" />
                             <br />
                             <SplitWords
                                 text="Minh Bạch & Linh Hoạt"
-                                innerClassName="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 bg-clip-text text-transparent"
+                                innerClassName="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 dark:from-blue-400 dark:via-cyan-300 dark:to-sky-300 bg-clip-text text-transparent"
                             />
                         </h1>
 
-                        <p data-hero-entrance="desc" className="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                        <p data-hero-entrance="desc" className="mt-6 text-lg sm:text-xl text-gray-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
                             Chọn gói dịch vụ phù hợp với quy mô nhân sự của bạn. Nâng cấp hoặc thay đổi số lượng điểm chốt bất kỳ khi nào bạn muốn.
                         </p>
 
                         {/* Billing Switch */}
                         <div data-reveal="up" className="flex justify-center items-center gap-4 mt-8">
-                            <span className={`text-sm font-semibold ${cycle === 'monthly' ? 'text-gray-900' : 'text-gray-400'}`}>
+                            <span className={`text-sm font-semibold ${cycle === 'monthly' ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>
                                 Thanh toán hàng tháng
                             </span>
                             <button
@@ -236,18 +240,18 @@ const PricingPage = () => {
                             >
                                 <div className={`w-5 h-5 bg-white rounded-full transition-transform duration-200 transform ${cycle === 'yearly' ? 'translate-x-7' : ''}`} />
                             </button>
-                            <span className={`text-sm font-semibold flex items-center gap-1.5 ${cycle === 'yearly' ? 'text-blue-600' : 'text-gray-400'}`}>
+                            <span className={`text-sm font-semibold flex items-center gap-1.5 ${cycle === 'yearly' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}>
                                 Thanh toán hàng năm
-                                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
                                     Tiết kiệm 20%
                                 </span>
                             </span>
                         </div>
 
                         {/* Promo Voucher Banner */}
-                        <div data-reveal="up" className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold">
-                            <HiOutlineTag className="w-4 h-4 text-amber-600" />
-                            <span>Nhập mã <strong className="text-amber-700 font-mono">AEGISM20</strong> để nhận thêm ưu đãi 20% trong hôm nay!</span>
+                        <div data-reveal="up" className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-300 text-xs font-semibold">
+                            <HiOutlineTag className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            <span>Nhập mã <strong className="text-amber-700 dark:text-amber-400 font-mono">AEGISM20</strong> để nhận thêm ưu đãi 20% trong hôm nay!</span>
                         </div>
                     </div>
                 </section>
@@ -255,7 +259,7 @@ const PricingPage = () => {
                 {/* --- PRICING CARDS --- */}
                 <section className="pb-20">
                     <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                        <div data-stagger-group className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                        <div data-reveal="up" className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
                             {dynamicPlans.map((plan, index) => {
                                 const isEnterprise = plan.planKey === 'ENTERPRISE' || (plan.monthlyPrice === 0 && plan.yearlyPrice === 0);
                                 const priceStr = isEnterprise
@@ -267,13 +271,12 @@ const PricingPage = () => {
 
                                 return (
                                     <div
-                                        key={index}
-                                        data-stagger-item
+                                        key={plan.planKey || index}
                                         className={`
-                                            relative flex flex-col p-8 bg-white rounded-3xl transition-all duration-300
+                                            relative flex flex-col p-8 bg-white dark:bg-slate-900 rounded-3xl transition-all duration-300
                                             ${isHighlighted
                                                 ? 'border-2 border-blue-600 shadow-2xl scale-[1.03] z-10'
-                                                : 'border border-gray-200 shadow-md hover:shadow-xl'
+                                                : 'border border-gray-200 dark:border-slate-800 shadow-md hover:shadow-xl'
                                             }
                                         `}
                                     >
@@ -284,8 +287,8 @@ const PricingPage = () => {
                                         )}
 
                                         <div className="mb-4">
-                                            <h3 className={`text-2xl font-black ${isHighlighted ? 'text-blue-600' : 'text-gray-900'}`}>{plan.displayName}</h3>
-                                            <p className="text-xs text-gray-500 mt-2 min-h-[36px]">
+                                            <h3 className={`text-2xl font-black ${isHighlighted ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>{plan.displayName}</h3>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 min-h-[36px]">
                                                 {plan.planKey === 'STARTER' && 'Mục tiêu đơn lẻ, đội tuần tra vừa và nhỏ dưới 10 nhân sự.'}
                                                 {plan.planKey === 'BUSINESS' && 'Tòa nhà văn phòng, khu chung cư và công ty an ninh chuyên nghiệp.'}
                                                 {plan.planKey === 'ENTERPRISE' && 'Tập đoàn đa chi nhánh, server riêng và cam kết SLA chặt chẽ.'}
@@ -293,26 +296,26 @@ const PricingPage = () => {
                                         </div>
 
                                         <div className="mb-6 flex items-baseline">
-                                            <span className="text-3xl sm:text-4xl font-black text-gray-900">{priceStr}</span>
-                                            {!isEnterprise && <span className="text-gray-500 font-medium ml-1.5 text-sm">/tháng</span>}
+                                            <span className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">{priceStr}</span>
+                                            {!isEnterprise && <span className="text-gray-500 dark:text-gray-400 font-medium ml-1.5 text-sm">/tháng</span>}
                                         </div>
 
-                                        <ul className="mb-8 space-y-3.5 flex-1 border-t border-gray-100 pt-6">
-                                            <li className="flex items-center text-sm font-semibold text-gray-700">
-                                                <HiCheck className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
+                                        <ul className="mb-8 space-y-3.5 flex-1 border-t border-gray-100 dark:border-slate-800 pt-6">
+                                            <li className="flex items-center text-sm font-semibold text-gray-700 dark:text-slate-200">
+                                                <HiCheck className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />
                                                 <span>Tối đa {plan.maxUsers} người dùng</span>
                                             </li>
-                                            <li className="flex items-center text-sm font-semibold text-gray-700">
-                                                <HiCheck className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
+                                            <li className="flex items-center text-sm font-semibold text-gray-700 dark:text-slate-200">
+                                                <HiCheck className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />
                                                 <span>Tối đa {plan.maxProjects} dự án</span>
                                             </li>
-                                            <li className="flex items-center text-sm font-semibold text-gray-700">
-                                                <HiCheck className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
+                                            <li className="flex items-center text-sm font-semibold text-gray-700 dark:text-slate-200">
+                                                <HiCheck className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />
                                                 <span>Tối đa {plan.maxQRCodes} điểm quét QR</span>
                                             </li>
                                             {(Array.isArray(plan.features) ? plan.features : []).map((f: string, idx: number) => (
-                                                <li key={idx} className="flex items-center text-sm text-gray-600">
-                                                    <HiCheck className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" />
+                                                <li key={idx} className="flex items-center text-sm text-gray-600 dark:text-slate-300">
+                                                    <HiCheck className="w-5 h-5 text-emerald-500 dark:text-emerald-400 mr-3 flex-shrink-0" />
                                                     <span>{f}</span>
                                                 </li>
                                             ))}
@@ -321,7 +324,7 @@ const PricingPage = () => {
                                         {isEnterprise ? (
                                             <Link
                                                 to="/contact"
-                                                className="w-full block text-center py-3.5 rounded-xl font-bold transition-all text-sm bg-gray-900 text-white hover:bg-gray-800"
+                                                className="w-full block text-center py-3.5 rounded-xl font-bold transition-all text-sm bg-gray-900 dark:bg-slate-800 text-white hover:bg-gray-800 dark:hover:bg-slate-700"
                                             >
                                                 Liên hệ chuyên viên
                                             </Link>
@@ -332,7 +335,7 @@ const PricingPage = () => {
                                                     w-full block text-center py-3.5 rounded-xl font-bold transition-all text-sm
                                                     ${isHighlighted
                                                         ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25'
-                                                        : 'bg-gray-100 text-gray-800 hover:bg-blue-50 hover:text-blue-600'
+                                                        : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/50 hover:text-blue-600 dark:hover:text-blue-400'
                                                     }
                                                 `}
                                             >
@@ -347,13 +350,13 @@ const PricingPage = () => {
                 </section>
 
                 {/* --- FAQ ACCORDION --- */}
-                <section className="bg-gray-50 py-20 border-t border-gray-100">
+                <section className="bg-gray-50 dark:bg-[#0b1220] py-20 border-t border-gray-100 dark:border-slate-800 transition-colors">
                     <div className="container mx-auto max-w-4xl px-4 sm:px-6">
                         <div data-reveal="up" className="text-center mb-12">
-                            <span className="text-blue-600 text-xs font-bold uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                            <span className="text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-100 dark:border-blue-800">
                                 Thắc mắc thường gặp
                             </span>
-                            <h2 data-split className="mt-3 text-3xl font-extrabold text-gray-900">
+                            <h2 data-split className="mt-3 text-3xl font-extrabold text-gray-900 dark:text-white">
                                 <SplitWords text="Giải Đáp Về Bảng Giá & Thanh Toán" />
                             </h2>
                         </div>
@@ -365,17 +368,17 @@ const PricingPage = () => {
                                     <div
                                         key={idx}
                                         data-reveal="up"
-                                        className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
+                                        className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm"
                                     >
                                         <button
                                             onClick={() => setOpenFaq(isOpen ? null : idx)}
-                                            className="w-full text-left px-6 py-4 flex items-center justify-between font-bold text-gray-900 hover:text-blue-600 transition"
+                                            className="w-full text-left px-6 py-4 flex items-center justify-between font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition"
                                         >
                                             <span className="text-base">{faq.question}</span>
-                                            <HiChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                                            <HiChevronDown className={`w-5 h-5 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''}`} />
                                         </button>
                                         {isOpen && (
-                                            <div className="px-6 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                                            <div className="px-6 pb-5 text-sm text-gray-600 dark:text-slate-300 leading-relaxed border-t border-gray-100 dark:border-slate-800 pt-3">
                                                 {faq.answer}
                                             </div>
                                         )}
@@ -395,37 +398,37 @@ const PricingPage = () => {
                             <div className="absolute inset-0 bg-gray-900/75 backdrop-blur-sm"></div>
                         </div>
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                        <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full relative">
+                        <div className="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-2xl border border-gray-200 dark:border-slate-800 transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full relative">
                             {['info', 'waiting', 'error'].includes(paymentStep) && (
-                                <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"><HiXMark className="text-2xl" /></button>
+                                <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 z-10"><HiXMark className="text-2xl" /></button>
                             )}
                             <div className="grid grid-cols-1 lg:grid-cols-12 h-full">
-                                <div className="lg:col-span-5 bg-gray-50 p-6 border-r border-gray-200 flex flex-col justify-between">
+                                <div className="lg:col-span-5 bg-gray-50 dark:bg-slate-950/80 p-6 border-r border-gray-200 dark:border-slate-800 flex flex-col justify-between">
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-4">Tóm Tắt Đơn Hàng</h3>
-                                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-4">
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Tóm Tắt Đơn Hàng</h3>
+                                        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm mb-4">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <p className="text-xs text-gray-500 uppercase font-bold">Gói dịch vụ</p>
-                                                    <h4 className="text-xl font-bold text-blue-600">{selectedPlanObj?.displayName || selectedPlanKey}</h4>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Gói dịch vụ</p>
+                                                    <h4 className="text-xl font-bold text-blue-600 dark:text-blue-400">{selectedPlanObj?.displayName || selectedPlanKey}</h4>
                                                 </div>
-                                                <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full uppercase">{cycle === 'yearly' ? 'Năm' : 'Tháng'}</span>
+                                                <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-full uppercase">{cycle === 'yearly' ? 'Năm' : 'Tháng'}</span>
                                             </div>
-                                            <div className="mt-3 pt-3 border-t border-gray-100 text-sm space-y-1">
-                                                <div className="flex justify-between"><span className="text-gray-500">Đơn giá:</span><span className="font-semibold">{formatMoney(getPlanPrice())}</span></div>
-                                                <div className="flex justify-between"><span className="text-gray-500">Chu kỳ:</span><span className="font-semibold">{cycle === 'yearly' ? '12 tháng (-20%)' : '30 ngày'}</span></div>
+                                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-800 text-sm space-y-1">
+                                                <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Đơn giá:</span><span className="font-semibold text-gray-900 dark:text-white">{formatMoney(getPlanPrice())}</span></div>
+                                                <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Chu kỳ:</span><span className="font-semibold text-gray-900 dark:text-white">{cycle === 'yearly' ? '12 tháng (-20%)' : '30 ngày'}</span></div>
                                             </div>
                                         </div>
 
-                                        <div className="bg-white p-4 rounded-xl border border-gray-200 mb-4">
-                                            <p className="text-xs text-gray-500 mb-2 font-semibold">Mã ưu đãi / Voucher:</p>
+                                        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-800 mb-4">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-semibold">Mã ưu đãi / Voucher:</p>
                                             <div className="flex gap-2">
                                                 <input
                                                     type="text"
                                                     value={discountCode}
                                                     onChange={e => { setDiscountCode(e.target.value.toUpperCase()); setDiscountResult(null); }}
                                                     placeholder="VD: AEGISM20"
-                                                    className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold outline-none focus:border-blue-600 uppercase"
+                                                    className="flex-1 px-3 py-1.5 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-lg text-xs font-bold outline-none focus:border-blue-600 uppercase"
                                                 />
                                                 <button
                                                     onClick={checkDiscountCode}
@@ -435,51 +438,51 @@ const PricingPage = () => {
                                                     {checkingCode ? '...' : 'Áp dụng'}
                                                 </button>
                                             </div>
-                                            {discountResult && <p className={`text-xs mt-1.5 font-medium ${discountResult.valid ? 'text-emerald-600' : 'text-rose-500'}`}>{discountResult.message}</p>}
+                                            {discountResult && <p className={`text-xs mt-1.5 font-medium ${discountResult.valid ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>{discountResult.message}</p>}
                                         </div>
                                     </div>
 
-                                    <div className="border-t border-gray-200 pt-4 mt-4">
+                                    <div className="border-t border-gray-200 dark:border-slate-800 pt-4 mt-4">
                                         {discountResult?.valid && (
-                                            <div className="space-y-1 text-sm text-gray-500 mb-2">
+                                            <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400 mb-2">
                                                 <div className="flex justify-between"><span>Tạm tính:</span><span>{formatMoney(calculateSubTotal())}</span></div>
-                                                <div className="flex justify-between text-emerald-600 font-semibold"><span>Giảm giá:</span><span>-{formatMoney(calculateSubTotal() - getFinalPrice())}</span></div>
+                                                <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold"><span>Giảm giá:</span><span>-{formatMoney(calculateSubTotal() - getFinalPrice())}</span></div>
                                             </div>
                                         )}
-                                        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                                            <span className="font-bold text-gray-900">Tổng thanh toán:</span>
-                                            <span className="text-2xl font-black text-blue-600">{formatMoney(getFinalPrice())}</span>
+                                        <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-slate-800">
+                                            <span className="font-bold text-gray-900 dark:text-white">Tổng thanh toán:</span>
+                                            <span className="text-2xl font-black text-blue-600 dark:text-blue-400">{formatMoney(getFinalPrice())}</span>
                                         </div>
-                                        <p className="mt-3 text-[11px] text-gray-400">🔒 Cổng thanh toán bảo mật PayOS & VietQR</p>
+                                        <p className="mt-3 text-[11px] text-gray-400 dark:text-gray-500">🔒 Cổng thanh toán bảo mật PayOS & VietQR</p>
                                     </div>
                                 </div>
 
-                                <div className="lg:col-span-7 p-6 sm:p-8 relative">
+                                <div className="lg:col-span-7 p-6 sm:p-8 relative bg-white dark:bg-slate-900">
                                     {paymentStep === 'info' && (
                                         <div>
-                                            <h3 className="text-xl font-bold text-gray-900 mb-4">Thông Tin Khách Hàng</h3>
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Thông Tin Khách Hàng</h3>
                                             <div className="space-y-4 mb-6">
                                                 <div>
-                                                    <label className="block text-xs font-bold text-gray-700 mb-1">Họ và tên *</label>
-                                                    <input type="text" value={userInfo.fullName} onChange={e => setUserInfo(p => ({ ...p, fullName: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="Nguyễn Văn A" />
+                                                    <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">Họ và tên *</label>
+                                                    <input type="text" value={userInfo.fullName} onChange={e => setUserInfo(p => ({ ...p, fullName: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="Nguyễn Văn A" />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-bold text-gray-700 mb-1">Email nhận thông báo kích hoạt *</label>
-                                                    <input type="email" value={userInfo.email} onChange={e => setUserInfo(p => ({ ...p, email: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="admin@doanhnghiep.com" />
+                                                    <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">Email nhận thông báo kích hoạt *</label>
+                                                    <input type="email" value={userInfo.email} onChange={e => setUserInfo(p => ({ ...p, email: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="admin@doanhnghiep.com" />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div>
-                                                        <label className="block text-xs font-bold text-gray-700 mb-1">Số điện thoại</label>
-                                                        <input type="tel" value={userInfo.phone} onChange={e => setUserInfo(p => ({ ...p, phone: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="0901..." />
+                                                        <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">Số điện thoại</label>
+                                                        <input type="tel" value={userInfo.phone} onChange={e => setUserInfo(p => ({ ...p, phone: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="0901..." />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-bold text-gray-700 mb-1">Công ty / Tổ chức</label>
-                                                        <input type="text" value={userInfo.company} onChange={e => setUserInfo(p => ({ ...p, company: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="Tên đơn vị" />
+                                                        <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">Công ty / Tổ chức</label>
+                                                        <input type="text" value={userInfo.company} onChange={e => setUserInfo(p => ({ ...p, company: e.target.value }))} className="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl outline-none focus:border-blue-600 text-sm" placeholder="Tên đơn vị" />
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="border border-blue-200 bg-blue-50/60 rounded-xl p-4 mb-6 text-xs text-blue-900 leading-relaxed">
+                                            <div className="border border-blue-200 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/40 rounded-xl p-4 mb-6 text-xs text-blue-900 dark:text-blue-300 leading-relaxed">
                                                 Hệ thống sẽ tạo mã QR thanh toán tức thời. Ngay sau khi ngân hàng xác nhận, gói dịch vụ của bạn sẽ được kích hoạt tự động.
                                             </div>
 
@@ -495,22 +498,22 @@ const PricingPage = () => {
 
                                     {paymentStep === 'processing' && (
                                         <div className="h-full flex flex-col items-center justify-center p-8 text-center min-h-[350px]">
-                                            <div className="w-14 h-14 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4" />
-                                            <p className="font-bold text-gray-800">Đang khởi tạo giao dịch PayOS...</p>
-                                            <p className="text-xs text-gray-500 mt-1">Vui lòng không tắt trình duyệt.</p>
+                                            <div className="w-14 h-14 border-4 border-gray-200 dark:border-slate-700 border-t-blue-600 rounded-full animate-spin mb-4" />
+                                            <p className="font-bold text-gray-800 dark:text-slate-200">Đang khởi tạo giao dịch PayOS...</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Vui lòng không tắt trình duyệt.</p>
                                         </div>
                                     )}
 
                                     {paymentStep === 'waiting' && (
                                         <div className="h-full flex flex-col items-center justify-center p-6 text-center">
-                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-bold mb-4">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 rounded-full text-xs font-bold mb-4">
                                                 ⏱️ Hết hạn trong {fmtCountdown(countdown)}
                                             </div>
-                                            <h4 className="text-xl font-bold text-gray-900 mb-2">Quét Mã VietQR Để Kích Hoạt</h4>
-                                            <p className="text-xs text-gray-500 mb-4 max-w-sm">Mở ứng dụng ngân hàng bất kỳ để quét mã. Đơn hàng sẽ tự động duyệt trong giây lát.</p>
+                                            <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Quét Mã VietQR Để Kích Hoạt</h4>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-sm">Mở ứng dụng ngân hàng bất kỳ để quét mã. Đơn hàng sẽ tự động duyệt trong giây lát.</p>
 
                                             {checkoutUrl && (
-                                                <div className="p-3 bg-white border border-gray-200 rounded-2xl shadow-md mb-4">
+                                                <div className="p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-md mb-4">
                                                     <iframe
                                                         src={checkoutUrl}
                                                         className="w-72 sm:w-80 h-80 border-0 rounded-xl"
@@ -524,13 +527,13 @@ const PricingPage = () => {
                                                     href={checkoutUrl}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition"
+                                                    className="px-4 py-2 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition"
                                                 >
                                                     Mở trang PayOS rời ↗
                                                 </a>
                                                 <button
                                                     onClick={closeModal}
-                                                    className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-50"
+                                                    className="px-4 py-2 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-gray-50 dark:hover:bg-slate-800"
                                                 >
                                                     Đóng
                                                 </button>
@@ -540,11 +543,11 @@ const PricingPage = () => {
 
                                     {paymentStep === 'success' && (
                                         <div className="h-full flex flex-col items-center justify-center p-8 text-center min-h-[350px]">
-                                            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 text-3xl">
+                                            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-4 text-3xl">
                                                 ✓
                                             </div>
-                                            <h4 className="text-2xl font-black text-gray-900">Kích Hoạt Thành Công!</h4>
-                                            <p className="text-sm text-gray-600 mt-2 max-w-sm">Gói {selectedPlanObj?.displayName} đã được kích hoạt cho tổ chức của bạn.</p>
+                                            <h4 className="text-2xl font-black text-gray-900 dark:text-white">Kích Hoạt Thành Công!</h4>
+                                            <p className="text-sm text-gray-600 dark:text-slate-300 mt-2 max-w-sm">Gói {selectedPlanObj?.displayName} đã được kích hoạt cho tổ chức của bạn.</p>
                                             <Link
                                                 to="/dashboard"
                                                 onClick={closeModal}
@@ -557,11 +560,11 @@ const PricingPage = () => {
 
                                     {paymentStep === 'error' && (
                                         <div className="h-full flex flex-col items-center justify-center p-8 text-center min-h-[350px]">
-                                            <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mb-4 text-3xl">
+                                            <div className="w-16 h-16 bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center mb-4 text-3xl">
                                                 ✕
                                             </div>
-                                            <h4 className="text-xl font-bold text-gray-900">Khởi Tạo Thất Bại</h4>
-                                            <p className="text-xs text-gray-500 mt-2 max-w-sm">Đã có sự cố kết nối tới cổng PayOS. Vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
+                                            <h4 className="text-xl font-bold text-gray-900 dark:text-white">Khởi Tạo Thất Bại</h4>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 max-w-sm">Đã có sự cố kết nối tới cổng PayOS. Vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
                                             <button onClick={() => setPaymentStep('info')} className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold">
                                                 Thử lại
                                             </button>
@@ -577,20 +580,20 @@ const PricingPage = () => {
             {/* LOGIN PROMPT MODAL */}
             {showLoginModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
-                        <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border border-gray-200 dark:border-slate-800">
+                        <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
                             🔒
                         </div>
-                        <h4 className="text-lg font-bold text-gray-900">Yêu Cầu Đăng Nhập</h4>
-                        <p className="text-xs text-gray-500 mt-2 mb-6">Bạn cần đăng nhập hoặc tạo tài khoản trước khi thực hiện thanh toán gói dịch vụ.</p>
+                        <h4 className="text-lg font-bold text-gray-900 dark:text-white">Yêu Cầu Đăng Nhập</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-6">Bạn cần đăng nhập hoặc tạo tài khoản trước khi thực hiện thanh toán gói dịch vụ.</p>
                         <div className="space-y-2">
                             <Link to="/login" className="w-full block py-2.5 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700">
                                 Đăng nhập tài khoản
                             </Link>
-                            <Link to="/register" className="w-full block py-2.5 border border-gray-200 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-50">
+                            <Link to="/register" className="w-full block py-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-xl font-bold text-xs hover:bg-gray-50 dark:hover:bg-slate-800">
                                 Đăng ký tài khoản mới
                             </Link>
-                            <button onClick={() => setShowLoginModal(false)} className="text-xs text-gray-400 mt-2 hover:underline">
+                            <button onClick={() => setShowLoginModal(false)} className="text-xs text-gray-400 dark:text-gray-500 mt-2 hover:underline">
                                 Đóng
                             </button>
                         </div>

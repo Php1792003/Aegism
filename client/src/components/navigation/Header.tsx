@@ -1,9 +1,22 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { HiBars3, HiXMark } from 'react-icons/hi2';
+import {
+    HiBars3,
+    HiXMark,
+    HiChevronDown,
+    HiOutlineSquares2X2,
+    HiOutlineCog6Tooth,
+    HiOutlineCreditCard,
+    HiOutlineArrowRightOnRectangle,
+    HiOutlineGlobeAlt,
+    HiOutlineBuildingOffice2,
+    HiOutlineSparkles,
+    HiOutlinePhone,
+} from 'react-icons/hi2';
 import Swal from 'sweetalert2';
 import { gsap } from 'gsap';
 import { getAvatar } from '@/utils/formatters';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface NavItem {
     path: string;
@@ -306,13 +319,13 @@ const Header = () => {
         if (isMobile) {
             return `block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                 isActive
-                    ? 'text-[#2563EB] bg-blue-50 font-bold'
-                    : 'text-gray-700 hover:text-[#2563EB] hover:bg-gray-50'
+                    ? 'text-[#2563EB] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 font-bold'
+                    : 'text-gray-700 dark:text-gray-200 hover:text-[#2563EB] dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-800/50'
             }`;
         }
         return isActive
-            ? 'font-bold text-[#2563EB]'
-            : 'font-medium text-gray-600 hover:text-[#2563EB] transition-colors';
+            ? 'font-bold text-[#2563EB] dark:text-blue-400'
+            : 'font-medium text-gray-600 dark:text-gray-300 hover:text-[#2563EB] dark:hover:text-blue-400 transition-colors';
     };
 
     // Micro-interactions cho nút CTA (hover scale nhẹ nhàng bằng GSAP, không tracking theo chuột)
@@ -328,8 +341,8 @@ const Header = () => {
             ref={headerRef}
             className={`sticky top-0 z-50 font-sans transition-all duration-300 ${
                 scrolled
-                    ? 'bg-white/85 backdrop-blur-md shadow-md border-b border-gray-100/70'
-                    : 'bg-white shadow-sm'
+                    ? 'bg-white/90 dark:bg-[#070d18]/90 backdrop-blur-md shadow-md border-b border-gray-100/80 dark:border-slate-800/80'
+                    : 'bg-white dark:bg-[#070d18] shadow-sm dark:border-b dark:border-slate-800/50'
             }`}
         >
             <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
@@ -346,7 +359,7 @@ const Header = () => {
                         </Link>
                     </div>
 
-                    {/* Desktop Navigation - Giữ nguyên chữ như cũ, căn chuẩn 100% */}
+                    {/* Desktop Navigation */}
                     <nav
                         ref={navRef}
                         onMouseLeave={() => syncActiveIndicator(false)}
@@ -368,7 +381,7 @@ const Header = () => {
                         {/* Thanh chỉ báo trượt GSAP chuẩn xác: left-0, m-0, không bị lệch */}
                         <span
                             ref={indicatorRef}
-                            className="absolute bottom-0 left-0 m-0 h-[2.5px] bg-[#2563EB] rounded-full shadow-[0_2px_8px_rgba(37,99,235,0.4)] pointer-events-none opacity-0"
+                            className="absolute bottom-0 left-0 m-0 h-[2.5px] bg-[#2563EB] dark:bg-blue-400 rounded-full shadow-[0_2px_8px_rgba(37,99,235,0.4)] pointer-events-none opacity-0"
                             style={{ left: 0, margin: 0 }}
                             aria-hidden="true"
                         />
@@ -376,6 +389,7 @@ const Header = () => {
 
                     {/* CTA / User */}
                     <div ref={ctaRef} className="flex items-center gap-3">
+                        <ThemeToggle compact />
                         {isLoggedIn ? (
                             /* Avatar dropdown khi đã đăng nhập */
                             <div className="relative" ref={dropdownRef}>
@@ -388,87 +402,101 @@ const Header = () => {
                                         alt="Avatar"
                                         className="w-9 h-9 rounded-full object-cover border-2 border-[#2563EB] shadow-sm"
                                     />
-                                    <span className="hidden md:block text-sm font-semibold text-gray-700 max-w-[120px] truncate">
+                                    <span className="hidden md:block text-sm font-semibold text-gray-700 dark:text-gray-200 max-w-[120px] truncate">
                                         {user.name}
                                     </span>
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
+                                    <HiChevronDown
+                                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                                    />
                                 </button>
 
                                 {dropdownOpen && (
                                     <div
                                         ref={dropdownMenuRef}
-                                        className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                                        className="absolute right-0 mt-2.5 w-60 bg-white/95 dark:bg-[#0c1425]/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-slate-900/10 dark:shadow-black/70 border border-gray-100 dark:border-slate-800/80 z-50 overflow-hidden p-1.5 transition-all"
                                     >
-                                        <div className="px-4 py-3 border-b border-gray-100">
-                                            <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">
-                                                {user.isSuperAdmin ? 'Super Admin' : 'Thành viên'}
-                                            </p>
+                                        <div className="px-3.5 py-3 mb-1 rounded-xl bg-gray-50/80 dark:bg-slate-800/40 border border-gray-100/80 dark:border-slate-800/50">
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.name}</p>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+                                                <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 truncate">
+                                                    {user.isSuperAdmin ? 'Super Admin' : 'Thành viên'}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="md:hidden py-1 border-b border-gray-100">
+
+                                        <div className="md:hidden py-1 space-y-0.5 border-b border-gray-100 dark:border-slate-800/60 mb-1">
                                             <Link
                                                 to="/"
                                                 onClick={closeDropdown}
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#2563EB] transition-colors"
+                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                             >
-                                                🌐 Trang chủ
+                                                <HiOutlineGlobeAlt className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                                                <span>Trang chủ</span>
                                             </Link>
                                             <Link
                                                 to="/about"
                                                 onClick={closeDropdown}
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#2563EB] transition-colors"
+                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                             >
-                                                🏢 Giới thiệu
+                                                <HiOutlineBuildingOffice2 className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                                                <span>Giới thiệu</span>
                                             </Link>
                                             <Link
                                                 to="/features"
                                                 onClick={closeDropdown}
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#2563EB] transition-colors"
+                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                             >
-                                                ⭐ Tính năng
+                                                <HiOutlineSparkles className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                                                <span>Tính năng</span>
                                             </Link>
                                             <Link
                                                 to="/contact"
                                                 onClick={closeDropdown}
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#2563EB] transition-colors"
+                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                             >
-                                                📞 Liên hệ
+                                                <HiOutlinePhone className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                                                <span>Liên hệ</span>
                                             </Link>
                                         </div>
-                                        <div className="py-1">
+
+                                        <div className="py-0.5 space-y-0.5">
                                             <Link
                                                 to={user.isSuperAdmin ? '/super-admin/dashboard' : '/dashboard'}
                                                 onClick={closeDropdown}
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#2563EB] transition-colors"
+                                                className="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                             >
-                                                🏠 Vào Dashboard
+                                                <HiOutlineSquares2X2 className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                                                <span>Vào Dashboard</span>
                                             </Link>
                                             <Link
                                                 to="/profile"
                                                 onClick={closeDropdown}
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#2563EB] transition-colors"
+                                                className="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                             >
-                                                ⚙️ Cài đặt tài khoản
+                                                <HiOutlineCog6Tooth className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                                                <span>Cài đặt tài khoản</span>
                                             </Link>
                                             <Link
                                                 to="/pricing"
                                                 onClick={closeDropdown}
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#2563EB] transition-colors"
+                                                className="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                             >
-                                                💳 Nâng cấp gói
+                                                <HiOutlineCreditCard className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                                                <span>Nâng cấp gói</span>
                                             </Link>
                                         </div>
-                                        <div className="border-t border-gray-100 py-1">
+
+                                        <div className="pt-1 mt-1 border-t border-gray-100 dark:border-slate-800/60">
                                             <button
                                                 onClick={() => {
                                                     closeDropdown();
                                                     handleLogout();
                                                 }}
-                                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                                className="group flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                                             >
-                                                🚪 Đăng xuất
+                                                <HiOutlineArrowRightOnRectangle className="w-4 h-4 text-rose-500 dark:text-rose-400 group-hover:translate-x-0.5 transition-transform" />
+                                                <span>Đăng xuất</span>
                                             </button>
                                         </div>
                                     </div>
@@ -489,7 +517,7 @@ const Header = () => {
                                     to="/login"
                                     onMouseEnter={handleCtaEnter}
                                     onMouseLeave={handleCtaLeave}
-                                    className="hidden h-10 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-neutral-100 px-4 text-sm font-bold leading-normal tracking-[0.015em] text-neutral-700 transition-colors hover:bg-neutral-200 active:scale-95 sm:flex"
+                                    className="hidden h-10 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-neutral-100 dark:bg-slate-800 px-4 text-sm font-bold leading-normal tracking-[0.015em] text-neutral-700 dark:text-gray-200 transition-colors hover:bg-neutral-200 dark:hover:bg-slate-700 active:scale-95 sm:flex"
                                 >
                                     Đăng nhập
                                 </Link>
@@ -502,7 +530,7 @@ const Header = () => {
                                 type="button"
                                 onClick={toggleMobileMenu}
                                 aria-label={mobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
-                                className="ml-2 md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition-transform active:scale-95"
+                                className="ml-2 md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none transition-transform active:scale-95"
                             >
                                 {!mobileMenuOpen ? <HiBars3 className="h-6 w-6" /> : <HiXMark className="h-6 w-6" />}
                             </button>
@@ -512,7 +540,7 @@ const Header = () => {
 
                 {/* Mobile menu */}
                 {mobileMenuOpen && (
-                    <div ref={mobileMenuRef} className="md:hidden border-t border-gray-100 overflow-hidden">
+                    <div ref={mobileMenuRef} className="md:hidden border-t border-gray-100 dark:border-slate-800 bg-white/95 dark:bg-[#0d1527]/95 backdrop-blur-md px-4 pt-2 pb-6 space-y-1 shadow-lg">
                         <div className="pt-2 pb-3 space-y-1">
                             {NAV_ITEMS.map((item) => (
                                 <Link
@@ -525,23 +553,34 @@ const Header = () => {
                                     {item.label}
                                 </Link>
                             ))}
-                            <div className="border-t border-gray-100 my-2 pt-2">
+                            <div className="border-t border-gray-100 dark:border-slate-800 my-2 pt-2">
                                 {isLoggedIn ? (
                                     <>
                                         <Link
-                                            to="/dashboard"
+                                            to={user.isSuperAdmin ? '/super-admin/dashboard' : '/dashboard'}
                                             data-mobile-item
                                             onClick={() => closeMobileMenu()}
-                                            className="block px-3 py-2 rounded-md text-base font-medium text-[#2563EB] hover:bg-blue-50"
+                                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
                                         >
-                                            🏠 Vào Dashboard
+                                            <HiOutlineSquares2X2 className="w-4 h-4" />
+                                            <span>Vào Dashboard</span>
+                                        </Link>
+                                        <Link
+                                            to="/profile"
+                                            data-mobile-item
+                                            onClick={() => closeMobileMenu()}
+                                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+                                        >
+                                            <HiOutlineCog6Tooth className="w-4 h-4 text-gray-400" />
+                                            <span>Cài đặt tài khoản</span>
                                         </Link>
                                         <button
                                             data-mobile-item
                                             onClick={() => closeMobileMenu(() => handleLogout())}
-                                            className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
+                                            className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition"
                                         >
-                                            🚪 Đăng xuất
+                                            <HiOutlineArrowRightOnRectangle className="w-4 h-4 text-rose-500" />
+                                            <span>Đăng xuất</span>
                                         </button>
                                     </>
                                 ) : (
@@ -549,7 +588,7 @@ const Header = () => {
                                         <Link
                                             to="/login"
                                             data-mobile-item
-                                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#2563EB] hover:bg-gray-50"
+                                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-[#2563EB] dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-800"
                                             onClick={() => closeMobileMenu()}
                                         >
                                             Đăng nhập
