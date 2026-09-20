@@ -2,6 +2,22 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import * as fs from 'fs';
+
+const getStaticPath = (dirName: string): string => {
+  const candidates = [
+    join(__dirname, '..', '..', dirName), // When running compiled from dist/src/
+    join(__dirname, '..', dirName),       // When running from src/
+    join(process.cwd(), 'server', dirName), // When running from repo root
+    join(process.cwd(), dirName),           // When running from server/
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return join(process.cwd(), dirName);
+};
 
 // Core Modules
 import { AppController } from './app.controller';
@@ -51,11 +67,11 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
     ServeStaticModule.forRoot(
       {
-        rootPath: join(__dirname, '..', 'uploads'),
+        rootPath: getStaticPath('uploads'),
         serveRoot: '/uploads',
       },
       {
-        rootPath: join(__dirname, '..', 'public'),
+        rootPath: getStaticPath('public'),
       }
     ),
 

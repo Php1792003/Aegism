@@ -145,7 +145,16 @@ const SuperAdminLayout = () => {
                     {sidebarOpen ? (
                         <>
                             <div className="flex items-center gap-3 mb-3 px-1">
-                                <img src={user.avatar || 'https://ui-avatars.com/api/?name=Admin&background=random'} className="w-9 h-9 rounded-full border-2 border-purple-500 flex-shrink-0" alt="avatar" />
+                                <img
+                                    src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`}
+                                    onError={(e) => {
+                                        const target = e.currentTarget;
+                                        target.onerror = null;
+                                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`;
+                                    }}
+                                    className="w-9 h-9 rounded-full border-2 border-purple-500 flex-shrink-0 object-cover"
+                                    alt="avatar"
+                                />
                                 <div>
                                     <div className="text-white text-sm font-semibold truncate">{user.name}</div>
                                     <div className="text-purple-400 text-xs truncate">Super Administrator</div>
@@ -158,7 +167,17 @@ const SuperAdminLayout = () => {
                         </>
                     ) : (
                         <>
-                            <img src={user.avatar || 'https://ui-avatars.com/api/?name=Admin&background=random'} className="w-8 h-8 rounded-full border-2 border-purple-500" alt="avatar" title={user.name} />
+                            <img
+                                src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`}
+                                onError={(e) => {
+                                    const target = e.currentTarget;
+                                    target.onerror = null;
+                                    target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Admin')}&background=4F46E5&color=fff&bold=true&size=128`;
+                                }}
+                                className="w-8 h-8 rounded-full border-2 border-purple-500 object-cover"
+                                alt="avatar"
+                                title={user.name}
+                            />
                             <button onClick={handleLogout} className="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors" title="Đăng xuất">
                                 <HiOutlineLogout className="w-4 h-4" />
                             </button>

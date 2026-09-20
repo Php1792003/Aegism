@@ -363,13 +363,31 @@ const MainLayout = () => {
                                     <div className="text-sm font-bold text-gray-800 leading-tight">{user.name}</div>
                                     <div className="text-[11px] uppercase font-bold text-blue-600 mt-0.5 tracking-wide">{user.roleName}</div>
                                 </div>
-                                <img className="h-10 w-10 rounded-full object-cover border-2 border-gray-100 shadow-sm" src={user.avatar} alt="Avatar" />
+                                <img
+                                    className="h-10 w-10 rounded-full object-cover border-2 border-gray-100 shadow-sm"
+                                    src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=4F46E5&color=fff&bold=true&size=128`}
+                                    onError={(e) => {
+                                        const target = e.currentTarget;
+                                        target.onerror = null;
+                                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=4F46E5&color=fff&bold=true&size=128`;
+                                    }}
+                                    alt="Avatar"
+                                />
                             </div>
                             <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:right-0 top-[72px] sm:top-full mt-1 sm:w-80 bg-white rounded-xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top sm:origin-top-right z-50">
                                 <div className="absolute -top-2 right-6 sm:right-4 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
                                 <div className="p-6 relative bg-white rounded-xl z-20">
                                     <div className="flex items-center space-x-4 mb-4">
-                                        <img className="h-14 w-14 rounded-full object-cover border-2 border-blue-500 p-0.5" src={user.avatar} alt="Large Avatar" />
+                                        <img
+                                            className="h-14 w-14 rounded-full object-cover border-2 border-blue-500 p-0.5"
+                                            src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=4F46E5&color=fff&bold=true&size=128`}
+                                            onError={(e) => {
+                                                const target = e.currentTarget;
+                                                target.onerror = null;
+                                                target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=4F46E5&color=fff&bold=true&size=128`;
+                                            }}
+                                            alt="Large Avatar"
+                                        />
                                         <div>
                                             <h3 className="text-lg font-bold text-gray-900">{user.name}</h3>
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{user.roleName}</span>
