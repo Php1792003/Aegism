@@ -229,23 +229,50 @@ const PricingPage = () => {
                         </p>
 
                         {/* Billing Switch */}
-                        <div data-reveal="up" className="flex justify-center items-center gap-4 mt-8">
-                            <span className={`text-sm font-semibold ${cycle === 'monthly' ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>
-                                Thanh toán hàng tháng
-                            </span>
-                            <button
-                                onClick={() => setCycle(c => c === 'monthly' ? 'yearly' : 'monthly')}
-                                className="w-14 h-7 bg-blue-600 rounded-full p-1 transition-colors duration-200 focus:outline-none relative flex items-center"
-                                aria-label="Chuyển đổi chu kỳ thanh toán"
-                            >
-                                <div className={`w-5 h-5 bg-white rounded-full transition-transform duration-200 transform ${cycle === 'yearly' ? 'translate-x-7' : ''}`} />
-                            </button>
-                            <span className={`text-sm font-semibold flex items-center gap-1.5 ${cycle === 'yearly' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}>
-                                Thanh toán hàng năm
-                                <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                    Tiết kiệm 20%
-                                </span>
-                            </span>
+                        <div data-reveal="up" className="mt-8 flex justify-center px-2">
+                            <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-200/80 dark:border-slate-800 shadow-sm shadow-slate-900/5">
+                                <button
+                                    type="button"
+                                    onClick={() => setCycle('monthly')}
+                                    className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                                        cycle === 'monthly'
+                                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shadow-sm'
+                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Hàng tháng
+                                </button>
+
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked={cycle === 'yearly'}
+                                    aria-label="Chuyển chu kỳ thanh toán"
+                                    onClick={() => setCycle((c) => (c === 'monthly' ? 'yearly' : 'monthly'))}
+                                    className="relative h-7 w-12 sm:h-8 sm:w-14 shrink-0 rounded-full bg-blue-600 p-1 transition-all active:scale-95 focus:outline-none"
+                                >
+                                    <span
+                                        className={`block h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                                            cycle === 'yearly' ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0'
+                                        }`}
+                                    />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setCycle('yearly')}
+                                    className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                                        cycle === 'yearly'
+                                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shadow-sm'
+                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    <span>Hàng năm</span>
+                                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 text-[10px] sm:text-xs font-black text-emerald-700 dark:text-emerald-300 border border-emerald-300/40">
+                                        Tiết kiệm 20%
+                                    </span>
+                                </button>
+                            </div>
                         </div>
 
                         {/* Promo Voucher Banner */}

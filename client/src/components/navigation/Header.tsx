@@ -4,6 +4,8 @@ import {
     HiBars3,
     HiXMark,
     HiChevronDown,
+    HiChevronRight,
+    HiOutlineHome,
     HiOutlineSquares2X2,
     HiOutlineCog6Tooth,
     HiOutlineCreditCard,
@@ -12,6 +14,7 @@ import {
     HiOutlineBuildingOffice2,
     HiOutlineSparkles,
     HiOutlinePhone,
+    HiOutlineShieldCheck,
 } from 'react-icons/hi2';
 import Swal from 'sweetalert2';
 import { gsap } from 'gsap';
@@ -21,6 +24,8 @@ import ThemeToggle from '@/components/ThemeToggle';
 interface NavItem {
     path: string;
     label: string;
+    desc: string;
+    icon: React.ComponentType<{ className?: string }>;
 }
 
 interface UserInfo {
@@ -30,11 +35,36 @@ interface UserInfo {
 }
 
 const NAV_ITEMS: NavItem[] = [
-    { path: '/', label: 'Trang chủ' },
-    { path: '/about', label: 'Giới thiệu' },
-    { path: '/pricing', label: 'Bảng giá' },
-    { path: '/features', label: 'Tính năng' },
-    { path: '/contact', label: 'Liên hệ' },
+    {
+        path: '/',
+        label: 'Trang chủ',
+        desc: 'Tổng quan & trung tâm an ninh',
+        icon: HiOutlineHome,
+    },
+    {
+        path: '/about',
+        label: 'Giới thiệu',
+        desc: 'Sứ mệnh & giải pháp Aegism',
+        icon: HiOutlineBuildingOffice2,
+    },
+    {
+        path: '/pricing',
+        label: 'Bảng giá',
+        desc: 'Gói dịch vụ minh bạch & linh hoạt',
+        icon: HiOutlineCreditCard,
+    },
+    {
+        path: '/features',
+        label: 'Tính năng',
+        desc: 'Tuần tra QR, GPS & AI giám sát',
+        icon: HiOutlineSparkles,
+    },
+    {
+        path: '/contact',
+        label: 'Liên hệ',
+        desc: 'Tư vấn & Hỗ trợ kỹ thuật 24/7',
+        icon: HiOutlinePhone,
+    },
 ];
 
 const getStoredUser = (): { isLoggedIn: boolean; user: UserInfo } => {
@@ -177,27 +207,27 @@ const Header = () => {
                 opacity: 0,
                 duration: 0.7,
             })
-            // 2. Logo bung ra với hiệu ứng lò xo nhẹ
-            .from(logoRef.current, {
-                scale: 0.85,
-                opacity: 0,
-                duration: 0.5,
-                ease: 'back.out(1.7)',
-            }, '-=0.4')
-            // 3. Các mục điều hướng rơi nhẹ lần lượt
-            .from('[data-nav-link]', {
-                y: -14,
-                opacity: 0,
-                duration: 0.45,
-                stagger: 0.06,
-            }, '-=0.35')
-            // 4. Cụm nút hành động / Đăng nhập xuất hiện
-            .from(ctaRef.current, {
-                scale: 0.92,
-                opacity: 0,
-                duration: 0.5,
-                ease: 'back.out(1.5)',
-            }, '-=0.3');
+                // 2. Logo bung ra với hiệu ứng lò xo nhẹ
+                .from(logoRef.current, {
+                    scale: 0.85,
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: 'back.out(1.7)',
+                }, '-=0.4')
+                // 3. Các mục điều hướng rơi nhẹ lần lượt
+                .from('[data-nav-link]', {
+                    y: -14,
+                    opacity: 0,
+                    duration: 0.45,
+                    stagger: 0.06,
+                }, '-=0.35')
+                // 4. Cụm nút hành động / Đăng nhập xuất hiện
+                .from(ctaRef.current, {
+                    scale: 0.92,
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: 'back.out(1.5)',
+                }, '-=0.3');
         }, headerRef);
 
         return () => ctx.revert();
@@ -317,11 +347,10 @@ const Header = () => {
     const getLinkClass = (path: string, isMobile = false) => {
         const isActive = location.pathname === path;
         if (isMobile) {
-            return `block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                isActive
+            return `block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive
                     ? 'text-[#2563EB] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 font-bold'
                     : 'text-gray-700 dark:text-gray-200 hover:text-[#2563EB] dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-800/50'
-            }`;
+                }`;
         }
         return isActive
             ? 'font-bold text-[#2563EB] dark:text-blue-400'
@@ -339,11 +368,10 @@ const Header = () => {
     return (
         <header
             ref={headerRef}
-            className={`sticky top-0 z-50 font-sans transition-all duration-300 ${
-                scrolled
+            className={`sticky top-0 z-50 font-sans transition-all duration-300 ${scrolled
                     ? 'bg-white/90 dark:bg-[#070d18]/90 backdrop-blur-md shadow-md border-b border-gray-100/80 dark:border-slate-800/80'
                     : 'bg-white dark:bg-[#070d18] shadow-sm dark:border-b dark:border-slate-800/50'
-            }`}
+                }`}
         >
             <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
                 <div className={`flex justify-between items-center transition-all duration-300 ${scrolled ? 'h-14' : 'h-16'}`}>
@@ -363,7 +391,7 @@ const Header = () => {
                     <nav
                         ref={navRef}
                         onMouseLeave={() => syncActiveIndicator(false)}
-                        className="relative hidden md:flex md:items-center md:gap-4 lg:gap-10 text-sm lg:text-base whitespace-nowrap py-1"
+                        className="relative hidden lg:flex lg:items-center lg:gap-8 xl:gap-10 text-sm lg:text-base whitespace-nowrap py-1"
                     >
                         {NAV_ITEMS.map((item) => (
                             <Link
@@ -388,7 +416,7 @@ const Header = () => {
                     </nav>
 
                     {/* CTA / User */}
-                    <div ref={ctaRef} className="flex items-center gap-3">
+                    <div ref={ctaRef} className="flex items-center gap-2 sm:gap-3">
                         <ThemeToggle compact />
                         {isLoggedIn ? (
                             /* Avatar dropdown khi đã đăng nhập */
@@ -423,41 +451,6 @@ const Header = () => {
                                                     {user.isSuperAdmin ? 'Super Admin' : 'Thành viên'}
                                                 </p>
                                             </div>
-                                        </div>
-
-                                        <div className="md:hidden py-1 space-y-0.5 border-b border-gray-100 dark:border-slate-800/60 mb-1">
-                                            <Link
-                                                to="/"
-                                                onClick={closeDropdown}
-                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                                            >
-                                                <HiOutlineGlobeAlt className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
-                                                <span>Trang chủ</span>
-                                            </Link>
-                                            <Link
-                                                to="/about"
-                                                onClick={closeDropdown}
-                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                                            >
-                                                <HiOutlineBuildingOffice2 className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
-                                                <span>Giới thiệu</span>
-                                            </Link>
-                                            <Link
-                                                to="/features"
-                                                onClick={closeDropdown}
-                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                                            >
-                                                <HiOutlineSparkles className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
-                                                <span>Tính năng</span>
-                                            </Link>
-                                            <Link
-                                                to="/contact"
-                                                onClick={closeDropdown}
-                                                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                                            >
-                                                <HiOutlinePhone className="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
-                                                <span>Liên hệ</span>
-                                            </Link>
                                         </div>
 
                                         <div className="py-0.5 space-y-0.5">
@@ -509,7 +502,7 @@ const Header = () => {
                                     to="/request-demo"
                                     onMouseEnter={handleCtaEnter}
                                     onMouseLeave={handleCtaLeave}
-                                    className="hidden md:inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#2563EB] hover:bg-blue-700 transition-shadow hover:shadow-blue-500/25 hover:shadow-lg active:scale-95"
+                                    className="hidden lg:inline-flex items-center justify-center px-4 xl:px-5 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-[#2563EB] hover:bg-blue-700 transition-all hover:shadow-blue-500/25 hover:shadow-lg active:scale-95"
                                 >
                                     Dùng thử miễn phí
                                 </Link>
@@ -517,92 +510,180 @@ const Header = () => {
                                     to="/login"
                                     onMouseEnter={handleCtaEnter}
                                     onMouseLeave={handleCtaLeave}
-                                    className="hidden h-10 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-neutral-100 dark:bg-slate-800 px-4 text-sm font-bold leading-normal tracking-[0.015em] text-neutral-700 dark:text-gray-200 transition-colors hover:bg-neutral-200 dark:hover:bg-slate-700 active:scale-95 sm:flex"
+                                    className="hidden h-10 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-neutral-100 dark:bg-slate-800 px-4 text-sm font-semibold leading-normal text-neutral-700 dark:text-gray-200 transition-colors hover:bg-neutral-200 dark:hover:bg-slate-700 active:scale-95 lg:flex"
                                 >
                                     Đăng nhập
                                 </Link>
                             </>
                         )}
 
-                        {/* Mobile menu button */}
-                        {!isLoggedIn && (
-                            <button
-                                type="button"
-                                onClick={toggleMobileMenu}
-                                aria-label={mobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
-                                className="ml-2 md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none transition-transform active:scale-95"
-                            >
-                                {!mobileMenuOpen ? <HiBars3 className="h-6 w-6" /> : <HiXMark className="h-6 w-6" />}
-                            </button>
-                        )}
+                        {/* Mobile & Tablet menu toggle button */}
+                        <button
+                            type="button"
+                            onClick={toggleMobileMenu}
+                            aria-label={mobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
+                            className="ml-1 lg:hidden inline-flex items-center justify-center p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-slate-800/80 focus:outline-none transition-all active:scale-95 border border-gray-200/50 dark:border-slate-800"
+                        >
+                            {!mobileMenuOpen ? (
+                                <HiBars3 className="h-6 w-6" />
+                            ) : (
+                                <HiXMark className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                            )}
+                        </button>
                     </div>
                 </div>
 
-                {/* Mobile menu */}
+                {/* Mobile & Tablet Drawer Menu */}
                 {mobileMenuOpen && (
-                    <div ref={mobileMenuRef} className="md:hidden border-t border-gray-100 dark:border-slate-800 bg-white/95 dark:bg-[#0d1527]/95 backdrop-blur-md px-4 pt-2 pb-6 space-y-1 shadow-lg">
-                        <div className="pt-2 pb-3 space-y-1">
-                            {NAV_ITEMS.map((item) => (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    data-mobile-item
-                                    className={getLinkClass(item.path, true)}
-                                    onClick={() => closeMobileMenu()}
-                                >
-                                    {item.label}
-                                </Link>
-                            ))}
-                            <div className="border-t border-gray-100 dark:border-slate-800 my-2 pt-2">
-                                {isLoggedIn ? (
-                                    <>
+                    <div
+                        ref={mobileMenuRef}
+                        className="lg:hidden border-t border-gray-100 dark:border-slate-800/80 bg-white/95 dark:bg-[#070d18]/95 backdrop-blur-xl px-3.5 sm:px-6 pt-3 pb-5 shadow-2xl shadow-blue-900/10 dark:shadow-black/70 overflow-hidden rounded-b-2xl"
+                    >
+                        {/* Navigation Cards List */}
+                        <div className="space-y-1.5 py-1">
+                            {NAV_ITEMS.map((item) => {
+                                const isActive = location.pathname === item.path;
+                                const IconComponent = item.icon || HiOutlineGlobeAlt;
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        data-mobile-item
+                                        onClick={() => closeMobileMenu()}
+                                        className={`group flex items-center justify-between p-2.5 sm:p-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${
+                                            isActive
+                                                ? 'bg-blue-50/90 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/60 shadow-sm'
+                                                : 'hover:bg-gray-50/80 dark:hover:bg-slate-800/40 border border-transparent hover:border-gray-200/50 dark:hover:border-slate-800/50'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div
+                                                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+                                                    isActive
+                                                        ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25'
+                                                        : 'bg-gray-100 dark:bg-slate-800/90 text-gray-500 dark:text-slate-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/40 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                                                }`}
+                                            >
+                                                <IconComponent className="w-5 h-5" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p
+                                                    className={`text-sm font-semibold truncate ${
+                                                        isActive
+                                                            ? 'text-blue-600 dark:text-blue-400 font-bold'
+                                                            : 'text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                                                    }`}
+                                                >
+                                                    {item.label}
+                                                </p>
+                                                {item.desc && (
+                                                    <p className="text-[11px] text-gray-500 dark:text-slate-400 truncate">
+                                                        {item.desc}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center pl-2 flex-shrink-0">
+                                            {isActive ? (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/30">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse" />
+                                                    Đang xem
+                                                </span>
+                                            ) : (
+                                                <HiChevronRight className="w-4 h-4 text-gray-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                                            )}
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+
+                        {/* User or Guest Action Section */}
+                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-800/80">
+                            {isLoggedIn ? (
+                                /* Logged-in profile preview card & actions */
+                                <div data-mobile-item className="space-y-2.5">
+                                    <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-50/80 dark:bg-slate-800/40 border border-gray-100 dark:border-slate-800/60">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <img
+                                                src={user.avatar}
+                                                alt={user.name}
+                                                className="w-10 h-10 rounded-full object-cover border-2 border-blue-600 shadow-sm flex-shrink-0"
+                                            />
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.name}</p>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                    <p className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                                                        {user.isSuperAdmin ? 'Super Admin' : 'Thành viên'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => closeMobileMenu(() => handleLogout())}
+                                            className="p-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition active:scale-95"
+                                            title="Đăng xuất"
+                                        >
+                                            <HiOutlineArrowRightOnRectangle className="w-5 h-5" />
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2">
                                         <Link
                                             to={user.isSuperAdmin ? '/super-admin/dashboard' : '/dashboard'}
-                                            data-mobile-item
                                             onClick={() => closeMobileMenu()}
-                                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
+                                            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition"
                                         >
                                             <HiOutlineSquares2X2 className="w-4 h-4" />
-                                            <span>Vào Dashboard</span>
+                                            <span>Dashboard</span>
                                         </Link>
                                         <Link
                                             to="/profile"
-                                            data-mobile-item
                                             onClick={() => closeMobileMenu()}
-                                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+                                            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 font-semibold text-xs active:scale-95 transition"
                                         >
-                                            <HiOutlineCog6Tooth className="w-4 h-4 text-gray-400" />
-                                            <span>Cài đặt tài khoản</span>
+                                            <HiOutlineCog6Tooth className="w-4 h-4" />
+                                            <span>Tài khoản</span>
                                         </Link>
-                                        <button
-                                            data-mobile-item
-                                            onClick={() => closeMobileMenu(() => handleLogout())}
-                                            className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition"
-                                        >
-                                            <HiOutlineArrowRightOnRectangle className="w-4 h-4 text-rose-500" />
-                                            <span>Đăng xuất</span>
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Link
-                                            to="/login"
-                                            data-mobile-item
-                                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-[#2563EB] dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-800"
-                                            onClick={() => closeMobileMenu()}
-                                        >
-                                            Đăng nhập
-                                        </Link>
-                                        <Link
-                                            to="/request-demo"
-                                            data-mobile-item
-                                            className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-[#2563EB] hover:bg-blue-700 mt-1"
-                                            onClick={() => closeMobileMenu()}
-                                        >
-                                            Dùng thử miễn phí
-                                        </Link>
-                                    </>
-                                )}
+                                    </div>
+                                </div>
+                            ) : (
+                                /* Guest action buttons: 2-column grid */
+                                <div data-mobile-item className="grid grid-cols-2 gap-2.5 pt-1">
+                                    <Link
+                                        to="/login"
+                                        onClick={() => closeMobileMenu()}
+                                        className="flex items-center justify-center gap-2 py-2.5 sm:py-3 px-3 rounded-xl font-semibold text-sm border border-gray-200 dark:border-slate-700/80 bg-gray-50/80 dark:bg-slate-800/80 text-gray-700 dark:text-gray-200 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all active:scale-95"
+                                    >
+                                        <HiOutlineArrowRightOnRectangle className="w-4 h-4" />
+                                        <span>Đăng nhập</span>
+                                    </Link>
+                                    <Link
+                                        to="/request-demo"
+                                        onClick={() => closeMobileMenu()}
+                                        className="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 px-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] hover:bg-right shadow-lg shadow-blue-500/25 active:scale-95 transition-all text-center"
+                                    >
+                                        <span>Dùng thử miễn phí</span>
+                                        <HiChevronRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
+                            )}
+
+                            {/* Trust & Hotline badge */}
+                            <div data-mobile-item className="mt-3.5 pt-2.5 border-t border-gray-100/80 dark:border-slate-800/50 flex items-center justify-between text-[11px] text-gray-500 dark:text-slate-400 px-1">
+                                <div className="flex items-center gap-1.5">
+                                    <HiOutlineShieldCheck className="w-4 h-4 text-emerald-500" />
+                                    <span className="font-medium text-gray-600 dark:text-slate-300">An ninh chuẩn ISO</span>
+                                </div>
+                                <a
+                                    href="tel:0905441263"
+                                    className="flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    <HiOutlinePhone className="w-3.5 h-3.5" />
+                                    <span>Hotline: 0905 441 263</span>
+                                </a>
                             </div>
                         </div>
                     </div>

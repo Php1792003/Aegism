@@ -109,6 +109,7 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -219,35 +220,43 @@ html.dark .bg-slate-50\/80 {
 html.dark .to-white {
   --tw-gradient-to: #070d18 var(--tw-gradient-to-position, ) !important;
 }
+
 html.dark .from-white {
   --tw-gradient-from: #0d1527 var(--tw-gradient-from-position, ) !important;
   --tw-gradient-to: rgba(13, 21, 39, 0) var(--tw-gradient-to-position, ) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
+
 html.dark .via-white {
   --tw-gradient-to: rgba(7, 13, 24, 0) var(--tw-gradient-to-position, ) !important;
   --tw-gradient-stops: var(--tw-gradient-from), #0d1527 var(--tw-gradient-via-position, ), var(--tw-gradient-to) !important;
 }
+
 html.dark .from-blue-50,
 html.dark .from-blue-50\/50,
 html.dark .from-blue-50\/60 {
   --tw-gradient-from: rgba(15, 23, 42, 0.8) var(--tw-gradient-from-position, ) !important;
 }
+
 html.dark .to-blue-50,
 html.dark .to-blue-50\/50 {
   --tw-gradient-to: #070d18 var(--tw-gradient-to-position, ) !important;
 }
+
 html.dark .from-sky-50,
 html.dark .from-sky-50\/50 {
   --tw-gradient-from: rgba(15, 23, 42, 0.8) var(--tw-gradient-from-position, ) !important;
 }
+
 html.dark .to-sky-50 {
   --tw-gradient-to: #070d18 var(--tw-gradient-to-position, ) !important;
 }
+
 html.dark .from-gray-50,
 html.dark .from-slate-50 {
   --tw-gradient-from: #0d1527 var(--tw-gradient-from-position, ) !important;
 }
+
 html.dark .to-gray-50,
 html.dark .to-slate-50 {
   --tw-gradient-to: #070d18 var(--tw-gradient-to-position, ) !important;
@@ -275,10 +284,10 @@ html.dark .border-slate-200\/80 {
   border-color: rgba(30, 41, 59, 0.8) !important;
 }
 
-html.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+html.dark .divide-gray-100> :not([hidden])~ :not([hidden]),
+html.dark .divide-gray-200> :not([hidden])~ :not([hidden]),
+html.dark .divide-slate-100> :not([hidden])~ :not([hidden]),
+html.dark .divide-slate-200> :not([hidden])~ :not([hidden]) {
   border-color: #1e293b !important;
 }
 
@@ -292,6 +301,7 @@ html.dark .bg-sky-100 {
   background-color: rgba(37, 99, 235, 0.15) !important;
   border-color: rgba(59, 130, 246, 0.3) !important;
 }
+
 html.dark .text-blue-600,
 html.dark .text-blue-700,
 html.dark .text-blue-800,
@@ -310,6 +320,7 @@ html.dark .bg-emerald-100 {
   background-color: rgba(16, 185, 129, 0.15) !important;
   border-color: rgba(16, 185, 129, 0.3) !important;
 }
+
 html.dark .text-green-600,
 html.dark .text-green-700,
 html.dark .text-green-800,
@@ -331,6 +342,7 @@ html.dark .bg-orange-100 {
   background-color: rgba(245, 158, 11, 0.15) !important;
   border-color: rgba(245, 158, 11, 0.3) !important;
 }
+
 html.dark .text-amber-600,
 html.dark .text-amber-700,
 html.dark .text-amber-800,
@@ -352,6 +364,7 @@ html.dark .bg-red-50\/60 {
   background-color: rgba(239, 68, 68, 0.15) !important;
   border-color: rgba(239, 68, 68, 0.3) !important;
 }
+
 html.dark .text-red-600,
 html.dark .text-red-700,
 html.dark .text-red-800,
@@ -372,6 +385,7 @@ html.dark .bg-violet-100 {
   background-color: rgba(139, 92, 246, 0.15) !important;
   border-color: rgba(139, 92, 246, 0.3) !important;
 }
+
 html.dark .text-purple-600,
 html.dark .text-purple-700,
 html.dark .text-purple-800,
@@ -390,6 +404,7 @@ html.dark .bg-cyan-100 {
   background-color: rgba(6, 182, 212, 0.15) !important;
   border-color: rgba(6, 182, 212, 0.3) !important;
 }
+
 html.dark .text-cyan-600,
 html.dark .text-cyan-700,
 html.dark .text-cyan-800 {
@@ -508,19 +523,23 @@ html.dark .swal2-actions button.swal2-confirm {
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
+
   100% {
     transform: translateY(0px);
   }
 }
 
 @keyframes pulse-slow {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: .5;
   }
@@ -530,6 +549,7 @@ html.dark .swal2-actions button.swal2-confirm {
   from {
     transform: rotate(360deg);
   }
+
   to {
     transform: rotate(0deg);
   }

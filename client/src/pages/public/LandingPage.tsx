@@ -428,7 +428,7 @@ const LandingPage: React.FC = () => {
                 qa('[data-split]').forEach((h) => {
                     const chars = h.querySelectorAll('.split-char');
                     if (chars.length) {
-                        gsap.fromTo(chars, 
+                        gsap.fromTo(chars,
                             { opacity: 0 },
                             {
                                 opacity: 1,
@@ -441,24 +441,54 @@ const LandingPage: React.FC = () => {
                     }
                 });
 
-                /* 6. Reveal theo lô, trái/phải, thu phóng, mở ảnh bằng clip-path */
+                /* 6. Reveal an toàn tuyệt đối theo lô (không bao giờ bị mất nội dung khi scroll hoặc reload) */
                 const upEls = qa('[data-reveal="up"]');
-                gsap.set(upEls, { autoAlpha: 0, y: 48 });
-                ScrollTrigger.batch(upEls, {
-                    start: 'top 90%',
-                    once: true,
-                    onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.12, overwrite: true }),
-                });
+                if (upEls.length) {
+                    gsap.set(upEls, { autoAlpha: 0, y: 36 });
+                    ScrollTrigger.batch(upEls, {
+                        start: 'top 92%',
+                        once: true,
+                        onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1, overwrite: 'auto' }),
+                    });
+                }
 
-                qa('[data-reveal="left"]').forEach((n) =>
-                    gsap.from(n, { x: -90, autoAlpha: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: n, start: 'top 85%', once: true } })
-                );
-                qa('[data-reveal="right"]').forEach((n) =>
-                    gsap.from(n, { x: 90, autoAlpha: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: n, start: 'top 85%', once: true } })
-                );
-                qa('[data-reveal="scale"]').forEach((n) =>
-                    gsap.from(n, { scale: 0.9, autoAlpha: 0, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: n, start: 'top 85%', once: true } })
-                );
+                const leftEls = qa('[data-reveal="left"]');
+                if (leftEls.length) {
+                    gsap.set(leftEls, { autoAlpha: 0, x: desktop ? -40 : 0, y: desktop ? 0 : 25 });
+                    ScrollTrigger.batch(leftEls, {
+                        start: 'top 92%',
+                        once: true,
+                        onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, x: 0, y: 0, duration: 0.85, ease: 'power3.out', stagger: 0.1, overwrite: 'auto' }),
+                    });
+                }
+
+                const rightEls = qa('[data-reveal="right"]');
+                if (rightEls.length) {
+                    gsap.set(rightEls, { autoAlpha: 0, x: desktop ? 40 : 0, y: desktop ? 0 : 25 });
+                    ScrollTrigger.batch(rightEls, {
+                        start: 'top 92%',
+                        once: true,
+                        onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, x: 0, y: 0, duration: 0.85, ease: 'power3.out', stagger: 0.1, overwrite: 'auto' }),
+                    });
+                }
+
+                const scaleEls = qa('[data-reveal="scale"]');
+                if (scaleEls.length) {
+                    gsap.set(scaleEls, { autoAlpha: 0, scale: 0.94 });
+                    ScrollTrigger.batch(scaleEls, {
+                        start: 'top 92%',
+                        once: true,
+                        onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, scale: 1, duration: 0.85, ease: 'expo.out', overwrite: 'auto' }),
+                    });
+                }
+
+                // Cứu cánh (Fail-safe): Tự động hiển thị toàn bộ nội dung nếu sau 1.2s có phần tử nào chưa hiện
+                const safetyTimer = setTimeout(() => {
+                    qa('[data-reveal]').forEach((el) => {
+                        gsap.to(el, { autoAlpha: 1, x: 0, y: 0, scale: 1, duration: 0.3, overwrite: 'auto' });
+                    });
+                }, 1200);
+                cleanups.push(() => clearTimeout(safetyTimer));
 
                 /* 7. Bento: đường quét QR, sóng GPS, xung SOS, cột biểu đồ */
                 qa('[data-scan]').forEach((n) =>
@@ -629,7 +659,7 @@ const LandingPage: React.FC = () => {
                     />
                     <div aria-hidden="true" data-orb className="absolute -left-24 top-10 -z-10 h-96 w-96 rounded-full bg-blue-600/25 blur-3xl" />
                     <div aria-hidden="true" data-orb className="absolute -right-24 top-40 -z-10 h-96 w-96 rounded-full bg-cyan-500/20 blur-3xl" />
-                    <ShieldMark className="pointer-events-none absolute left-1/2 top-24 -z-10 h-[46rem] w-[46rem] -translate-x-1/2 text-blue-300/30" />
+                    <ShieldMark className="pointer-events-none absolute left-1/2 top-20 sm:top-24 -z-10 w-[84vw] max-w-[20rem] sm:max-w-none sm:w-[32rem] md:w-[40rem] lg:w-[46rem] aspect-[100/110] -translate-x-1/2 text-blue-300/25 sm:text-blue-300/30" />
 
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto max-w-5xl lg:max-w-6xl text-center">
@@ -893,8 +923,8 @@ const LandingPage: React.FC = () => {
                                             onClick={() => setActiveTab(idx)}
                                             onKeyDown={onTabKeyDown}
                                             className={`flex min-w-[15rem] items-center gap-4 rounded-2xl border p-4 text-left transition lg:min-w-0 ${focusRing} ${selected
-                                                    ? 'border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                                                    : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-200 hover:border-blue-300 dark:hover:border-blue-500'
+                                                ? 'border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                                                : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-200 hover:border-blue-300 dark:hover:border-blue-500'
                                                 }`}
                                         >
                                             <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${selected ? 'bg-white/15 text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'}`}>
@@ -997,22 +1027,50 @@ const LandingPage: React.FC = () => {
                             desc="Không chi phí ẩn. Đổi gói hoặc thay đổi quy mô bất cứ lúc nào."
                         />
 
-                        <div data-reveal="up" className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                            <span className={`text-sm font-semibold ${cycle === 'monthly' ? 'text-gray-950 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>Thanh toán hàng tháng</span>
-                            <button
-                                type="button"
-                                role="switch"
-                                aria-checked={cycle === 'yearly'}
-                                aria-label="Chuyển sang thanh toán hàng năm"
-                                onClick={() => setCycle((c) => (c === 'monthly' ? 'yearly' : 'monthly'))}
-                                className={`relative h-8 w-14 rounded-full bg-blue-600 p-1 transition ${focusRing}`}
-                            >
-                                <span className={`block h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${cycle === 'yearly' ? 'translate-x-6' : ''}`} />
-                            </button>
-                            <span className={`flex items-center gap-2 text-sm font-semibold ${cycle === 'yearly' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}>
-                                Thanh toán hàng năm
-                                <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">Tiết kiệm 20%</span>
-                            </span>
+                        <div data-reveal="up" className="mt-8 sm:mt-10 flex justify-center px-2">
+                            <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-200/80 dark:border-slate-800 shadow-sm shadow-slate-900/5">
+                                <button
+                                    type="button"
+                                    onClick={() => setCycle('monthly')}
+                                    className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                                        cycle === 'monthly'
+                                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shadow-sm'
+                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Hàng tháng
+                                </button>
+
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked={cycle === 'yearly'}
+                                    aria-label="Chuyển chu kỳ thanh toán"
+                                    onClick={() => setCycle((c) => (c === 'monthly' ? 'yearly' : 'monthly'))}
+                                    className={`relative h-7 w-12 sm:h-8 sm:w-14 shrink-0 rounded-full bg-blue-600 p-1 transition-all active:scale-95 ${focusRing}`}
+                                >
+                                    <span
+                                        className={`block h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                                            cycle === 'yearly' ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0'
+                                        }`}
+                                    />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setCycle('yearly')}
+                                    className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                                        cycle === 'yearly'
+                                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shadow-sm'
+                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    <span>Hàng năm</span>
+                                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 text-[10px] sm:text-xs font-black text-emerald-700 dark:text-emerald-300 border border-emerald-300/40">
+                                        Tiết kiệm 20%
+                                    </span>
+                                </button>
+                            </div>
                         </div>
 
                         <div data-reveal="up" className="mx-auto mt-14 grid max-w-6xl grid-cols-1 items-stretch gap-6 md:grid-cols-3">
@@ -1027,8 +1085,8 @@ const LandingPage: React.FC = () => {
                                     <article
                                         key={plan.planKey}
                                         className={`relative flex flex-col rounded-3xl bg-white dark:bg-slate-900 p-8 transition shadow-sm hover:shadow-md ${highlight
-                                                ? 'border-2 border-blue-600 shadow-2xl shadow-blue-500/15 md:py-12'
-                                                : 'border border-gray-200 dark:border-slate-800'
+                                            ? 'border-2 border-blue-600 shadow-2xl shadow-blue-500/15 md:py-12'
+                                            : 'border border-gray-200 dark:border-slate-800'
                                             }`}
                                     >
                                         {highlight && (
@@ -1066,8 +1124,8 @@ const LandingPage: React.FC = () => {
                                         <Link
                                             to={ctaLink}
                                             className={`block w-full rounded-xl py-3.5 text-center text-sm font-bold transition ${focusRing} ${highlight
-                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700'
-                                                    : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/50 hover:text-blue-600 dark:hover:text-blue-400'
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700'
+                                                : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/50 hover:text-blue-600 dark:hover:text-blue-400'
                                                 }`}
                                         >
                                             {isEnterprise ? 'Liên hệ tư vấn' : `Đăng ký gói ${plan.displayName}`}
@@ -1085,7 +1143,7 @@ const LandingPage: React.FC = () => {
                         <SectionHeading id="reviews-title" title="Các nhà quản lý nói gì về AEGISM" />
 
                         <div className="mx-auto mt-14 grid max-w-5xl gap-8 md:grid-cols-2">
-                            <figure data-reveal="left" className="relative rounded-3xl border border-gray-200 dark:border-slate-800 bg-gradient-to-br from-blue-50/60 to-white dark:from-slate-900/90 dark:to-slate-950/90 p-8 shadow-sm transition hover:shadow-md">
+                            <figure data-reveal="up" className="relative rounded-3xl border border-gray-200 dark:border-slate-800 bg-gradient-to-br from-blue-50/60 to-white dark:from-slate-900/90 dark:to-slate-950/90 p-8 shadow-sm transition hover:shadow-md">
                                 <span aria-hidden="true" className="absolute right-6 top-2 text-8xl font-black leading-none text-blue-200 dark:text-blue-900/30">&rdquo;</span>
                                 <blockquote className="relative text-base italic leading-relaxed text-gray-700 dark:text-slate-200">
                                     Từ khi áp dụng AEGISM, tình trạng bảo vệ bỏ chốt hoặc tuần tra đối phó đã giảm về 0. Tỷ lệ hoàn thành nhiệm vụ theo ca trực hiển thị minh bạch giúp chúng tôi dễ dàng nghiệm thu với chủ đầu tư.
@@ -1099,7 +1157,7 @@ const LandingPage: React.FC = () => {
                                 </figcaption>
                             </figure>
 
-                            <figure data-reveal="right" className="relative rounded-3xl border border-gray-200 dark:border-slate-800 bg-gradient-to-br from-sky-50/60 to-white dark:from-slate-900/90 dark:to-slate-950/90 p-8 shadow-sm transition hover:shadow-md">
+                            <figure data-reveal="up" className="relative rounded-3xl border border-gray-200 dark:border-slate-800 bg-gradient-to-br from-sky-50/60 to-white dark:from-slate-900/90 dark:to-slate-950/90 p-8 shadow-sm transition hover:shadow-md">
                                 <span aria-hidden="true" className="absolute right-6 top-2 text-8xl font-black leading-none text-sky-200 dark:text-sky-900/30">&rdquo;</span>
                                 <blockquote className="relative text-base italic leading-relaxed text-gray-700 dark:text-slate-200">
                                     Giao diện app di động rất dễ dùng, ngay cả các chú bảo vệ lớn tuổi cũng chỉ mất 15 phút là quen thao tác quét QR và chụp ảnh báo cáo sự cố. Rất đáng đồng tiền.
@@ -1169,7 +1227,7 @@ const LandingPage: React.FC = () => {
                 <section data-cta-section aria-labelledby="cta-title" className="relative isolate overflow-hidden bg-[#071328] py-24 text-white">
                     <div aria-hidden="true" data-orb className="absolute -left-20 top-0 -z-10 h-80 w-80 rounded-full bg-blue-600/25 blur-3xl" />
                     <div aria-hidden="true" data-orb className="absolute -right-20 bottom-0 -z-10 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl" />
-                    <ShieldMark className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 text-blue-300/25" />
+                    <ShieldMark className="pointer-events-none absolute left-1/2 top-1/2 -z-10 w-[80vw] max-w-[18rem] sm:max-w-none sm:w-[26rem] md:w-[32rem] aspect-[100/110] -translate-x-1/2 -translate-y-1/2 text-blue-300/25" />
 
                     <div data-reveal="scale" className="container mx-auto max-w-4xl px-4 text-center">
                         <h2 id="cta-title" className="text-3xl font-black leading-tight sm:text-5xl">
