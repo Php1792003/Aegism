@@ -4,7 +4,10 @@
   "description": "AEGISM Desktop Application",
   "main": "dist/main.js",
   "scripts": {
+    "build": "tsc",
     "build:electron": "tsc",
+    "predist": "tsc",
+    "dist": "electron-builder --win",
     "start": "npm run build:electron && electron .",
     "build:win": "npm run build:electron && electron-builder --win"
   },
